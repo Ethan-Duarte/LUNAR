@@ -794,3 +794,75 @@ a {
 .v1-science-entry .lunar-tools > button:nth-child(2) {
   display: none;
 }
+
+/* LUNAR 1.1 engineering workspace */
+.base-map {
+  width: 100%;
+  border: 1px solid #344550;
+  border-radius: 8px;
+  cursor: crosshair;
+  margin: 10px 0;
+  touch-action: manipulation;
+}
+.base-map g {
+  cursor: pointer;
+}
+.base-map g:focus circle {
+  stroke: #e8c676;
+  stroke-width: 3;
+}
+.base-facility-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 12px;
+}
+.base-facility-list button[aria-pressed="true"] {
+  border-color: #e4c982;
+  background: #28353b;
+}
+.base-scene-label {
+  font: 10px monospace;
+  white-space: nowrap;
+  padding: 4px 7px;
+  background: #0e1925e8;
+  border: 1px solid #c7af78;
+  color: #e7e8e5;
+  border-radius: 3px;
+}
+.v1-facility input[type="checkbox"],
+.v1-scroll input[type="checkbox"] {
+  width: auto;
+  display: inline-block;
+  margin-right: 8px;
+}
+.v1-facility input,
+.v1-facility select {
+  max-width: 100%;
+  min-width: 0;
+}
+.v1-facility label {
+  display: block;
+  margin: 6px 0;
+}
+.v1-scroll figure {
+  margin: 12px 0;
+}
+.v1-scroll figcaption {
+  font-size: 11px;
+  color: #9bafb8;
+}
+@media (min-width: 1000px) {
+  .v1-aside {
+    resize: horizontal;
+    overflow: auto;
+    min-width: 330px;
+    max-width: 55vw;
+  }
+  .v1-main {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .v1-aside {
+    width: 390px;
+  }
+}

@@ -1,3 +1,15 @@
+# V1.1 preview additions
+
+The base engineering worker is new screening code. Its analytic energy-conservation, constant-darkness discharge, minimum-storage, RF scaling, eclipse-overlap, disconnected-network and relay-routing checks pass. Production-worker integration runs use shipped JPL/LOLA data and separately synthetic terrain; `qa/v11` preserves the cases. The actual App navigation regression and Base editing/recovery/undo flows are checked in a simulated DOM. These are not unassisted human usability or hardware rendering checks.
+
+Browser partial eclipses now use analytic circular overlap; terrain and eclipse masks still use a product approximation. Explicit loss-of-generation and battery implications are new. Independent eclipse contact timing has not been validated for this version. Python calculations/archives remain unchanged.
+
+Earth-dependent design recommendations remain provisional. No fixed-holdout thresholds have been changed and the older failure remains below. Source terrain has not been upgraded globally by the display remesh. The remote browser could not reach the local preview; no new live hardware rendering claim is made.
+
+See ENGINEERING_V1_1.md for assumptions, limits and sources; NEXT_VERSION_PROGRESS.md separates implemented work from the broader roadmap.
+
+---
+
 # V1.0 scientific evidence and open questions
 
 V1 is a versioned screening prototype. A polished view is not evidence of physical accuracy.

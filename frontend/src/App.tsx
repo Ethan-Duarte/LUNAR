@@ -38,6 +38,11 @@ import { useSiteAnalysis, type SiteAnalysis } from "./ui/useSiteAnalysis";
 import { ScienceWorkspace } from "./lunar/ScienceWorkspace";
 import { exportFile } from "./lunar/science";
 import { observationProject } from "./lunar/project";
+import { MISSION_NOTES } from "./lunar/missionNotes";
+import { focusTerrain } from "./lunar/focusTerrain";
+import { BaseOverlay } from "./lunar/BaseOverlay";
+import type { Link } from "./lunar/engineering";
+import type { Facility } from "./lunar/network";
 import { BasePlanner } from "./lunar/BasePlanner";
 import { LunarCompass } from "./lunar/LunarCompass";
 import "./lunar/lunar.css";
@@ -65,6 +70,17 @@ export default function App() {
     [lon, setLon] = useState(222.8524),
     [finderGrid, setFinderGrid] = useState<FinderGrid | null>(null),
     [finderError, setFinderError] = useState("");
+  const [baseFacilities, setBaseFacilities] = useState<Facility[]>([]);
+  const [baseLinks,setBaseLinks]=useState<Link[]>([]);
+  const basePick = useRef<
+    ((lat: number, lon: number, id?: string) => void) | null
+  >(null);
+  const registerBasePick = useCallback(
+    (fn: (lat: number, lon: number, id?: string) => void) => {
+      basePick.current = fn;
+    },
+    [],
+  );
   const pins = useStore((s) => s.pins),
     activeId = useStore((s) => s.activePin),
     t = useStore((s) => s.tMs),
@@ -133,13 +149,13 @@ export default function App() {
       index
         ? Array.from(
             new Set(
-              pins.flatMap((p) =>
+              [...pins, ...baseFacilities].flatMap((p) =>
                 patchesCovering(index, p.lat, p.lon).map((p) => p.id),
               ),
             ),
           )
         : [],
-    [index, pins],
+    [index, pins, baseFacilities],
   );
   const pending = useRef(new Set<string>());
   useEffect(() => {
@@ -147,7 +163,11 @@ export default function App() {
     for (const id of wanted) {
       if (patches[id] || pending.current.has(id)) continue;
       pending.current.add(id);
-      loadPatch(BASE, index, index.patches.find((p) => p.id === id)!)
+      loadPatch(
+        BASE,
+        index,
+        index.patches.find((p) => p.id === id)!,
+      )
         .then(
           (v) => setPatches((p) => ({ ...p, [id]: v })),
           (e) => setError("Local terrain: " + e.message),
@@ -198,7 +218,7 @@ export default function App() {
       label,
     });
     setError("");
-    setTab("analyze");
+    // Location selection preserves the current workspace.
   }
   function locate(a: number, b: number, label?: string) {
     pin(a, b, label);
@@ -230,9 +250,26 @@ export default function App() {
   const analyses = [a, b, c].filter((v): v is SiteAnalysis => !!v),
     active = analyses.find((a) => a.pin.id === activeId) ?? analyses.at(-1);
   const bodies = ephem ? bodyVectors(ephem, t) : null;
+  const selectedFocus = useMemo(
+    () =>
+      active &&
+      relief &&
+      terrain &&
+      (view === "site" || view === "approach") &&
+      ["natural", "elevation", "slope"].includes(layer)
+        ? focusTerrain(
+            sourceOf(active.pin.lat, active.pin.lon),
+            active.pin.lat,
+            active.pin.lon,
+          )
+        : null,
+    [active?.pin.lat, active?.pin.lon, sourceOf, relief, terrain, view, layer],
+  );
   const shown = wanted
     .map((id) => patches[id])
-    .filter((v): v is Terrain => !!v);
+    .filter((v): v is Terrain => !!v && v.render !== false);
+  const displayTiles = selectedFocus ? [...shown, selectedFocus] : shown;
+  const focusedDetail=useMemo(()=>({...detail,grid:selectedFocus?selectedFocus.levels[0].size-1:detail.grid}),[detail,selectedFocus]);
   useEffect(() => {
     invalidate();
   });
@@ -288,7 +325,7 @@ export default function App() {
       JSON.stringify(
         {
           schema: "lunar-project-1",
-          version: "1.0.0",
+          version: "1.1.0-preview",
           pins,
           time: t,
           observer,
@@ -338,7 +375,7 @@ export default function App() {
       <header className="v1-header">
         <a className="v1-brand" href="#" onClick={(e) => e.preventDefault()}>
           <span className="brand-orbit" />
-          LUNAR <small>FIELD ATLAS / 1.0</small>
+          LUNAR <small>FIELD ATLAS / 1.1 PREVIEW</small>
         </a>
         <div className="v1-header-right">
           <span className="v1-live">
@@ -353,6 +390,8 @@ export default function App() {
                 aria-pressed={advanced === v}
                 onClick={() => {
                   setAdvanced(v);
+                  if (!v && !["analyze", "sites"].includes(tab))
+                    setTab("analyze");
                   useStore.getState().setMode(v ? "plan" : "explore");
                 }}
               >
@@ -378,15 +417,17 @@ export default function App() {
               ["compare", "Compare"],
               ["base", "Base"],
               ["sites", "Sites"],
-            ].map(([id, name]) => (
-              <button
-                key={id}
-                aria-pressed={tab === id}
-                onClick={() => setTab(id)}
-              >
-                {name}
-              </button>
-            ))}
+            ]
+              .filter(([id]) => advanced || id === "analyze" || id === "sites")
+              .map(([id, name]) => (
+                <button
+                  key={id}
+                  aria-pressed={tab === id}
+                  onClick={() => setTab(id)}
+                >
+                  {name}
+                </button>
+              ))}
           </nav>
           <div className="v1-science-entry" hidden={!advanced}>
             <ScienceWorkspace onLocate={(s) => locate(s.lat, s.lon, s.name)} />
@@ -556,11 +597,9 @@ export default function App() {
                       type="number"
                       value={finder.maxSlopeDeg}
                       onChange={(e) =>
-                        useStore
-                          .getState()
-                          .setFinder({
-                            maxSlopeDeg: Math.max(0, +e.target.value),
-                          })
+                        useStore.getState().setFinder({
+                          maxSlopeDeg: Math.max(0, +e.target.value),
+                        })
                       }
                     />
                   </label>
@@ -573,11 +612,9 @@ export default function App() {
                       step=".05"
                       value={finder.sunMin}
                       onChange={(e) =>
-                        useStore
-                          .getState()
-                          .setFinder({
-                            sunMin: Math.max(0, Math.min(1, +e.target.value)),
-                          })
+                        useStore.getState().setFinder({
+                          sunMin: Math.max(0, Math.min(1, +e.target.value)),
+                        })
                       }
                     />
                   </label>
@@ -590,11 +627,9 @@ export default function App() {
                       step=".05"
                       value={finder.earthMin}
                       onChange={(e) =>
-                        useStore
-                          .getState()
-                          .setFinder({
-                            earthMin: Math.max(0, Math.min(1, +e.target.value)),
-                          })
+                        useStore.getState().setFinder({
+                          earthMin: Math.max(0, Math.min(1, +e.target.value)),
+                        })
                       }
                     />
                   </label>
@@ -606,14 +641,12 @@ export default function App() {
                       value={finder.maxPsrKm ?? ""}
                       placeholder="Unrestricted"
                       onChange={(e) =>
-                        useStore
-                          .getState()
-                          .setFinder({
-                            maxPsrKm:
-                              e.target.value === ""
-                                ? null
-                                : Math.max(0, +e.target.value),
-                          })
+                        useStore.getState().setFinder({
+                          maxPsrKm:
+                            e.target.value === ""
+                              ? null
+                              : Math.max(0, +e.target.value),
+                        })
                       }
                     />
                   </label>
@@ -809,6 +842,9 @@ export default function App() {
                 windowStart={windowStart}
                 advanced={advanced}
                 onLocate={locate}
+                onLayout={setBaseFacilities}
+                onLinks={setBaseLinks}
+                onPlaceReady={registerBasePick}
               />
             </div>
             {tab === "sites" && (
@@ -816,11 +852,16 @@ export default function App() {
                 <p className="v1-eyebrow">
                   A REFERENCE LIBRARY, NOT A RECOMMENDATION
                 </p>
-                <h1>Places with context.</h1>
+                <h1>Explore the Moon’s history.</h1>
                 <p>
                   Historical coordinates and announced target regions. Proposed
                   locations are approximate and reflect the supplied catalog,
                   not live mission updates.
+                </p>
+                <p className="v1-note">
+                  Viewing a historical site keeps the current simulation date.
+                  The catalog’s landing date is historical context, not a replay
+                  of that mission.
                 </p>
                 {[
                   ["landed", "Historical landings"],
@@ -838,6 +879,21 @@ export default function App() {
                             {m.agency} · {m.date_utc.slice(0, 10)} ·{" "}
                             {m.lat.toFixed(3)}°, {m.lon.toFixed(3)}°
                           </p>
+                          {MISSION_NOTES[m.id] && (
+                            <>
+                              <p>{MISSION_NOTES[m.id].text}</p>
+                              <p className="v1-note">
+                                Try this: {MISSION_NOTES[m.id].question}
+                              </p>
+                              <a
+                                href={MISSION_NOTES[m.id].source}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                NASA mission history ↗
+                              </a>
+                            </>
+                          )}
                           <div>
                             <button
                               disabled={!ready}
@@ -879,14 +935,12 @@ export default function App() {
               {active && (
                 <button
                   onClick={() =>
-                    useStore
-                      .getState()
-                      .goTo({
-                        kind: "approach",
-                        lat: active.pin.lat,
-                        lon: active.pin.lon,
-                        hM: active.hM,
-                      })
+                    useStore.getState().goTo({
+                      kind: "approach",
+                      lat: active.pin.lat,
+                      lon: active.pin.lon,
+                      hM: active.hM,
+                    })
                   }
                 >
                   Surface
@@ -914,14 +968,19 @@ export default function App() {
           </div>
           <div className="v1-canvas">
             <MoonCanvas quality={quality}>
-              <color attach="background" args={["#000"]} />
+              <color attach="background" args={["#03060b"]} />
               <Globe
                 sunDir={unit(bodies?.sun ?? [1, 0, 0])}
-                cuts={[...(terrain ? [cut(terrain)] : []), ...shown.map(cut)]}
+                cuts={[
+                  ...(terrain ? [cut(terrain)] : []),
+                  ...displayTiles.map(cut),
+                ]}
                 map={map}
                 relief={relief}
                 segments={detail.globe}
-                onPick={(a, b) => pin(a, b)}
+                onPick={(a, b) =>
+                  tab === "base" ? basePick.current?.(a, b) : pin(a, b)
+                }
               />
               {terrain && (
                 <MoonTerrain
@@ -936,11 +995,13 @@ export default function App() {
                   relief={relief}
                   overlays
                   detail={detail}
-                  cuts={shown.map(cut)}
-                  onPick={(a, b) => pin(a, b)}
+                  cuts={displayTiles.map(cut)}
+                  onPick={(a, b) =>
+                    tab === "base" ? basePick.current?.(a, b) : pin(a, b)
+                  }
                 />
               )}{" "}
-              {shown.map((tile) => (
+              {displayTiles.map((tile) => (
                 <MoonTerrain
                   key={tile.id}
                   terrain={tile}
@@ -951,12 +1012,29 @@ export default function App() {
                   map={map}
                   relief={relief}
                   overlays={false}
-                  detail={detail}
-                  onPick={(a, b) => pin(a, b)}
+                  cuts={
+                    tile === selectedFocus
+                      ? []
+                      : selectedFocus
+                        ? [cut(selectedFocus)]
+                        : []
+                  }
+                  detail={tile === selectedFocus ? focusedDetail : detail}
+                  onPick={(a, b) =>
+                    tab === "base" ? basePick.current?.(a, b) : pin(a, b)
+                  }
                 />
               ))}
               {bodies && (
                 <SkyBodies sun={bodies.sun} earth={bodies.earth} tMs={t} />
+              )}
+              {tab === "base" && (
+                <BaseOverlay
+                  facilities={baseFacilities}
+                  links={baseLinks}
+                  elevation={elevation}
+                  onSelect={(id) => basePick.current?.(0, 0, id)}
+                />
               )}
               <Markers pins={pins} elevation={elevation} />
               <Rig elevation={elevation} />
@@ -1095,7 +1173,7 @@ export default function App() {
             ],
             [
               "Base",
-              "Assign facilities to locations. Compare geometric infrastructure and simultaneous availability; inspect assumptions before using a layout.",
+              "Assign facilities to locations. Size solar arrays and storage, test eclipse losses and geometric tower links, and compare nearby layouts under explicit constraints.",
             ],
             [
               "Advanced",
@@ -1232,11 +1310,9 @@ function Assumptions() {
             max="100"
             value={h}
             onChange={(e) =>
-              useStore
-                .getState()
-                .setAssumptions({
-                  observerM: Math.max(0, Math.min(100, +e.target.value)),
-                })
+              useStore.getState().setAssumptions({
+                observerM: Math.max(0, Math.min(100, +e.target.value)),
+              })
             }
           />
         </label>
@@ -1263,11 +1339,9 @@ function Assumptions() {
             max="15"
             value={c.earthMaskDeg}
             onChange={(e) =>
-              useStore
-                .getState()
-                .setAssumptions({
-                  earthMaskDeg: Math.max(0, Math.min(15, +e.target.value)),
-                })
+              useStore.getState().setAssumptions({
+                earthMaskDeg: Math.max(0, Math.min(15, +e.target.value)),
+              })
             }
           />
         </label>

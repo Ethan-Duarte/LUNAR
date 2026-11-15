@@ -9,6 +9,9 @@ export interface Facility {
   lat: number;
   lon: number;
   mast: number;
+  areaM2?: number;
+  loadKW?: number;
+  fixed?: boolean;
 }
 export function distanceKm(
   a: Pick<Facility, "lat" | "lon">,
@@ -71,10 +74,16 @@ export function layoutGeometry(
     conflicts,
   };
 }
-export function lineOfSight(a: Facility, b: Facility, source: HeightSource) {
+export function lineOfSight(
+  a: Facility,
+  b: Facility,
+  source: HeightSource | ((lat: number, lon: number) => HeightSource),
+) {
+  const terrainAt = (lat: number, lon: number) =>
+    typeof source === "function" ? source(lat, lon) : source;
   const pos = (f: Facility) => {
     const u = upVector(f.lat, f.lon),
-      h = sourceHeight(source, ...u);
+      h = sourceHeight(terrainAt(f.lat, f.lon), ...u);
     return Number.isFinite(h) ? sitePosKm(f.lat, f.lon, h + f.mast) : null;
   };
   const p = pos(a),
@@ -88,7 +97,15 @@ export function lineOfSight(a: Facility, b: Facility, source: HeightSource) {
     const t = i / steps,
       v = p.map((x, k) => x + (q[k] - x) * t),
       r = Math.hypot(...v),
-      h = sourceHeight(source, v[0] / r, v[1] / r, v[2] / r);
+      h = sourceHeight(
+        terrainAt(
+          (Math.asin(v[2] / r) * 180) / Math.PI,
+          (Math.atan2(v[1], v[0]) * 180) / Math.PI,
+        ),
+        v[0] / r,
+        v[1] / r,
+        v[2] / r,
+      );
     if (!Number.isFinite(h))
       return { status: "unknown" as const, minClearanceM: null, samples: i };
     min = Math.min(min, (r - R_KM) * 1000 - h);

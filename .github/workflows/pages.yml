@@ -1,13 +1,13 @@
 name: Test and publish LUNAR
 on:
   push:
-    branches: [main]
+    branches: [main, next]
   pull_request:
   workflow_dispatch:
 permissions:
   contents: read
 concurrency:
-  group: pages-${{ github.ref }}
+  group: lunar-pages
   cancel-in-progress: true
 jobs:
   build:
@@ -27,12 +27,38 @@ jobs:
         working-directory: frontend
         env:
           VITE_LUNAR_STATIC: 'true'
-      - uses: actions/upload-pages-artifact@v4
-        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+      - name: Read stable source for preview deployments
+        if: github.ref == 'refs/heads/next' && github.event_name != 'pull_request'
+        uses: actions/checkout@v6
         with:
-          path: frontend/dist
+          ref: main
+          path: stable
+      - name: Build unchanged stable viewer
+        if: github.ref == 'refs/heads/next' && github.event_name != 'pull_request'
+        working-directory: stable/frontend
+        env:
+          VITE_LUNAR_STATIC: 'true'
+        run: |
+          npm ci
+          npm run build
+      - name: Assemble website
+        if: github.event_name != 'pull_request'
+        shell: bash
+        run: |
+          mkdir -p site
+          if [ "$GITHUB_REF_NAME" = next ]; then
+            cp -a stable/frontend/dist/. site/
+            mkdir -p site/preview
+            cp -a frontend/dist/. site/preview/
+          else
+            cp -a frontend/dist/. site/
+          fi
+      - uses: actions/upload-pages-artifact@v4
+        if: github.event_name != 'pull_request'
+        with:
+          path: site
   deploy:
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/next')
     needs: build
     runs-on: ubuntu-latest
     permissions:

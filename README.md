@@ -1,6 +1,12 @@
 # LUNAR
 
-**Lunar Utility for Navigation, Analysis, & Reconnaissance — V1.0**
+**Lunar Utility for Navigation, Analysis, & Reconnaissance — V1.1 engineering preview**
+
+The next-version checkpoint adds direct Base editing, bounded connected-layout search, array/storage sizing, tower-height sweeps, geometric relay paths, optional free-space RF budgets and explicit eclipse-aware power. Basic emphasizes exploration; Advanced contains engineering and science. Read [ENGINEERING_V1_1.md](ENGINEERING_V1_1.md) for the model and walkthrough, [NEXT_VERSION_PROGRESS.md](NEXT_VERSION_PROGRESS.md) for remaining scope, and [UPDATE_V1_1.md](UPDATE_V1_1.md) for GitHub Desktop instructions.
+
+This preview is not full competitor parity or independently validated mission design. The V1.0 evidence below remains historical; new checks and limits are recorded in `qa/v11` and the engineering guide. The fixed Earth holdout remains unresolved.
+
+## V1.0 baseline documentation
 
 A lunar landscape is more than a promising coordinate. A habitat needs power, a power installation needs useful sunlight, and facilities need connections that work at the same time. LUNAR brings measured terrain, sky geometry and early infrastructure screening into one workspace.
 

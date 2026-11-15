@@ -1,14 +1,14 @@
 {
   "name": "lunar-field-atlas",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.1.0-preview.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run --maxWorkers=4"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.9",
@@ -19,12 +19,14 @@
     "zustand": "^5.1.0"
   },
   "devDependencies": {
+    "@testing-library/react": "^16.3.3",
     "@types/node": "^24.19.2",
     "@types/pngjs": "^6.0.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@types/three": "^0.187.0",
     "@vitejs/plugin-react": "^6.1.2",
+    "happy-dom": "^21.0.4",
     "oxlint": "^1.90.0",
     "pngjs": "^7.0.0",
     "typescript": "~7.0.2",

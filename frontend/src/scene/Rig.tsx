@@ -263,7 +263,8 @@ export function Rig({ elevation }: RigProps) {
     const c = controls.current
     if (!c || goal.seq === 0) return
     const look = (move.current?.look ?? c.target).clone()
-    const to = poseFor(goal, camera, look)
+    const corrected = (goal.kind === 'site' || goal.kind === 'approach') && elevation ? {...goal,hM:elevation(goal.lat,goal.lon)} : goal
+    const to = poseFor(corrected, camera, look)
     const h0 = heightKm(camera.position, look)
     const h1 = heightKm(to.pos, to.target)
     // With reduced motion asked for, the view goes straight to where it is going.
@@ -283,7 +284,7 @@ export function Rig({ elevation }: RigProps) {
     c.enabled = false
     invalidate() // the view only redraws on demand; start the move
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [goal, camera])
+  }, [goal, camera, elevation])
 
   // Holding the wheel (or the right button) and dragging slides the view over the Moon: the
   // camera and the point it looks at both turn about the Moon's centre, so the height above

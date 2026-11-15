@@ -1,0 +1,19 @@
+{
+  "version": "1.1.0-preview.1",
+  "frontend_tests": {
+    "passed": 269,
+    "optional_holdout_skipped": 1
+  },
+  "production_build": "PASS",
+  "http_module_mime_and_assets": "PASS",
+  "worker_integration": [
+    "Shipped Connecting Ridge JPL/LOLA finite electrical study",
+    "Real March 2025 ephemeris with synthetic flat terrain, eclipse smoke only",
+    "Nine-position bounded-search smoke",
+    "Synthetic curvature-limited corridor, lowest tested relay 5 m"
+  ],
+  "interactive_browser": "NOT COMPLETED: local preview blocked by remote browser; simulated-DOM flows pass",
+  "independent_earth_holdout": "Unresolved; previous failure retained; not rerun in this checkpoint",
+  "independent_eclipse_contact_timing": "Not performed",
+  "scope": "Runnable engineering checkpoint; broader roadmap remains in NEXT_VERSION_PROGRESS.md"
+}

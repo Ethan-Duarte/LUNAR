@@ -439,7 +439,7 @@ export function MoonTerrain({ terrain, sunDir, sunRad, layer, score, dataBase, m
   const moving = useBusy()
   const gl = useThree((s) => s.gl)
   const global = relief ? relief.dem : null
-  const grid = overlays ? detail.grid : Math.min(detail.grid, 384)
+  const grid = overlays || terrain.id === "observer-focus" ? detail.grid : Math.min(detail.grid, 384)
   const [globeW, globeH] = detail.globe
   const geometry = useMemo(() => buildGeometry(terrain, global, grid, [globeW, globeH]), [terrain, global, grid, globeW, globeH])
   const material = useMemo(() => {

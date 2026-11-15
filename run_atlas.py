@@ -84,9 +84,9 @@ def main():
     p.add_argument('--open-browser',action='store_true')
     args=p.parse_args()
     required=['index.html','lunar/data/manifest.json','lunar/data/sites/ridge-2m.json','data/missions.json','data/ephem/ephem.json','data/globe/globe.json']
-    if (FRONT/'index.html').is_file() and 'LUNAR V1.0' not in (FRONT/'index.html').read_text():
+    if (FRONT/'index.html').is_file() and 'LUNAR V1.' not in (FRONT/'index.html').read_text():
         print('WRONG VIEWER BUILD in '+str(FRONT.resolve()),flush=True)
-        print('Extract the V1.0 ZIP into a fresh folder; an older app/index.html is present.',flush=True)
+        print('Extract the complete release ZIP into a fresh folder; an older app/index.html is present.',flush=True)
         return 2
     if (FRONT/'index.html').is_file():
         required += [a.removeprefix('./') for a in re.findall(r'(?:src|href)="([^" ]+\.(?:js|css))"', (FRONT/'index.html').read_text())]

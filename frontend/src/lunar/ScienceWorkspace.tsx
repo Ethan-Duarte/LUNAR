@@ -4,7 +4,7 @@ import {invalidate} from '@react-three/fiber'
 import {useStore} from '../store'
 import {batteryKWh,closestSample,exportCSV,exportFile,intervals,studyFromResponse,type Study} from './science'
 const BASE=import.meta.env.BASE_URL+'lunar/'
-const HOSTED=import.meta.env.VITE_LUNAR_STATIC==='true'
+const HOSTED=import.meta.env.VITE_LUNAR_STATIC==='true'||(typeof window!=='undefined'&&window.location.hostname.endsWith('.github.io'))
 const percent=(n:number)=>(100*n).toFixed(2)+'%'
 const utc=(t:number|string)=>new Date(t).toISOString().replace('T',' ').slice(0,16)+' UTC'
 interface Entry {id:string;name:string;file:string}

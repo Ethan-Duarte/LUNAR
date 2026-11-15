@@ -1,3 +1,13 @@
+# 1.1.0-preview.1
+
+- Direct Base editing, facility undo/redo, worker-based finite-mission electrical analysis and explicit failure reporting.
+- Bounded layout search with shortlisted array resizing; discrete tower-height sweep; placement sensitivity.
+- Geometric relay routing and optional free-space link budget.
+- Analytic browser eclipse overlap and eclipse-aware generation/storage reports.
+- Preserve workspace when selecting sites; Basic/Advanced navigation; complete Base project import/export.
+- Observer-centred measured-terrain remesh and camera elevation refresh, reduced glare and resizable analysis panel.
+- Hardware rendering, independent eclipse timing and full roadmap remain pending. Earth holdout remains FAIL.
+
 # V1.0.0 — 2026-11-15
 
 - Replaced the inherited product interface with an original LUNAR workspace: quiet left analysis panel, large observatory and bottom UTC timeline.

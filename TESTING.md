@@ -30,3 +30,7 @@ Check Globe, South pole, Surface, camera orbit/zoom, original Sun/Earth bearing 
 - run_atlas.py --self-test: packaged asset references and MIME types.
 
 See SCIENCE_STATUS.md for the distinction between a successful regression/audit execution and a failed scientific comparison. No RF reliability, landing safety or flight certification is claimed.
+
+## 1.1 engineering preview
+
+`npm test` bounds Vitest to four workers. The retained-observer SSR regression has a 30-second fixture-processing timeout because it decodes native LOLA/ephemeris inputs; its physical assertions are unchanged. Timing is not an accuracy acceptance threshold. Worker integration checks retain their own explicit computation budgets. New logs and cases are under `qa/v11`.

@@ -1,0 +1,263 @@
+{
+  "version": "1.1.0-preview.1",
+  "base_commit": "a3a73c219827d014d94c3b80b77668975366fb63",
+  "source_commit": "4d48794c17a429214176ea6304c218a6f0a0d84a",
+  "requires": "Existing complete V1.0 data for local app; Pages builds from included source changes.",
+  "files": [
+    {
+      "path": ".github/workflows/pages.yml",
+      "bytes": 2145,
+      "sha256": "3fa0689c000ca4b7898c2dc4ed668e68691645021bbc88aec99fec6368c4685c"
+    },
+    {
+      "path": ".gitignore",
+      "bytes": 674,
+      "sha256": "89f9d068a35315f7d413e3e438e07d8bf0b0f262ecd3695ffbc633c961b4e53b"
+    },
+    {
+      "path": "CHANGELOG.md",
+      "bytes": 2282,
+      "sha256": "35acaff6cd3e127731ca38ecf531593d635e683d739b05c259d2e3f7474d92b0"
+    },
+    {
+      "path": "ENGINEERING_V1_1.md",
+      "bytes": 6748,
+      "sha256": "28c9d58a0e15bcf9ecd13e8c36dd1ede71421473f013b75324fabfd8bd58b9e7"
+    },
+    {
+      "path": "NEXT_VERSION_PROGRESS.md",
+      "bytes": 2406,
+      "sha256": "c502e4b7124c0d31287185a83d3f24244ff524f90f083c65f66b1f1807900c3c"
+    },
+    {
+      "path": "NOTICE",
+      "bytes": 1688,
+      "sha256": "a02308dc006e3c25921c36083b901b161103588b5b337500a80ee86cfeec04ad"
+    },
+    {
+      "path": "README.md",
+      "bytes": 11608,
+      "sha256": "e6344e7bd47b20bb501173d5421ca211891cb5bc1869c35953c1659fab6837fb"
+    },
+    {
+      "path": "SCIENCE_STATUS.md",
+      "bytes": 5887,
+      "sha256": "8e1543dbee4c49ff8b38c04f48eaacb95c7bd9bddbb575022a3b831b68f50201"
+    },
+    {
+      "path": "TESTING.md",
+      "bytes": 3081,
+      "sha256": "aa0c52a0b780d773cc11c3eb2d6ab9508db9601659f8fb5b61064a5f3d3a5c3a"
+    },
+    {
+      "path": "UPDATE_V1_1.md",
+      "bytes": 3002,
+      "sha256": "10a3ef374c890839a348f4c6e1fc861ab68a62ec1030a5781e38aabcdab20d7f"
+    },
+    {
+      "path": "frontend/index.html",
+      "bytes": 1101,
+      "sha256": "44b4bfec1ca26b7ce7daac731f01922f24bf18fc55a2388538c4dbfe7905ae22"
+    },
+    {
+      "path": "frontend/package-lock.json",
+      "bytes": 103346,
+      "sha256": "fb70e58fe1b6de149cbebc0607566f4d35915bf16734252e5fce7a62b368061a"
+    },
+    {
+      "path": "frontend/package.json",
+      "bytes": 887,
+      "sha256": "bee2d67454c7ab74849940b087f4bd7263c2a443787fd11960f86da08bd4baf1"
+    },
+    {
+      "path": "frontend/public/lunar-build.json",
+      "bytes": 167,
+      "sha256": "ee2ddf6bdcd5061ebe0dbe90fb30e8d47ef9a36d6f76bf32b6e893cc783b23eb"
+    },
+    {
+      "path": "frontend/public/lunar/evidence/SCIENCE_STATUS.md",
+      "bytes": 5887,
+      "sha256": "8e1543dbee4c49ff8b38c04f48eaacb95c7bd9bddbb575022a3b831b68f50201"
+    },
+    {
+      "path": "frontend/src/App.tsx",
+      "bytes": 49200,
+      "sha256": "06f1a03add5242c3bf2778882845fee3c2ca0a70da69ba74f21b45936eb335b7"
+    },
+    {
+      "path": "frontend/src/lib/windows.ts",
+      "bytes": 7113,
+      "sha256": "c2052b3231704f4c57cb918fd49f3eb1d02e4f250718828d8df95726ba91a4d0"
+    },
+    {
+      "path": "frontend/src/lunar/BaseOverlay.tsx",
+      "bytes": 2775,
+      "sha256": "4658ffdf1db4afc41a69d1a505b4c9093d9cd33591b54209365b27eb7fd62148"
+    },
+    {
+      "path": "frontend/src/lunar/BasePlanner.tsx",
+      "bytes": 41798,
+      "sha256": "7c174112eefa6ef23d0a6c3d46830710b5bcd0c1bddc9012abfddd9668f0cc60"
+    },
+    {
+      "path": "frontend/src/lunar/BasePlanner.ui.test.tsx",
+      "bytes": 3603,
+      "sha256": "a4af59b61b68d2e305a09acc30968611bafb685b3295179a963162872980988b"
+    },
+    {
+      "path": "frontend/src/lunar/ScienceWorkspace.tsx",
+      "bytes": 18427,
+      "sha256": "eba6612c1327487c3efe6cc6e01d0b72166fd73998810644dca2ba793168c13e"
+    },
+    {
+      "path": "frontend/src/lunar/engineering.test.ts",
+      "bytes": 7326,
+      "sha256": "41f8ee3a48d68a34040d501990a4d7e9d4a033a9a6bfaa1f9db699ff48fd0f11"
+    },
+    {
+      "path": "frontend/src/lunar/engineering.ts",
+      "bytes": 15292,
+      "sha256": "abe2db857eb8155fe7756ca9d1dead1509d463865b0fca867e6d522b4852d074"
+    },
+    {
+      "path": "frontend/src/lunar/focusTerrain.test.ts",
+      "bytes": 612,
+      "sha256": "8d22f78febd3cec353079c3240e3e017ba384bd4f9b555ed88ef1dc4ee9bac37"
+    },
+    {
+      "path": "frontend/src/lunar/focusTerrain.ts",
+      "bytes": 1141,
+      "sha256": "d5345c09df00296a6d44c42e0048e07a8c72c40c880e1ea7ac31bf2f32f32234"
+    },
+    {
+      "path": "frontend/src/lunar/loading.test.ts",
+      "bytes": 1378,
+      "sha256": "c3e2b30a28fc65b2200d11625cc4c64c21beaebd4a32ec2b285829b3958ccff2"
+    },
+    {
+      "path": "frontend/src/lunar/missionNotes.ts",
+      "bytes": 1568,
+      "sha256": "77b20b5279ceaa72f301d3df80aace60b1fd871d750320ab383b59708b122b16"
+    },
+    {
+      "path": "frontend/src/lunar/navigation.ui.test.tsx",
+      "bytes": 2882,
+      "sha256": "8b8e5dad7776f400d6b0e51a39fc84651e80d67e4cba508ffb1ee71429f82d3d"
+    },
+    {
+      "path": "frontend/src/lunar/network.ts",
+      "bytes": 3714,
+      "sha256": "9a6f98d991d6a37d9fd2eb4cbad8cfc6f491292eb7fb24d90869aae7ec9ad55f"
+    },
+    {
+      "path": "frontend/src/lunar/planner.integration.test.ts",
+      "bytes": 7330,
+      "sha256": "e3bc3a826b5f057fdad5e5d7058c3140eb76330a82dfa157d790031cd06b4677"
+    },
+    {
+      "path": "frontend/src/lunar/planner.worker.ts",
+      "bytes": 13123,
+      "sha256": "30df507b34d765ee506df7220722317a3a8dbdf26a9736f00e30f19123973412"
+    },
+    {
+      "path": "frontend/src/lunar/radio.ts",
+      "bytes": 1169,
+      "sha256": "0073b8a508695b3b9d48fb7c565723c5650cda9dcff51068408031ac4538ab69"
+    },
+    {
+      "path": "frontend/src/lunar/v1.css",
+      "bytes": 14852,
+      "sha256": "3867e5e1df13f8653c055456c13a59436e1c2d085d47f5a2ffbc550d8280a4a0"
+    },
+    {
+      "path": "frontend/src/scene/MoonTerrain.tsx",
+      "bytes": 22772,
+      "sha256": "5eb231893b414d1ea5a88423d35f30acc40acb67198844a859884d21dfa2290f"
+    },
+    {
+      "path": "frontend/src/scene/Rig.tsx",
+      "bytes": 23303,
+      "sha256": "26dcdc2bf4ab2dc2d4b9f712bd2d7a0a752abe9dce5c7a84fda26ab49b9b4906"
+    },
+    {
+      "path": "frontend/src/scene/SkyBodies.tsx",
+      "bytes": 3337,
+      "sha256": "750ef942619e8f728f758b211a0273ff99fbb2b6ad37454fa74863b045d60b43"
+    },
+    {
+      "path": "frontend/tsconfig.app.json",
+      "bytes": 745,
+      "sha256": "a8e95a097f9902008cf4d38a89b749f2699b91011d350851f0d8119ca1ca5e65"
+    },
+    {
+      "path": "qa/v11/browser-status.json",
+      "bytes": 173,
+      "sha256": "132bffa6ce22ff4ce7b9b61006777775901937e321d0c780a46e2f133cef4151"
+    },
+    {
+      "path": "qa/v11/eclipse-smoke.json",
+      "bytes": 302,
+      "sha256": "4e8dbab87dda06afc55d32b42472e8753e91a1203b55838ea952fc46c618313b"
+    },
+    {
+      "path": "qa/v11/frontend-tests.txt",
+      "bytes": 1680,
+      "sha256": "b1dfca292774c5fe9118b9be11fc7c435eb2cf357db5a2eb89d4501a88fcc3de"
+    },
+    {
+      "path": "qa/v11/http-selftest.txt",
+      "bytes": 1081,
+      "sha256": "aeaca6a2433117fffd7888e200810b6faf90b1f06bdd74f7a464aa4b46a674de"
+    },
+    {
+      "path": "qa/v11/production-build.txt",
+      "bytes": 960,
+      "sha256": "b1faa49f45760de7581e4c02bf60d59c91581879e52b6b7a83578d50996b3dfd"
+    },
+    {
+      "path": "qa/v11/real-base-smoke.json",
+      "bytes": 20662,
+      "sha256": "72022b36e4fd9ecbf68be6db91e7454ab2dfe39ed340e157015a0878b616b5dc"
+    },
+    {
+      "path": "qa/v11/verification-summary.json",
+      "bytes": 840,
+      "sha256": "157e4be41fee3ad40780a4ee78075de69b5fd8a250e42474678456508ab51696"
+    },
+    {
+      "path": "run_atlas.py",
+      "bytes": 9738,
+      "sha256": "897aff0ad633d928065af9c0abafe9c84e5a458391433e42300e07691d830024"
+    },
+    {
+      "path": "app/index.html",
+      "bytes": 1144,
+      "sha256": "9e7b10c5121c7bc924ae3a2a7a77bf99714bb704ed44cb1c7306a71d53043071"
+    },
+    {
+      "path": "app/lunar-build.json",
+      "bytes": 167,
+      "sha256": "ee2ddf6bdcd5061ebe0dbe90fb30e8d47ef9a36d6f76bf32b6e893cc783b23eb"
+    },
+    {
+      "path": "app/lunar/evidence/SCIENCE_STATUS.md",
+      "bytes": 5887,
+      "sha256": "8e1543dbee4c49ff8b38c04f48eaacb95c7bd9bddbb575022a3b831b68f50201"
+    },
+    {
+      "path": "app/assets/planner.worker-D1clk1hY.js",
+      "bytes": 19887,
+      "sha256": "b2691c51c198faa64b4ad154ad55fad4a08edcb7461da76077d2030c58120c21"
+    },
+    {
+      "path": "app/assets/index-awljT3sc.css",
+      "bytes": 16724,
+      "sha256": "0304d8bbb8a3472281105ae9ec1b256a18d31f57c3eb985373dcb54889e35135"
+    },
+    {
+      "path": "app/assets/index-DwTeQHs_.js",
+      "bytes": 1313997,
+      "sha256": "946d935a2a1c93eac5afb84dc04ba9ec6cbf24319997f315278f841bdcc52a75"
+    }
+  ]
+}

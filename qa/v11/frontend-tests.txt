@@ -1,0 +1,29 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> lunar-field-atlas@1.1.0-preview.1 test
+> vitest run --maxWorkers=4
+
+
+ RUN  v5.1.0 /workspace/scratch/7dfc364995d9/lunar-next/frontend
+
+(node:101) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:149) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:197) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:213) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+ Test Files  37 passed | 1 skipped (38)
+      Tests  269 passed | 1 skipped (270)
+   Start at  16:52:06
+   Duration  13.95s (tests 71%, import 24%, transform 2%, environment 2%, worker 1%)
+
+    Isolate  38 workers spawned · ~240ms startup each (spawn + environment, per file)
+             at least ~2.04s faster with isolate: false — reuses workers across files instead of one per file
+

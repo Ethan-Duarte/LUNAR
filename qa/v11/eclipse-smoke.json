@@ -1,0 +1,13 @@
+{
+  "start": 1741910400000,
+  "events": [
+    {
+      "startIndex": 31,
+      "endIndex": 60,
+      "minVisible": 0
+    }
+  ],
+  "lostGenerationKWh": 19.42608523218216,
+  "stepMinutes": 10,
+  "limits": "Actual JPL ephemeris, synthetic zero-height terrain. Not an independent event-timing validation."
+}

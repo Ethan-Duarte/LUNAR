@@ -23,8 +23,8 @@ export function glowTexture(): THREE.Texture {
   const grad = g.createRadialGradient(128, 128, 0, 128, 128, 128)
   grad.addColorStop(0, 'rgba(255,252,238,1)')
   grad.addColorStop(0.09, 'rgba(255,250,228,1)')
-  grad.addColorStop(0.13, 'rgba(255,236,190,0.55)')
-  grad.addColorStop(0.4, 'rgba(255,220,150,0.12)')
+  grad.addColorStop(0.13, 'rgba(255,242,214,0.28)')
+  grad.addColorStop(0.4, 'rgba(255,232,186,0.035)')
   grad.addColorStop(1, 'rgba(255,210,130,0)')
   g.fillStyle = grad
   g.fillRect(0, 0, 256, 256)
@@ -65,7 +65,7 @@ export function SkyBodies({ sun, earth, tMs }: Props) {
       <mesh position={earthPos} quaternion={earthTurn} material={material} frustumCulled={false}>
         <sphereGeometry args={[EARTH_RADIUS_KM, 48, 32]} />
       </mesh>
-      <sprite position={[sunDir[0] * SUN_AT_KM, sunDir[1] * SUN_AT_KM, sunDir[2] * SUN_AT_KM]} scale={[SUN_DISC_KM * 22, SUN_DISC_KM * 22, 1]}>
+      <sprite position={[sunDir[0] * SUN_AT_KM, sunDir[1] * SUN_AT_KM, sunDir[2] * SUN_AT_KM]} scale={[SUN_DISC_KM * 15, SUN_DISC_KM * 15, 1]}>
         <spriteMaterial map={glow} transparent depthWrite={false} blending={THREE.AdditiveBlending} toneMapped={false} />
       </sprite>
     </>

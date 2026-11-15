@@ -25,3 +25,6 @@ engine/data/kernels/*.tf
 *.zip
 *.tsbuildinfo
 RELEASE_MANIFEST.json
+
+preview-root/
+engine/data/dems/LOLA_GLOBAL_64PPD_UINT.tif

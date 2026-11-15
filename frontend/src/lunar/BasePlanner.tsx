@@ -1,21 +1,97 @@
-// Original LUNAR connected-base prototype. Transparent geometric and sampled temporal screening.
-import { useMemo, useState } from "react";
+// Original LUNAR connected-base engineering workspace. NASA-derived terrain, explicit model limits.
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { SiteAnalysis } from "../ui/useSiteAnalysis";
 import type { Ephem } from "../lib/ephem";
-import { computeHorizon } from "../lib/horizon";
 import { sourceHeight, type HeightSource } from "../lib/terrain";
-import { upVector } from "../lib/geo";
-import { computeSeries, hasComm, isSunlit } from "../lib/windows";
+import { localFrame, R_KM, upVector } from "../lib/geo";
 import { useStore } from "../store";
 import { exportFile } from "./science";
+import { distanceKm, type Facility, type Role } from "./network";
 import {
-  layoutGeometry,
-  lineOfSight,
-  simultaneous,
-  type Facility,
-  type Role,
-} from "./network";
-const DAY = 86400000;
+  DEFAULT_ENGINEERING,
+  validateSettings,
+  type EngineeringSettings,
+  type FacilityProfile,
+  type Link,
+  type RankedDesign,
+  type evaluateDesign,
+} from "./engineering";
+import type { PlannerRequest } from "./planner.worker";
+interface Report {
+  schema: string;
+  model: string;
+  start: number;
+  settings: EngineeringSettings;
+  criteria: { earthMaskDeg: number };
+  facilities: Facility[];
+  profiles: FacilityProfile[];
+  links: Link[];
+  result: ReturnType<typeof evaluateDesign>;
+  arrayScale: number | null;
+  azimuthStepDeg: number;
+  horizonRadiusKm: number;
+}
+const KEY = "lunar.base.v1.1";
+const roles: Role[] = ["habitat", "power", "resource", "relay", "landing"];
+function validateFacilities(value: unknown): Facility[] {
+  if (
+    !Array.isArray(value) ||
+    value.length > 8 ||
+    value.some(
+      (f) =>
+        !f ||
+        !roles.includes(f.role) ||
+        !Number.isFinite(
+          f.lat + f.lon + f.mast + (f.areaM2 ?? 0) + (f.loadKW ?? 0),
+        ) ||
+        Math.abs(f.lat) > 90 ||
+        f.mast < 0 ||
+        f.mast > 100 ||
+        (f.areaM2 ?? 0) < 0 ||
+        (f.loadKW ?? 0) < 0,
+    )
+  )
+    throw Error("Invalid facilities");
+  return value.map((f) => ({
+    ...f,
+    id: String(f.id || crypto.randomUUID()),
+    name: String(f.name ?? f.role).slice(0, 80),
+    lon: ((((f.lon + 180) % 360) + 360) % 360) - 180,
+    fixed: !!f.fixed,
+  }));
+}
+function initial(): { facilities: Facility[]; settings: EngineeringSettings } {
+  try {
+    const j = JSON.parse(localStorage.getItem(KEY) || "null");
+    if (j) {
+      const facilities = validateFacilities(j.facilities),
+        settings = { ...DEFAULT_ENGINEERING, ...j.settings };
+      validateSettings(settings);
+      return { facilities, settings };
+    }
+  } catch {
+    /* Invalid recovery data never mutates the live scenario. */
+  }
+  return { facilities: [] as Facility[], settings: { ...DEFAULT_ENGINEERING } };
+}
+function destination(
+  anchor: { lat: number; lon: number },
+  north: number,
+  east: number,
+) {
+  const f = localFrame(anchor.lat, anchor.lon),
+    r = Math.hypot(north, east),
+    a = r / R_KM,
+    v = f.u.map(
+      (x, i) =>
+        x * Math.cos(a) +
+        (r ? (north * f.n[i] + east * f.e[i]) / r : 0) * Math.sin(a),
+    );
+  return {
+    lat: (Math.asin(Math.max(-1, Math.min(1, v[2]))) * 180) / Math.PI,
+    lon: (Math.atan2(v[1], v[0]) * 180) / Math.PI,
+  };
+}
 export function BasePlanner({
   active,
   ready,
@@ -24,280 +100,950 @@ export function BasePlanner({
   windowStart,
   advanced,
   onLocate,
+  onLayout,
+  onLinks,
+  onPlaceReady,
 }: {
   active?: SiteAnalysis;
   ready: boolean;
-  sourceOf: (a: number, b: number) => HeightSource;
+  sourceOf: (lat: number, lon: number) => HeightSource;
   ephem: Ephem | null;
   windowStart: number;
   advanced: boolean;
-  onLocate: (a: number, b: number, label?: string) => void;
+  onLocate: (lat: number, lon: number, label?: string) => void;
+  onLayout?: (f: Facility[]) => void;
+  onLinks?: (links: Link[]) => void;
+  onPlaceReady?: (fn: (lat: number, lon: number, id?: string) => void) => void;
 }) {
-  const [facilities, setFacilities] = useState<Facility[]>([]),
+  const [boot] = useState(initial),
+    [facilities, rawSetFacilities] = useState(boot.facilities),
+    [settings, setSettings] = useState(boot.settings),
     [role, setRole] = useState<Role>("habitat"),
-    [maxLink, setMaxLink] = useState(10),
-    [exclusion, setExclusion] = useState(2),
-    [saved, setSaved] = useState<{ name: string; report: unknown }[]>([]),
-    [message, setMessage] = useState("");
-  const criteria = useStore((s) => s.criteria),
-    height = useStore((s) => s.observerM);
-  const physicalKey = JSON.stringify(
-    facilities.map(({ id, role, lat, lon, mast }) => ({
-      id,
-      role,
-      lat,
-      lon,
-      mast,
-    })),
-  );
-  const geometry = useMemo(
-    () => layoutGeometry(facilities, maxLink, exclusion),
-    [physicalKey, maxLink, exclusion],
-  );
-  const temporal = useMemo(() => {
-    if (!ephem || !ready || !facilities.length) return null;
-    const results = facilities.map((f) => {
-      const src = sourceOf(f.lat, f.lon),
-        u = upVector(f.lat, f.lon),
-        h = sourceHeight(src, ...u),
-        horizon = computeHorizon(src, f.lat, f.lon, {
-          observerHeightM: f.mast,
-        });
-      const series = computeSeries(
-        ephem,
-        horizon,
-        h,
-        windowStart,
-        windowStart + 60 * DAY - 3600000,
-        3600000,
-      );
-      return {
-        f,
-        series,
-        sun: Array.from({ length: series.count }, (_, i) =>
-          isSunlit(series, i, criteria),
-        ),
-        earth: Array.from({ length: series.count }, (_, i) =>
-          hasComm(series, i, criteria),
-        ),
-      };
-    });
-    const power = results.filter((v) => v.f.role === "power"),
-      hub = results.filter((v) => v.f.role === "habitat");
-    const required = [...power.map((r) => r.sun), ...hub.map((r) => r.earth)];
+    [selected, setSelected] = useState<string | null>(null),
+    [placing, setPlacing] = useState(false),
+    [radius, setRadius] = useState(2),
+    [maxTower, setMaxTower] = useState(50),
+    [report, setReport] = useState<Report | null>(null),
+    [alternatives, setAlternatives] = useState<RankedDesign[]>([]),
+    [snapshots, setSnapshots] = useState<{ name: string; project: unknown }[]>(
+      [],
+    ),
+    [status, setStatus] = useState(""),
+    [busy, setBusy] = useState(false),
+    [searchNote, setSearchNote] = useState(""),
+    [duration, setDuration] = useState(0);
+  const history = useRef<{ past: Facility[][]; future: Facility[][] }>({
+    past: [],
+    future: [],
+  });
+  function setFacilities(value: Facility[] | ((f: Facility[]) => Facility[])) {
+    const next = typeof value === "function" ? value(facilities) : value;
+    if (JSON.stringify(next) === JSON.stringify(facilities)) return;
+    history.current.past = [...history.current.past.slice(-29), facilities];
+    history.current.future = [];
+    rawSetFacilities(next);
+  }
+  const worker = useRef<Worker | null>(null),
+    jobStart = useRef(0),
+    criteria = useStore((s) => s.criteria),
+    mast = useStore((s) => s.observerM);
+  const anchor = facilities.find((f) => f.role === "habitat") ??
+    active?.pin ?? { lat: -89.4399, lon: 222.8524 };
+  const source = useMemo(() => {
+    const points = [anchor, ...facilities],
+      pool = points.flatMap((f) => sourceOf(f.lat, f.lon).terrains);
     return {
-      results: results.map((r) => ({
-        id: r.f.id,
-        sun: r.sun.filter(Boolean).length / r.sun.length,
-        earth: r.earth.filter(Boolean).length / r.earth.length,
-      })),
-      concurrent: power.length && hub.length ? simultaneous(required) : null,
+      terrains: [...new Set(pool)].sort(
+        (a, b) => a.levels.at(-1)!.pixel - b.levels.at(-1)!.pixel,
+      ),
+      global: sourceOf(anchor.lat, anchor.lon).global,
     };
-  }, [physicalKey, criteria, ephem, ready, sourceOf, windowStart]);
-  const links = useMemo(
-    () =>
-      geometry.tree.map((e) => ({
-        ...e,
-        ...lineOfSight(
-          facilities.find((f) => f.id === e.a)!,
-          facilities.find((f) => f.id === e.b)!,
-          sourceOf(
-            facilities.find((f) => f.id === e.a)!.lat,
-            facilities.find((f) => f.id === e.a)!.lon,
-          ),
-        ),
-      })),
-    [geometry, physicalKey, sourceOf],
-  );
-  const report = {
-    schema: "lunar-base-1",
-    name: "Base layout " + (saved.length + 1),
+  }, [facilities, sourceOf, anchor.lat, anchor.lon]);
+  useEffect(()=>{onLinks?.(report?.links.filter(e=>e.km<=settings.maxLinkKm)??[])},[report,settings.maxLinkKm,onLinks]);
+  const inputKey = JSON.stringify([
     facilities,
-    criteria,
-    period: {
-      start: new Date(windowStart).toISOString(),
-      days: 60,
-      step_hours: 1,
-    },
-    constraints: { maxLinkKm: maxLink, habitatPadExclusionKm: exclusion },
-    geometry,
-    links,
-    temporal,
-    limits: [
-      "Geometric tree distances, not routed cable or rover paths.",
-      "Sampled centreline terrain visibility, 20m step capped at 10000 segments; coarser DEM data remain coarser. No Fresnel zone or RF budget.",
-      "Simultaneous metric requires all listed solar installations sunlit and all habitats Earth-visible; does not model power storage or relayed Earth access.",
-      "Exclusion radius is user-selected, not a plume/debris safety prediction.",
-      "Independent Earth-map holdout remains unresolved.",
-    ],
-  };
-  function add() {
-    if (!active) return;
+    settings,
+    windowStart,
+    criteria.earthMaskDeg,
+  ]);
+  useEffect(() => {
+    onLayout?.(facilities);
+    try {
+      localStorage.setItem(KEY, JSON.stringify({ facilities, settings }));
+    } catch {
+      /* Project export remains available when storage is blocked. */
+    }
+  }, [facilities, settings, onLayout]);
+  useEffect(() => {
+    worker.current?.terminate();
+    worker.current = null;
+    setBusy(false);
+    setReport(null);
+    setAlternatives([]);
+    setSearchNote("");
+  }, [inputKey, source]);
+  useEffect(() => () => worker.current?.terminate(), []);
+  function add(lat: number, lon: number) {
     if (facilities.length >= 8) {
-      setMessage("Eight facilities is the V1.0 screening limit.");
+      setStatus("Eight facilities is the screening limit.");
       return;
     }
+    const id = crypto.randomUUID();
     setFacilities((f) => [
       ...f,
       {
-        id: crypto.randomUUID(),
+        id,
         name: role + " " + (f.filter((x) => x.role === role).length + 1),
         role,
-        lat: active.pin.lat,
-        lon: active.pin.lon,
-        mast: height,
+        lat,
+        lon,
+        mast: role === "relay" ? 10 : mast,
+        areaM2: role === "power" ? 20 : 0,
+        loadKW: 0,
+        fixed: role === "habitat" || role === "resource",
       },
     ]);
-    setMessage("");
+    setSelected(id);
+    setPlacing(false);
+    setStatus("Facility added. Recalculate after editing.");
+  }
+  function mapPlace(lat: number, lon: number, id?: string) {
+    if (id) {
+      setSelected(id);
+      return;
+    }
+    if (placing && selected) {
+      update(selected, { lat, lon });
+      setPlacing(false);
+    } else add(lat, lon);
+  }
+  useEffect(() => {
+    onPlaceReady?.(mapPlace);
+  }, [onPlaceReady, facilities, role, mast, placing, selected]);
+  function update(id: string, changes: Partial<Facility>) {
+    setFacilities((f) =>
+      f.map((x) => (x.id === id ? { ...x, ...changes } : x)),
+    );
+  }
+  function setting<K extends keyof EngineeringSettings>(
+    key: K,
+    value: EngineeringSettings[K],
+  ) {
+    setSettings((s) => ({ ...s, [key]: value }));
+  }
+  const startLabel = new Date(windowStart).toISOString().slice(0, 16);
+  function project() {
+    return {
+      schema: "lunar-base-2",
+      version: "1.1-preview",
+      facilities,
+      settings,
+      start: windowStart,
+      criteria,
+      radiusKm: radius,
+      maxTowerM: maxTower,
+      report,
+      limits: LIMITS,
+    };
+  }
+  function restore(value: unknown) {
+    const j = value as ReturnType<typeof project>;
+    if (!["lunar-base-1", "lunar-base-2"].includes(j?.schema))
+      throw Error("Unknown base project schema");
+    const f = validateFacilities(j.facilities);
+    const s = { ...DEFAULT_ENGINEERING, ...j.settings };
+    validateSettings(s);
+    if (
+      j.schema === "lunar-base-2" &&
+      (!Number.isFinite(j.start) ||
+        !j.criteria ||
+        !Number.isFinite(j.criteria.earthMaskDeg + j.criteria.minSunFrac) ||
+        j.criteria.earthMaskDeg < 0 ||
+        j.criteria.earthMaskDeg > 15 ||
+        j.criteria.minSunFrac < 0 ||
+        j.criteria.minSunFrac > 1)
+    )
+      throw Error("Invalid project time or criteria");
+    setFacilities(f);
+    setSettings(s);
+    if (j.schema === "lunar-base-2") {
+      useStore.getState().setAssumptions(j.criteria);
+      useStore.getState().setPlaying(false);
+      useStore.getState().setTime(j.start);
+      useStore.getState().setWindowStart(j.start);
+      setRadius(
+        Number.isFinite(j.radiusKm) && j.radiusKm > 0 && j.radiusKm <= 10
+          ? j.radiusKm
+          : 2,
+      );
+      setMaxTower(
+        Number.isFinite(j.maxTowerM) && j.maxTowerM >= 2 && j.maxTowerM <= 100
+          ? j.maxTowerM
+          : 50,
+      );
+    }
+    setSelected(null);
+    setReport(null);
+    setStatus(
+      "Project restored; recalculate with current data. Previous report remains in the exported file.",
+    );
   }
   async function open(file: File) {
     try {
-      const j = JSON.parse(await file.text());
-      if (
-        j.schema !== "lunar-base-1" ||
-        !Array.isArray(j.facilities) ||
-        j.facilities.length > 8 ||
-        j.facilities.some(
-          (f: Facility) =>
-            !Number.isFinite(f.lat + f.lon + f.mast) ||
-            Math.abs(f.lat) > 90 ||
-            f.mast < 0 ||
-            f.mast > 100 ||
-            !["habitat", "power", "resource", "relay", "landing"].includes(
-              f.role,
-            ),
-        )
-      )
-        throw Error("Invalid base project");
-      setFacilities(
-        j.facilities.map((f: Facility) => ({
-          ...f,
-          id: crypto.randomUUID(),
-          name: String(f.name).slice(0, 80),
-        })),
-      );
-      setMessage(
-        "Facilities loaded; results recomputed using current dates, terrain and assumptions.",
-      );
+      restore(JSON.parse(await file.text()));
     } catch (e) {
-      setMessage(
-        e instanceof Error ? e.message : "Could not open base project",
-      );
+      setStatus(e instanceof Error ? e.message : String(e));
     }
   }
+  function run(kind: PlannerRequest["kind"]) {
+    if (!ephem || !ready) return;
+    try {
+      validateSettings(settings);
+      validateFacilities(facilities);
+      worker.current?.terminate();
+      const w = new Worker(new URL("./planner.worker.ts", import.meta.url), {
+        type: "module",
+      });
+      worker.current = w;
+      setBusy(true);
+      setStatus("Starting terrain analysis…");
+      setReport(null);
+      setAlternatives([]);
+      setSearchNote("");
+      jobStart.current = performance.now();
+      w.onmessage = (e) => {
+        const j = e.data;
+        if (j.progress) setStatus(j.progress);
+        if (j.error) {
+          setStatus(j.error);
+          setBusy(false);
+          w.terminate();
+          worker.current = null;
+        }
+        if (j.done) {
+          setReport(j.report ?? null);
+          setAlternatives(j.alternatives ?? []);
+          setSearchNote(j.note ? `${j.tested} designs tested. ${j.note}` : "");
+          setDuration((performance.now() - jobStart.current) / 1000);
+          setStatus(
+            j.report
+              ? "Analysis complete. Review assumptions and failures below."
+              : "Search complete. Inspect alternatives before applying.",
+          );
+          setBusy(false);
+          w.terminate();
+          worker.current = null;
+        }
+      };
+      w.onerror = (e) => {
+        setStatus("Analysis worker failed: " + e.message);
+        setBusy(false);
+        w.terminate();
+        worker.current = null;
+      };
+      w.postMessage({
+        kind,
+        facilities,
+        source,
+        ephem,
+        start: windowStart,
+        settings,
+        radiusKm: radius,
+        earthMaskDeg: criteria.earthMaskDeg,
+        maxTowerM: maxTower,
+      } satisfies PlannerRequest);
+    } catch (e) {
+      setStatus(e instanceof Error ? e.message : String(e));
+    }
+  }
+  const extent = Math.max(
+      radius * 1.25,
+      ...facilities.map((f) => distanceKm(anchor, f) * 1.15),
+      0.1,
+    ),
+    frame = localFrame(anchor.lat, anchor.lon);
+  const xy = (f: { lat: number; lon: number }) => {
+    const u = upVector(f.lat, f.lon);
+    return [
+      160 +
+        ((u.reduce((a, v, i) => a + v * frame.e[i], 0) * R_KM) / extent) * 140,
+      160 -
+        ((u.reduce((a, v, i) => a + v * frame.n[i], 0) * R_KM) / extent) * 140,
+    ];
+  };
+  const ground = useMemo(() => {
+    const cells: { x: number; y: number; h: number }[] = [];
+    for (let j = 0; j < 24; j++)
+      for (let i = 0; i < 24; i++) {
+        const p = destination(
+          anchor,
+          ((160 - ((j + 0.5) * 320) / 24) / 140) * extent,
+          ((((i + 0.5) * 320) / 24 - 160) / 140) * extent,
+        );
+        cells.push({
+          x: (i * 320) / 24,
+          y: (j * 320) / 24,
+          h: sourceHeight(source, ...upVector(p.lat, p.lon)),
+        });
+      }
+    return cells;
+  }, [source, anchor.lat, anchor.lon, extent]);
+  const valid = ground.filter((p) => Number.isFinite(p.h)),
+    lo = Math.min(...valid.map((p) => p.h)),
+    hi = Math.max(...valid.map((p) => p.h)),
+    picked = facilities.find((f) => f.id === selected),
+    r = report?.result;
+  const numeric = (
+    label: string,
+    key: keyof EngineeringSettings,
+    min: number,
+    max: number,
+    step: number,
+  ) => (
+    <label>
+      {label}
+      <input
+        type="number"
+        min={min}
+        max={max}
+        step={step}
+        value={settings[key] as number}
+        onChange={(e) => setting(key, +e.target.value as never)}
+      />
+    </label>
+  );
   return (
     <>
-      <p className="v1-eyebrow">CONNECTED BASE / FIRST ENGINEERING SCREEN</p>
-      <h1>A base is a network.</h1>
+      <p className="v1-eyebrow">LUNAR / CONNECTED BASE ENGINEERING</p>
+      <h1>Design a place to operate.</h1>
       <p>
-        Place observers in Observe, then assign facilities here. Compare nearby
-        arrangements rather than unrelated best pixels.
+        Choose components, place them on the map or terrain, then test power,
+        eclipses and geometric radio paths. All results are preliminary
+        screening.
       </p>
-      <label className="v1-label">
-        Facility role
-        <select value={role} onChange={(e) => setRole(e.target.value as Role)}>
-          {(["habitat", "power", "resource", "relay", "landing"] as const).map(
-            (r) => (
-              <option key={r} value={r}>
-                {r}
-              </option>
-            ),
-          )}
-        </select>
-      </label>
-      <button className="v1-primary" disabled={!active || !ready} onClick={add}>
-        Assign selected observer to layout
-      </button>
-      {!active && (
+      {!advanced && (
         <p className="v1-note">
-          Place an observer first. Add several locations to assemble a layout.
+          Advanced mode exposes the complete engineering workspace.
         </p>
       )}
-      {message && <p role="status">{message}</p>}
       <div className="v1-fields">
         <label>
-          Maximum link length km
+          New component
+          <select
+            value={role}
+            onChange={(e) => setRole(e.target.value as Role)}
+          >
+            {roles.map((x) => (
+              <option key={x}>{x}</option>
+            ))}
+          </select>
+        </label>
+        <button
+          disabled={!ready || !active}
+          onClick={() => active && add(active.pin.lat, active.pin.lon)}
+        >
+          Use selected observer
+        </button>
+      </div>
+      <button
+        disabled={!ready}
+        onClick={() => {
+          setFacilities([
+            {
+              id: crypto.randomUUID(),
+              name: "Ridge habitat",
+              role: "habitat",
+              lat: -89.4399,
+              lon: 222.8524,
+              mast: 2,
+              fixed: true,
+            },
+            {
+              id: crypto.randomUUID(),
+              name: "Ridge solar",
+              role: "power",
+              lat: -89.4399,
+              lon: 222.8524,
+              mast: 2,
+              areaM2: 20,
+              fixed: false,
+            },
+          ]);
+          setSettings({
+            ...DEFAULT_ENGINEERING,
+            days: 2,
+            requireEarth: false,
+            maxSlopeDeg: 90,
+          });
+          useStore.getState().setTime(Date.parse("2026-11-14T00:00:00Z"));
+          useStore
+            .getState()
+            .setWindowStart(Date.parse("2026-11-14T00:00:00Z"));
+          setStatus(
+            "Electrical tutorial loaded: co-located components intentionally isolate the power calculation. Move the array, add a relay and tighten constraints for a spatial design.",
+          );
+          onLocate(-89.4399, 222.8524, "Connecting Ridge tutorial");
+        }}
+      >
+        Load electrical tutorial
+      </button>
+      <p className="v1-note">
+        Click empty ground to add a {role}. Select a facility, then “Move on
+        map” to relocate it. Habitat/resource anchors start fixed for searches.
+      </p>
+      <svg
+        className="base-map"
+        viewBox="0 0 320 320"
+        role="img"
+        aria-label="Measured elevation base map; click to place a facility"
+        onClick={(e) => {
+          const box = e.currentTarget.getBoundingClientRect();
+          const east =
+              ((((e.clientX - box.left) / box.width) * 320 - 160) / 140) *
+              extent,
+            north =
+              ((160 - ((e.clientY - box.top) / box.height) * 320) / 140) *
+              extent;
+          const p = destination(anchor, north, east);
+          mapPlace(p.lat, p.lon);
+        }}
+      >
+        {ground.map((p, i) => (
+          <rect
+            key={i}
+            x={p.x}
+            y={p.y}
+            width={14}
+            height={14}
+            fill={
+              Number.isFinite(p.h)
+                ? `hsl(205 12% ${16 + (35 * (p.h - lo)) / Math.max(1, hi - lo)}%)`
+                : "#171d24"
+            }
+          />
+        ))}
+        <circle
+          cx="160"
+          cy="160"
+          r={(radius / extent) * 140}
+          fill="none"
+          stroke="#d7bd7e"
+          strokeDasharray="4 4"
+        />
+        {report?.links
+          .filter((e) => e.km <= settings.maxLinkKm)
+          .map((e) => {
+            const a = xy(facilities.find((f) => f.id === e.a)!),
+              b = xy(facilities.find((f) => f.id === e.b)!);
+            return (
+              <line
+                key={e.a + e.b}
+                x1={a[0]}
+                y1={a[1]}
+                x2={b[0]}
+                y2={b[1]}
+                stroke={e.status === "clear" ? "#7ec9aa" : "#e69180"}
+                strokeWidth="1.5"
+                strokeDasharray={e.status === "clear" ? "" : "4 3"}
+              />
+            );
+          })}
+        {facilities.map((f) => {
+          const p = xy(f);
+          return (
+            <g
+              key={f.id}
+              role="button"
+              tabIndex={0}
+              aria-label={"Select " + f.name}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setSelected(f.id);
+                }
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelected(f.id);
+              }}
+            >
+              <circle
+                cx={p[0]}
+                cy={p[1]}
+                r={selected === f.id ? 8 : 6}
+                fill={
+                  f.role === "power"
+                    ? "#e7c65e"
+                    : f.role === "relay"
+                      ? "#78b9dc"
+                      : "#e5ecee"
+                }
+                stroke="#111"
+              />
+              <text x={p[0] + 9} y={p[1] - 8} fill="white" fontSize="10">
+                {f.name}
+              </text>
+            </g>
+          );
+        })}
+        <text x="8" y="16" fill="white" fontSize="10">
+          N ↑ · elevation shading · radius {radius} km
+        </text>
+        <text x="8" y="309" fill="white" fontSize="9">
+          Decorative interpolation adds no measured terrain detail
+        </text>
+      </svg>
+      <div className="v1-actions">
+        <button
+          disabled={!history.current.past.length}
+          onClick={() => {
+            const previous = history.current.past.pop()!;
+            history.current.future.push(facilities);
+            rawSetFacilities(previous);
+            setSelected(null);
+          }}
+        >
+          Undo facility edit
+        </button>
+        <button
+          disabled={!history.current.future.length}
+          onClick={() => {
+            const next = history.current.future.pop()!;
+            history.current.past.push(facilities);
+            rawSetFacilities(next);
+            setSelected(null);
+          }}
+        >
+          Redo
+        </button>
+      </div>
+      <div className="base-facility-list">
+        {facilities.map((f) => (
+          <button
+            key={f.id}
+            aria-pressed={selected === f.id}
+            onClick={() => setSelected(f.id)}
+          >
+            {f.name} · {f.mast} m {f.fixed ? "· fixed" : ""}
+          </button>
+        ))}
+      </div>
+      {picked && (
+        <section className="v1-facility">
+          <label>
+            Name
+            <input
+              value={picked.name}
+              onChange={(e) => update(picked.id, { name: e.target.value })}
+            />
+          </label>
+          <div className="v1-fields">
+            <label>
+              Latitude
+              <input
+                type="number"
+                min="-90"
+                max="90"
+                step="0.0001"
+                value={picked.lat}
+                onChange={(e) => update(picked.id, { lat: +e.target.value })}
+              />
+            </label>
+            <label>
+              Longitude east
+              <input
+                type="number"
+                step="0.0001"
+                value={picked.lon}
+                onChange={(e) => update(picked.id, { lon: +e.target.value })}
+              />
+            </label>
+            <label>
+              Panel / antenna height (m)
+              <input
+                type="number"
+                min="0"
+                max="100"
+                value={picked.mast}
+                onChange={(e) => update(picked.id, { mast: +e.target.value })}
+              />
+            </label>
+            {picked.role === "power" && (
+              <label>
+                Array area (m²)
+                <input
+                  type="number"
+                  min="0"
+                  value={picked.areaM2 ?? 0}
+                  onChange={(e) =>
+                    update(picked.id, { areaM2: +e.target.value })
+                  }
+                />
+              </label>
+            )}
+            <label>
+              Additional load (kW)
+              <input
+                type="number"
+                min="0"
+                step=".1"
+                value={picked.loadKW ?? 0}
+                onChange={(e) => update(picked.id, { loadKW: +e.target.value })}
+              />
+            </label>
+          </div>
+          <label>
+            <input
+              type="checkbox"
+              checked={!!picked.fixed}
+              onChange={(e) => update(picked.id, { fixed: e.target.checked })}
+            />{" "}
+            Fixed location during search
+          </label>
+          <div className="v1-actions">
+            <button aria-pressed={placing} onClick={() => setPlacing(!placing)}>
+              {placing ? "Click new position…" : "Move on map / terrain"}
+            </button>
+            <button
+              onClick={() => onLocate(picked.lat, picked.lon, picked.name)}
+            >
+              Inspect terrain ↗
+            </button>
+            <button
+              onClick={() => {
+                setFacilities((f) => f.filter((x) => x.id !== picked.id));
+                setSelected(null);
+              }}
+            >
+              Remove
+            </button>
+          </div>
+        </section>
+      )}
+      <h2>Mission and electrical assumptions</h2>
+      <label>
+        Start (UTC)
+        <input
+          type="datetime-local"
+          value={startLabel}
+          onChange={(e) => {
+            const t = Date.parse(e.target.value + "Z");
+            if (Number.isFinite(t)) {
+              useStore.getState().setPlaying(false);
+              useStore.getState().setTime(t);
+              useStore.getState().setWindowStart(t);
+            }
+          }}
+        />
+      </label>
+      <div className="v1-fields">
+        {numeric("Duration (days)", "days", 1, 60, 1)}
+        {numeric("Base demand (kW)", "loadKW", 0, 1e6, 0.1)}
+        {numeric("Usable battery (kWh)", "batteryKWh", 0, 1e7, 10)}
+        {numeric("Required reserve fraction", "reserveSoc", 0, 1, 0.05)}
+        {numeric("Array efficiency", "efficiency", 0.01, 1, 0.01)}
+        {numeric("System derating", "derate", 0.01, 1, 0.01)}
+      </div>
+      <label>
+        Panel model
+        <select
+          value={settings.panelMode}
+          onChange={(e) =>
+            setting("panelMode", e.target.value as "tracking" | "horizontal")
+          }
+        >
+          <option value="tracking">Ideal two-axis Sun tracking</option>
+          <option value="horizontal">Horizontal panel, cosine incidence</option>
+        </select>
+      </label>
+      <details className="v1-detail">
+        <summary>Electrical and sampling details</summary>
+        <div className="v1-fields">
+          {numeric("Initial state of charge", "initialSoc", 0, 1, 0.05)}
+          {numeric("Charge efficiency", "chargeEfficiency", 0.01, 1, 0.01)}
+          {numeric(
+            "Discharge efficiency",
+            "dischargeEfficiency",
+            0.01,
+            1,
+            0.01,
+          )}
+          {numeric("Solar flux at 1 AU (W/m²)", "solarFlux", 1, 2000, 1)}
+          {numeric(
+            "Fractional cable loss / km",
+            "cableLossPerKm",
+            0,
+            0.1,
+            0.001,
+          )}
+        </div>
+        <label>
+          Time step
+          <select
+            value={settings.stepMinutes}
+            onChange={(e) => setting("stepMinutes", +e.target.value)}
+          >
+            {[5, 10, 20, 60].map((n) => (
+              <option key={n} value={n}>
+                {n} minutes
+              </option>
+            ))}
+          </select>
+        </label>
+        <p>
+          Constant demand plus component loads. Usable battery excludes
+          inaccessible capacity. Initial charge is an input, not free recurring
+          energy. Panel efficiency is constant; thermal effects, degradation and
+          voltage-dependent cable physics are not modeled.
+        </p>
+      </details>
+      <details className="v1-detail">
+        <summary>Optional free-space radio budget</summary>
+        <label>
+          <input
+            type="checkbox"
+            checked={settings.rfEnabled}
+            onChange={(e) => setting("rfEnabled", e.target.checked)}
+          />{" "}
+          Require nonnegative link-budget margin
+        </label>
+        <div className="v1-fields">
+          {numeric("Frequency (GHz)", "frequencyGHz", 0.1, 100, 0.1)}
+          {numeric("Transmitter power (W)", "txPowerW", 0.1, 1e5, 1)}
+          {numeric("Transmit gain (dBi)", "txGainDbi", -20, 100, 1)}
+          {numeric("Surface receive gain (dBi)", "rxGainDbi", -20, 100, 1)}
+          {numeric("Earth receive gain (dBi)", "earthRxGainDbi", -20, 100, 1)}
+          {numeric("System noise (K)", "noiseK", 1, 1e5, 10)}
+          {numeric("Data rate (kb/s)", "rateKbps", 0.001, 1e7, 10)}
+          {numeric("Required Eb/N₀ (dB)", "requiredEbN0Db", -20, 100, 1)}
+          {numeric(
+            "Combined fixed losses (dB)",
+            "implementationLossDb",
+            0,
+            100,
+            1,
+          )}
+        </div>
+        <p>
+          Example assumptions, not actual DSN antenna performance. Friis
+          free-space loss and thermal-noise Eb/N₀. No Fresnel clearance, fading,
+          weather, station visibility/scheduling or pointing model.
+        </p>
+      </details>
+      <h2>Constraints and bounded search</h2>
+      <div className="v1-fields">
+        {numeric(
+          "Maximum corridor / radio link (km)",
+          "maxLinkKm",
+          0.01,
+          100,
+          0.1,
+        )}
+        {numeric("Pad–habitat exclusion (km)", "exclusionKm", 0, 100, 0.1)}
+        {numeric("Maximum terrain slope (°)", "maxSlopeDeg", 0, 90, 1)}
+        {numeric("Placement sensitivity radius (m)", "footprintM", 0, 500, 10)}
+        {numeric("Maximum Earth outage (h)", "maxOutageHours", 0, 1440, 1)}
+        <label>
+          Search radius (km)
           <input
             type="number"
-            min="0"
-            value={maxLink}
-            onChange={(e) => setMaxLink(Math.max(0, +e.target.value))}
+            min=".1"
+            max="10"
+            step=".1"
+            value={radius}
+            onChange={(e) => setRadius(+e.target.value)}
           />
         </label>
         <label>
-          Pad–habitat exclusion km
+          Height-sweep maximum (m)
           <input
             type="number"
-            min="0"
-            value={exclusion}
-            onChange={(e) => setExclusion(Math.max(0, +e.target.value))}
+            min="2"
+            max="100"
+            value={maxTower}
+            onChange={(e) => setMaxTower(+e.target.value)}
           />
         </label>
       </div>
-      {facilities.map((f) => (
-        <article className="v1-facility" key={f.id}>
-          <input
-            aria-label={"Facility name " + f.id}
-            value={f.name}
-            onChange={(e) =>
-              setFacilities((a) =>
-                a.map((q) =>
-                  q.id === f.id ? { ...q, name: e.target.value } : q,
-                ),
-              )
-            }
-          />
-          <p>
-            {f.role} · {f.lat.toFixed(4)}°, {f.lon.toFixed(4)}° · {f.mast} m
-          </p>
-          <button onClick={() => onLocate(f.lat, f.lon, f.name)}>
-            Show location ↗
-          </button>
+      <label>
+        <input
+          type="checkbox"
+          checked={settings.requireEarth}
+          onChange={(e) => setting("requireEarth", e.target.checked)}
+        />{" "}
+        Require habitat contact through habitat/relay nodes
+      </label>
+      <p className="v1-note">
+        Search is centred on the first habitat. One to three components may
+        move. Resource, habitat and other fixed anchors stay put. This is
+        geometric Earth access, not DSN scheduling or an RF link budget.
+      </p>
+      <div className="v1-actions">
+        <button
+          className="v1-primary"
+          disabled={busy || !ready || !facilities.length}
+          onClick={() => run("evaluate")}
+        >
+          Evaluate design
+        </button>
+        <button
+          disabled={busy || !ready || !facilities.length}
+          onClick={() => run("search")}
+        >
+          Search nearby layouts
+        </button>
+        <button
+          disabled={busy || !ready || !facilities.length}
+          onClick={() => run("height")}
+        >
+          Test tower heights
+        </button>
+        <button
+          disabled={busy || !ready || !facilities.length}
+          onClick={() => run("robustness")}
+        >
+          Test placement sensitivity
+        </button>
+        {busy && (
           <button
-            onClick={() => setFacilities((a) => a.filter((q) => q.id !== f.id))}
+            onClick={() => {
+              worker.current?.terminate();
+              worker.current = null;
+              setBusy(false);
+              setStatus("Calculation cancelled.");
+            }}
           >
-            Remove
+            Cancel
           </button>
-        </article>
-      ))}
-      {facilities.length > 0 && (
+        )}
+      </div>
+      <p role="status" aria-live="polite">
+        {status}
+      </p>
+      {duration > 0 && !busy && (
+        <small>Last calculation: {duration.toFixed(1)} s on this device.</small>
+      )}
+      {r && report && (
         <>
-          <h2>Layout report</h2>
+          <h2>
+            {r.feasible
+              ? "Meets the selected screening constraints"
+              : "Design needs changes"}
+          </h2>
+          {r.failures.map((f, i) => (
+            <p className="v1-alert" key={i}>
+              {f}
+            </p>
+          ))}
           <div className="v1-metrics">
             <div>
-              <small>Shortest tree</small>
-              <strong>{geometry.totalKm.toFixed(2)} km</strong>
+              <small>Unmet demand</small>
+              <strong>{r.power.unmetKWh.toFixed(2)} kWh</strong>
             </div>
             <div>
-              <small>Longest separation</small>
-              <strong>{geometry.maxSpanKm.toFixed(2)} km</strong>
+              <small>Minimum SOC</small>
+              <strong>{(r.power.minSoc * 100).toFixed(1)}%</strong>
             </div>
             <div>
-              <small>Exclusion conflicts</small>
-              <strong>{geometry.conflicts.length}</strong>
+              <small>Earth access</small>
+              <strong>{(r.contactShare * 100).toFixed(1)}%</strong>
+            </div>
+            <div>
+              <small>Generation</small>
+              <strong>{r.power.generatedKWh.toFixed(1)} kWh</strong>
             </div>
           </div>
-          <p className={geometry.connected ? "v1-note" : "v1-alert"}>
-            {geometry.connected
-              ? "All facilities can be joined within the selected geometric link limit."
-              : "This arrangement requires at least one connection longer than the selected limit."}
+          <PowerChart report={report} />
+          <p>
+            Battery ends at {r.power.finalKWh.toFixed(1)} kWh; longest
+            unmet-power spell {r.power.longestShortfallHours.toFixed(2)} h.
+            Longest Earth-contact outage {r.longestContactLossHours.toFixed(2)}{" "}
+            h.
           </p>
-          {geometry.conflicts.length > 0 && (
-            <p className="v1-alert">
-              A landing facility violates the selected habitat separation. This
-              is a planning constraint, not a physical hazard calculation.
-            </p>
+          <p>
+            Minimum tested-model battery capacity for this finite mission and
+            selected reserve:{" "}
+            <b>
+              {r.requiredBatteryKWh === null
+                ? "No finite recommendation"
+                : r.requiredBatteryKWh.toFixed(1) + " kWh"}
+            </b>
+            . Assumes the selected initial SOC; not a sustainable
+            repeating-cycle design.
+          </p>
+          {r.electricalConnected && report.arrayScale !== null && (
+            <>
+              <p>
+                At the current battery size, the electrical model needs{" "}
+                {Math.max(0, report.arrayScale * r.totalArrayM2).toFixed(1)} m²
+                total array area in the existing proportions. Communication and
+                slope constraints are assessed separately.
+              </p>
+              <button
+                onClick={() => {
+                  const scale = report.arrayScale!;
+                  setFacilities((f) =>
+                    f.map((x) =>
+                      x.role === "power"
+                        ? {
+                            ...x,
+                            areaM2:
+                              Math.ceil((x.areaM2 ?? 0) * scale * 10) / 10,
+                          }
+                        : x,
+                    ),
+                  );
+                }}
+              >
+                Apply proposed array sizes
+              </button>
+            </>
           )}
+          <h2>Eclipses and terrain obstructions</h2>
+          <p>
+            {r.eclipseEvents.length} sampled eclipse interval(s);{" "}
+            {r.eclipseLostGenerationKWh.toFixed(2)} kWh solar generation lost to
+            eclipse. Additional unmet demand:{" "}
+            {Math.max(0, r.eclipseExtraUnmetKWh).toFixed(2)} kWh.
+          </p>
+          <p>
+            Battery requirement without eclipses:{" "}
+            {r.withoutEclipseMinimumBatteryKWh?.toFixed(1) ?? "unavailable"}{" "}
+            kWh; with eclipses:{" "}
+            {r.requiredBatteryKWh?.toFixed(1) ?? "unavailable"} kWh.
+          </p>
+          {r.eclipseEvents.map((e, i) => (
+            <p className="v1-note" key={i}>
+              {new Date(
+                report.start + e.startIndex * settings.stepMinutes * 60000,
+              ).toISOString()}{" "}
+              →{" "}
+              {new Date(
+                report.start + e.endIndex * settings.stepMinutes * 60000,
+              ).toISOString()}{" "}
+              · minimum unocculted Sun {(e.minVisible * 100).toFixed(1)}%
+            </p>
+          ))}
+          {report.profiles.map((p) => (
+            <p className="v1-note" key={p.id}>
+              <b>{facilities.find((f) => f.id === p.id)?.name}</b>: {p.terrain};
+              slope {p.slope?.toFixed(1) ?? "unknown"}°.{" "}
+              {p.blocker && p.blocker.lossHours > 0
+                ? `Largest geometric-daylight loss bin: azimuth ${p.blocker.az.toFixed(1)}°, ridge ${p.blocker.distanceKm.toFixed(2)} km away at ${p.blocker.alt.toFixed(2)}°; ${p.blocker.lossHours.toFixed(2)} equivalent obscured-disc hours in that azimuth bin.`
+                : "No above-horizontal sunlight obstruction recorded."}
+            </p>
+          ))}
+          <h2>Geometric connections</h2>
           <table className="v1-table">
             <thead>
               <tr>
-                <th>Connection</th>
-                <th>Arc km</th>
-                <th>Terrain LOS</th>
+                <th>Link</th>
+                <th>km</th>
+                <th>Clearance</th>
               </tr>
             </thead>
             <tbody>
-              {links.map((e) => (
+              {report.links.map((e) => (
                 <tr key={e.a + e.b}>
                   <td>
                     {facilities.find((f) => f.id === e.a)?.name} →{" "}
@@ -305,62 +1051,106 @@ export function BasePlanner({
                   </td>
                   <td>{e.km.toFixed(2)}</td>
                   <td>
-                    {e.status}
-                    {advanced && e.minClearanceM !== null ? (
-                      <small> {e.minClearanceM.toFixed(1)} m min</small>
-                    ) : null}
+                    {e.km > settings.maxLinkKm ? "over limit" : e.status}{" "}
+                    {e.minClearanceM?.toFixed(1)} m
+                    {settings.rfEnabled && (
+                      <small> RF {e.rfMarginDb?.toFixed(1)} dB margin</small>
+                    )}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
           <p className="v1-note">
-            Shortest tree uses surface arc distances. LOS checks straight
-            segments against the available DEM chain; clear does not establish a
-            reliable RF link. Links exceeding detailed patch coverage use
-            coarser terrain.
+            Power facilities share an ideal bus only when all
+            habitat/power/relay nodes connect through clear straight corridors.
+            Such corridors are conservative siting constraints, not routed
+            cable. Radio routing uses habitat/relay nodes only; clear LOS does
+            not prove an RF link.
           </p>
-          <h2>Simultaneous operations</h2>
-          <p>
-            {temporal?.concurrent !== null && temporal?.concurrent !== undefined
-              ? (temporal.concurrent * 100).toFixed(1) +
-                "% of hourly samples have all power sites sunlit and all habitats directly Earth-visible."
-              : "Add at least one habitat and one power installation to evaluate overlapping availability."}
-          </p>
-          <p className="v1-note">
-            60 shared days. This metric does not model storage, loads, relays or
-            operational sufficiency. Relay facilities currently participate in
-            the geometric layout, not automatic relay routing.
-          </p>
-          <div className="v1-actions">
-            <button
-              onClick={() =>
-                setSaved((a) => [
-                  ...a,
-                  {
-                    name: "Layout " + (a.length + 1),
-                    report: JSON.parse(JSON.stringify(report)),
-                  },
-                ])
-              }
-            >
-              Keep layout for comparison
-            </button>
-            <button
-              onClick={() =>
-                exportFile("LUNAR-base.json", JSON.stringify(report, null, 2))
-              }
-            >
-              Save base project ↓
-            </button>
-          </div>
         </>
       )}
+      {alternatives.length > 0 && (
+        <>
+          <h2>Search alternatives</h2>
+          <p className="v1-note">{searchNote}</p>
+          {alternatives.map((a, i) => (
+            <article className="v1-facility" key={i}>
+              <h3>
+                Alternative {i + 1} ·{" "}
+                {a.feasible ? "passes screening" : "constraints unmet"}
+              </h3>
+              <p>
+                {a.arrayM2.toFixed(1)} m² array ·{" "}
+                {a.batteryKWh?.toFixed(1) ?? "—"} kWh recommended storage ·{" "}
+                {a.towerM} m highest relay · Earth{" "}
+                {(a.contactShare * 100).toFixed(1)}%
+              </p>
+              <p>{a.failures.join("; ")}</p>
+              <button
+                onClick={() => {
+                  setFacilities(a.facilities);
+                  setStatus(
+                    "Alternative applied. Evaluate for the full report.",
+                  );
+                }}
+              >
+                Apply facilities
+              </button>
+              <button
+                onClick={() =>
+                  exportFile(
+                    "LUNAR-alternative-" + (i + 1) + ".json",
+                    JSON.stringify(
+                      {
+                        ...project(),
+                        facilities: a.facilities,
+                        report: null,
+                        searchResult: a,
+                        searchNote,
+                      },
+                      null,
+                      2,
+                    ),
+                  )
+                }
+              >
+                Export alternative
+              </button>
+            </article>
+          ))}
+        </>
+      )}
+      <div className="v1-actions">
+        <button
+          onClick={() =>
+            exportFile(
+              "LUNAR-base-v1.1.json",
+              JSON.stringify(project(), null, 2),
+            )
+          }
+        >
+          Save complete base project ↓
+        </button>
+        <button
+          onClick={() =>
+            setSnapshots((a) => [
+              ...a,
+              {
+                name: "Layout " + (a.length + 1),
+                project: JSON.parse(JSON.stringify(project())),
+              },
+            ])
+          }
+        >
+          Keep alternative
+        </button>
+      </div>
       <label className="v1-upload">
-        Open a base project
+        Open base project
         <input
           type="file"
-          accept="application/json,.json"
+          accept=".json,application/json"
           onChange={(e) => {
             const f = e.target.files?.[0];
             if (f) void open(f);
@@ -368,54 +1158,110 @@ export function BasePlanner({
           }}
         />
       </label>
-      {saved.length > 0 && (
-        <>
-          <h2>Saved alternatives</h2>
-          {saved.map((s, i) => {
-            const r = s.report as typeof report;
-            return (
-              <article className="v1-facility" key={i}>
-                <h3>{s.name}</h3>
-                <p>
-                  {r.facilities.length} facilities ·{" "}
-                  {r.geometry.totalKm.toFixed(2)} km tree ·{" "}
-                  {r.geometry.conflicts.length} conflicts
-                </p>
-                <button
-                  onClick={() =>
-                    exportFile(
-                      "LUNAR-" + s.name + ".json",
-                      JSON.stringify(s.report, null, 2),
-                    )
-                  }
-                >
-                  Export snapshot ↓
-                </button>
-                <button
-                  onClick={() => {
-                    setFacilities(r.facilities);
-                    setMaxLink(r.constraints.maxLinkKm);
-                    setExclusion(r.constraints.habitatPadExclusionKm);
-                  }}
-                >
-                  Restore facilities
-                </button>
-              </article>
-            );
-          })}
-          <p className="v1-note">
-            Snapshots retain their original dates and assumptions; restoring
-            facilities recalculates under current settings. Export snapshots
-            before closing the page.
-          </p>
-        </>
-      )}
+      {snapshots.map((s, i) => (
+        <div className="v1-facility" key={i}>
+          <b>{s.name}</b>
+          <button
+            onClick={() => {
+              try {
+                restore(s.project);
+              } catch (e) {
+                setStatus(String(e));
+              }
+            }}
+          >
+            Restore complete scenario
+          </button>
+          <button
+            onClick={() =>
+              exportFile(
+                "LUNAR-" + s.name + ".json",
+                JSON.stringify(s.project, null, 2),
+              )
+            }
+          >
+            Export
+          </button>
+        </div>
+      ))}
       <details className="v1-detail">
-        <summary>What this prototype does not establish</summary>
-        {report.limits.map((v) => (
-          <p key={v}>{v}</p>
+        <summary>Model boundaries and evidence</summary>
+        {LIMITS.map((l) => (
+          <p key={l}>{l}</p>
         ))}
       </details>
     </>
+  );
+}
+const LIMITS = [
+  "Research prototype. Independent Earth-map holdout is unresolved; Earth-dependent recommendations are provisional.",
+  "Analytic circular Earth/Sun overlap; terrain-visible and unocculted fractions are multiplied. Atmospheric refraction and exact combined masks are omitted.",
+  "Time bins approximate eclipse contacts and energy integration. Use 5-minute sampling near an event; no sub-step timing claim.",
+  "Terrain resolution varies. Interpolation and minimum sampled clearance do not resolve boulders or establish terrain uncertainty.",
+  "Optional free-space RF budget omits Fresnel clearance, weather, fading and pointing. No DSN scheduling, plume safety, thermal survival, vehicle dynamics or certified landing safety.",
+  "Search ranks sampled alternatives by feasibility, unmet energy, Earth access, array area, storage, tower height and clear-link length. It is not exhaustive over continuous terrain.",
+];
+function PowerChart({ report }: { report: Report }) {
+  const r = report.result,
+    n = r.generation.length,
+    capacity = report.settings.batteryKWh,
+    max = Math.max(1, capacity),
+    stride = Math.max(1, Math.floor(n / 400)),
+    points = r.power.socKWh
+      .filter((_, i) => i % stride === 0 || i === n)
+      .map((v, j) => {
+        const i = Math.min(j * stride, n);
+        return `${(i / n) * 600},${110 - (v / max) * 95}`;
+      })
+      .join(" ");
+  return (
+    <figure>
+      <svg
+        viewBox="0 0 600 130"
+        role="img"
+        aria-label="Battery energy over mission; gold bands mark solar eclipses"
+      >
+        <rect width="600" height="120" fill="#0b131a" />
+        {r.eclipseEvents.map((e, i) => (
+          <rect
+            key={i}
+            x={(e.startIndex / n) * 600}
+            width={Math.max(1, ((e.endIndex - e.startIndex) / n) * 600)}
+            y="0"
+            height="120"
+            fill="#d9bd7d"
+            opacity=".22"
+          />
+        ))}
+        <line
+          x1="0"
+          x2="600"
+          y1={110 - report.settings.reserveSoc * 95}
+          y2={110 - report.settings.reserveSoc * 95}
+          stroke="#e58b7b"
+          strokeDasharray="4 3"
+        />
+        <polyline
+          fill="none"
+          stroke="#8ad2bd"
+          strokeWidth="2"
+          points={points}
+        />
+        <text x="4" y="12" fill="#dce5e9" fontSize="10">
+          Battery kWh · reserve dashed · eclipse gold
+        </text>
+        <text x="4" y="127" fill="#dce5e9" fontSize="9">
+          Start
+        </text>
+        <text x="530" y="127" fill="#dce5e9" fontSize="9">
+          {report.settings.days} days
+        </text>
+      </svg>
+      <figcaption>
+        Finite mission, initial charge{" "}
+        {(report.settings.initialSoc * 100).toFixed(0)}%. No guarantee beyond
+        this window.
+      </figcaption>
+    </figure>
   );
 }
