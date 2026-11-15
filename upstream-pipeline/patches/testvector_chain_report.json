@@ -1,0 +1,412 @@
+{
+  "scheme": {
+    "ds_min_m": 20.0,
+    "growth": 0.002,
+    "max_range_m": 300000.0,
+    "samples_per_ray": 2202,
+    "az_step_deg": 0.5,
+    "observer_height_m": 2.0,
+    "elev_decimals": 6
+  },
+  "polar_points_chain_without_patch": [
+    {
+      "name": "Shackleton rim connecting ridge",
+      "lat": -89.45,
+      "lon": 222.7,
+      "azimuths_set_by": {
+        "patch": 0,
+        "L1": 720,
+        "L0": 0,
+        "whole-Moon map": 0
+      },
+      "chain_minus_tiles_only_deg": {
+        "max_abs": 4.99170146661676e-07,
+        "at_az_deg": 178.0,
+        "old_deg": -0.819833,
+        "new_deg": -0.819833,
+        "new_horizon_dist_km": 0.7,
+        "new_set_by": "L1",
+        "azimuths_changed_over_1e-6": 0,
+        "min_diff": -4.981915342483489e-07,
+        "max_diff": 4.99170146661676e-07,
+        "surface_h_change_m": 0.0
+      }
+    },
+    {
+      "name": "Shackleton crater floor",
+      "lat": -89.67,
+      "lon": 129.2,
+      "azimuths_set_by": {
+        "patch": 0,
+        "L1": 720,
+        "L0": 0,
+        "whole-Moon map": 0
+      },
+      "chain_minus_tiles_only_deg": {
+        "max_abs": 4.990931330439707e-07,
+        "at_az_deg": 288.0,
+        "old_deg": 20.199718,
+        "new_deg": 20.199718,
+        "new_horizon_dist_km": 9.76,
+        "new_set_by": "L1",
+        "azimuths_changed_over_1e-6": 0,
+        "min_diff": -4.990931330439707e-07,
+        "max_diff": 4.987937423095445e-07,
+        "surface_h_change_m": 0.0
+      }
+    },
+    {
+      "name": "Malapert massif",
+      "lat": -85.99,
+      "lon": 357.1,
+      "azimuths_set_by": {
+        "patch": 0,
+        "L1": 692,
+        "L0": 28,
+        "whole-Moon map": 0
+      },
+      "chain_minus_tiles_only_deg": {
+        "max_abs": 4.99723998181878e-07,
+        "at_az_deg": 309.0,
+        "old_deg": 5.651642,
+        "new_deg": 5.651642,
+        "new_horizon_dist_km": 0.12,
+        "new_set_by": "L1",
+        "azimuths_changed_over_1e-6": 0,
+        "min_diff": -4.985583483829714e-07,
+        "max_diff": 4.99723998181878e-07,
+        "surface_h_change_m": 0.0
+      }
+    },
+    {
+      "name": "Nobile rim",
+      "lat": -85.2,
+      "lon": 31.0,
+      "azimuths_set_by": {
+        "patch": 0,
+        "L1": 720,
+        "L0": 0,
+        "whole-Moon map": 0
+      },
+      "chain_minus_tiles_only_deg": {
+        "max_abs": 4.998363243302606e-07,
+        "at_az_deg": 171.5,
+        "old_deg": 6.802582,
+        "new_deg": 6.802582,
+        "new_horizon_dist_km": 0.26,
+        "new_set_by": "L1",
+        "azimuths_changed_over_1e-6": 0,
+        "min_diff": -4.998363243302606e-07,
+        "max_diff": 4.997002119866423e-07,
+        "surface_h_change_m": 0.0
+      }
+    },
+    {
+      "name": "Haworth floor",
+      "lat": -87.5,
+      "lon": 355.0,
+      "azimuths_set_by": {
+        "patch": 0,
+        "L1": 720,
+        "L0": 0,
+        "whole-Moon map": 0
+      },
+      "chain_minus_tiles_only_deg": {
+        "max_abs": 4.993725490898271e-07,
+        "at_az_deg": 178.0,
+        "old_deg": 3.863625,
+        "new_deg": 3.863625,
+        "new_horizon_dist_km": 23.470216396568798,
+        "new_set_by": "L1",
+        "azimuths_changed_over_1e-6": 0,
+        "min_diff": -4.993725490898271e-07,
+        "max_diff": 4.991696851419647e-07,
+        "surface_h_change_m": 0.0
+      }
+    },
+    {
+      "name": "Near DEM edge 81S",
+      "lat": -81.0,
+      "lon": 60.0,
+      "azimuths_set_by": {
+        "patch": 0,
+        "L1": 10,
+        "L0": 580,
+        "whole-Moon map": 130
+      },
+      "chain_minus_tiles_only_deg": {
+        "max_abs": 1.5245240412509233,
+        "at_az_deg": 31.0,
+        "old_deg": -2.620522,
+        "new_deg": -1.095998,
+        "new_horizon_dist_km": 111.9632074221156,
+        "new_set_by": "whole-Moon map",
+        "azimuths_changed_over_1e-6": 130,
+        "min_diff": -4.98467663145874e-07,
+        "max_diff": 1.5245240412509233,
+        "surface_h_change_m": 0.0
+      }
+    }
+  ],
+  "patch_points": [
+    {
+      "name": "Apollo 17 site",
+      "lat": 20.1911,
+      "lon": 30.7723,
+      "patch": "apollo-17",
+      "surface_h_m": -2627.25,
+      "observer_height_from": "patch",
+      "horizon_min_deg": 0.2705982170679341,
+      "horizon_max_deg": 14.196859363225373,
+      "azimuths_set_by": {
+        "patch": 685,
+        "L1": 0,
+        "L0": 0,
+        "whole-Moon map": 0,
+        "patch outer": 35
+      }
+    },
+    {
+      "name": "Apollo 15 site",
+      "lat": 26.13239,
+      "lon": 3.6333,
+      "patch": "apollo-15",
+      "surface_h_m": -1926.5,
+      "observer_height_from": "patch",
+      "horizon_min_deg": 0.4104753831418694,
+      "horizon_max_deg": 13.5700432961978,
+      "azimuths_set_by": {
+        "patch": 708,
+        "L1": 0,
+        "L0": 0,
+        "whole-Moon map": 0,
+        "patch outer": 12
+      }
+    },
+    {
+      "name": "IM-1 Odysseus site",
+      "lat": -80.13,
+      "lon": 1.44,
+      "patch": "im-1-odysseus",
+      "surface_h_m": 2591.625,
+      "observer_height_from": "patch",
+      "horizon_min_deg": -0.24320921800465792,
+      "horizon_max_deg": 11.079765714560551,
+      "azimuths_set_by": {
+        "patch": 674,
+        "L1": 0,
+        "L0": 0,
+        "whole-Moon map": 0,
+        "patch outer": 46
+      }
+    },
+    {
+      "name": "Chandrayaan-3 site",
+      "lat": -69.3741,
+      "lon": 32.32,
+      "patch": "chandrayaan-3",
+      "surface_h_m": 529.25,
+      "observer_height_from": "patch",
+      "horizon_min_deg": 0.49164408725404957,
+      "horizon_max_deg": 2.465845328761429,
+      "azimuths_set_by": {
+        "patch": 565,
+        "L1": 0,
+        "L0": 0,
+        "whole-Moon map": 0,
+        "patch outer": 155
+      }
+    },
+    {
+      "name": "10 km east of Apollo 11 site",
+      "lat": 0.674149,
+      "lon": 23.802942,
+      "patch": "apollo-11",
+      "surface_h_m": -2014.752,
+      "observer_height_from": "patch",
+      "horizon_min_deg": -0.40955246051736494,
+      "horizon_max_deg": 3.407288144989065,
+      "azimuths_set_by": {
+        "patch": 720,
+        "L1": 0,
+        "L0": 0,
+        "whole-Moon map": 0,
+        "patch outer": 0
+      }
+    },
+    {
+      "name": "Whole-Moon map only 30N 100W",
+      "lat": 30.0,
+      "lon": -100.0,
+      "patch": null,
+      "surface_h_m": -925.259,
+      "observer_height_from": "whole-Moon map",
+      "horizon_min_deg": -0.8708763632710466,
+      "horizon_max_deg": 6.224389135354154,
+      "azimuths_set_by": {
+        "patch": 0,
+        "L1": 0,
+        "L0": 0,
+        "whole-Moon map": 720,
+        "patch outer": 0
+      }
+    },
+    {
+      "name": "Connecting ridge 20 m patch centre",
+      "lat": -89.44715,
+      "lon": -137.151498,
+      "patch": "connecting-ridge",
+      "surface_h_m": 1953.1,
+      "observer_height_from": "patch",
+      "horizon_min_deg": -2.188512030386436,
+      "horizon_max_deg": 1.238082104766853,
+      "azimuths_set_by": {
+        "patch": 619,
+        "L1": 101,
+        "L0": 0,
+        "whole-Moon map": 0,
+        "patch outer": 0
+      }
+    },
+    {
+      "name": "Shackleton rim 20 m patch centre",
+      "lat": -89.78,
+      "lon": -155.7,
+      "patch": "shackleton-rim",
+      "surface_h_m": 1729.025,
+      "observer_height_from": "patch",
+      "horizon_min_deg": 1.7668395874383593,
+      "horizon_max_deg": 6.653979819982477,
+      "azimuths_set_by": {
+        "patch": 720,
+        "L1": 0,
+        "L0": 0,
+        "whole-Moon map": 0,
+        "patch outer": 0
+      }
+    },
+    {
+      "name": "de Gerlache rim 20 m patch centre",
+      "lat": -88.67,
+      "lon": -68.2,
+      "patch": "de-gerlache-rim",
+      "surface_h_m": 1810.275,
+      "observer_height_from": "patch",
+      "horizon_min_deg": -2.2274199895152345,
+      "horizon_max_deg": 0.906207606475926,
+      "azimuths_set_by": {
+        "patch": 430,
+        "L1": 290,
+        "L0": 0,
+        "whole-Moon map": 0,
+        "patch outer": 0
+      }
+    },
+    {
+      "name": "Malapert massif 20 m patch centre",
+      "lat": -85.964,
+      "lon": -2.319,
+      "patch": "malapert-massif",
+      "surface_h_m": 4991.6,
+      "observer_height_from": "patch",
+      "horizon_min_deg": -3.6834227758382183,
+      "horizon_max_deg": 0.9390163594736801,
+      "azimuths_set_by": {
+        "patch": 455,
+        "L1": 113,
+        "L0": 152,
+        "whole-Moon map": 0,
+        "patch outer": 0
+      }
+    },
+    {
+      "name": "Glaser spot 2 on the connecting ridge",
+      "lat": -89.4399,
+      "lon": 222.8524,
+      "patch": "connecting-ridge",
+      "surface_h_m": 1958.604,
+      "observer_height_from": "patch",
+      "horizon_min_deg": -2.7839714863509295,
+      "horizon_max_deg": -0.5539383431726099,
+      "azimuths_set_by": {
+        "patch": 445,
+        "L1": 275,
+        "L0": 0,
+        "whole-Moon map": 0,
+        "patch outer": 0
+      }
+    },
+    {
+      "name": "IM-2 Athena site (20 m patch)",
+      "lat": -84.7906,
+      "lon": 29.1957,
+      "patch": "im-2-athena-20m",
+      "surface_h_m": 5321.9,
+      "observer_height_from": "patch",
+      "horizon_min_deg": -1.4693718747099143,
+      "horizon_max_deg": 4.061340927175555,
+      "azimuths_set_by": {
+        "patch": 242,
+        "L1": 478,
+        "L0": 0,
+        "whole-Moon map": 0,
+        "patch outer": 0
+      }
+    },
+    {
+      "name": "LCROSS Centaur impact site (20 m patch)",
+      "lat": -84.6796,
+      "lon": -48.7093,
+      "patch": "lcross-centaur-20m",
+      "surface_h_m": -3833.975,
+      "observer_height_from": "patch",
+      "horizon_min_deg": 1.109045098744822,
+      "horizon_max_deg": 11.342524672076694,
+      "azimuths_set_by": {
+        "patch": 137,
+        "L1": 583,
+        "L0": 0,
+        "whole-Moon map": 0,
+        "patch outer": 0
+      }
+    },
+    {
+      "name": "Griffin Mission 1 site (20 m patch)",
+      "lat": -85.28,
+      "lon": 53.27,
+      "patch": "griffin-1-20m",
+      "surface_h_m": 915.45,
+      "observer_height_from": "patch",
+      "horizon_min_deg": -2.1611522570206416,
+      "horizon_max_deg": 7.858816160468708,
+      "azimuths_set_by": {
+        "patch": 209,
+        "L1": 478,
+        "L0": 33,
+        "whole-Moon map": 0,
+        "patch outer": 0
+      }
+    },
+    {
+      "name": "IM-1 Odysseus site (20 m patch)",
+      "lat": -80.13,
+      "lon": 1.44,
+      "patch": "im-1-odysseus-20m",
+      "surface_h_m": 2591.95,
+      "observer_height_from": "patch",
+      "horizon_min_deg": -0.28279550822361604,
+      "horizon_max_deg": 11.115603320818739,
+      "azimuths_set_by": {
+        "patch": 653,
+        "L1": 0,
+        "L0": 17,
+        "whole-Moon map": 50,
+        "patch outer": 0
+      }
+    }
+  ],
+  "bytes": {
+    "horizon_testvectors.json": 41866,
+    "patch_testvectors.json": 102493
+  }
+}

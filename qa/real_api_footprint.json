@@ -1,0 +1,55 @@
+{
+  "status": "MEETS_MACROSCALE_SCREEN",
+  "site": {
+    "lat": -89.4399,
+    "lon": 222.8524
+  },
+  "settings": {
+    "radius_m": 100,
+    "max_plane_or_p95_slope_deg": 10.0,
+    "max_plane_residual_rms_m": 2.0,
+    "min_coverage": 0.995
+  },
+  "metrics": {
+    "plane_slope_deg": 0.7802213616062591,
+    "slope_p95_deg": 5.175931251253129,
+    "slope_max_deg": 6.21896505255642,
+    "plane_residual_rms_m": 1.0920324372594261,
+    "elevation_range_m": 6.248284257314026
+  },
+  "coverage_fraction": 1.0,
+  "valid_samples": 81,
+  "total_samples": 81,
+  "native_pixel_m": 20.0,
+  "native_pixels_across_diameter": 10.0,
+  "sample_grid_spacing_m": 20.0,
+  "grid_shape": [
+    11,
+    11
+  ],
+  "model": "DEM macroscale plane slope, p95 local central-difference slope and RMS plane residual",
+  "limitations": [
+    "Not a landing-safety assessment; does not resolve subpixel boulders, hazards, soil mechanics or descent constraints.",
+    "Thresholds are selected by the user, not published NASA lander specifications.",
+    "Deterministic measured raster sampling; DEM accuracy, vertical offsets and registration uncertainty not statistically propagated.",
+    "Spherical-local points generated exactly; sampled raster interpolation does not add measurement resolution."
+  ],
+  "sources": [
+    {
+      "filename": "LDEM_20M_connecting_ridge_crop.TIF",
+      "native_pixel_m": 20.0,
+      "projection": "PROJCS[\"Moon (2015) - Sphere / Ocentric / South Polar\",GEOGCS[\"Moon (2015) - Sphere / Ocentric\",DATUM[\"Moon (2015) - Sphere\",SPHEROID[\"Moon (2015) - Sphere\",1737400,0,AUTHORITY[\"IAU\",\"30100\"]],AUTHORITY[\"IAU\",\"30100\"]],PRIMEM[\"Reference Meridian\",0,AUTHORITY[\"IAU\",\"30100\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"IAU\",\"30100\"]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-90],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",NORTH],AXIS[\"Northing\",NORTH],AUTHORITY[\"IAU\",\"30135\"]]",
+      "sampling": "bilinear native pixels"
+    },
+    {
+      "filename": "LDEM_80S_80MPP_ADJ.TIF",
+      "native_pixel_m": 80.0,
+      "projection": "PROJCS[\"Moon (2015) - Sphere / Ocentric / South Polar\",GEOGCS[\"Moon (2015) - Sphere / Ocentric\",DATUM[\"Moon (2015) - Sphere\",SPHEROID[\"Moon (2015) - Sphere\",1737400,0,AUTHORITY[\"IAU\",\"30100\"]],AUTHORITY[\"IAU\",\"30100\"]],PRIMEM[\"Reference Meridian\",0,AUTHORITY[\"IAU\",\"30100\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"IAU\",\"30100\"]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-90],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",NORTH],AXIS[\"Northing\",NORTH],AUTHORITY[\"IAU\",\"30135\"]]",
+      "sampling": "bilinear native pixels"
+    }
+  ],
+  "source_sample_counts": {
+    "LDEM_20M_connecting_ridge_crop.TIF": 121
+  },
+  "provenance_note": "Conservative largest native pixel spacing among DEM layers actually used at sampled points; boundary registration and DEM uncertainties remain unassessed."
+}

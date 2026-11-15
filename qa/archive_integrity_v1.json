@@ -1,0 +1,25 @@
+{
+  "archives": [
+    {
+      "file": "ridge-2m.json",
+      "sha256": "aaf679270ffb83f848c2304700b3de46b998a9eddf1d7bb960205183836f6623",
+      "byte_identical": true
+    },
+    {
+      "file": "earth-control.json",
+      "sha256": "20dc56da7aed8f4fe94fea9c72ca13f3aaceadd4a943b95d2be83dc50a3013c2",
+      "byte_identical": true
+    },
+    {
+      "file": "ridge-10m.json",
+      "sha256": "c54228a5d265418ecbcbd39b4a5bd0cd2e879fe52749dc1127fbcded6a02b638",
+      "byte_identical": true
+    }
+  ],
+  "new_science_changes": [
+    "engine/lunar/eclipse.py",
+    "engine/lunar/mission_analysis.py",
+    "engine/scripts/science_server.py"
+  ],
+  "note": "Archives are original modeled results, not updated V1 recalculations."
+}
