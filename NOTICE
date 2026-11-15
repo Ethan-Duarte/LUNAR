@@ -22,3 +22,5 @@ and imagery retain their credits in their metadata. Original upstream docs are
 preserved under upstream-docs and upstream-pipeline for attribution/provenance.
 
 LUNAR 1.1-preview.1 modifications: original connected-base engineering model, worker search, project workflows, map editing, RF screening, eclipse overlap integration, observer-centred measured-terrain remesh, original educational notes and related checks. The attributed rendering/geometry foundation remains under its existing license. AI-assisted development disclosure remains in README.
+
+LUNAR V1.2 modifications (2026-11-15): adaptive mesh sampling, import recovery, original contextual education and guided Base interface. NASA Apollo photos and source/credit hashes: frontend/public/lunar/history/credits.json.

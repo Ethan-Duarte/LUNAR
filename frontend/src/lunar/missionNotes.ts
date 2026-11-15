@@ -21,4 +21,8 @@ export const MISSION_NOTES: Record<
       "What does our elevation grid tell you about this site, and which hazards would require finer imagery or measurements?",
     source: "https://science.nasa.gov/mission/surveyor-1/",
   },
+  "apollo-12": {text:"Apollo 12 demonstrated a precise arrival near Surveyor 3. Retrieving spacecraft material let researchers examine exposure to the lunar environment.",question:"How would uncertainty in landing position affect access to a nearby target?",source:"https://www.nasa.gov/missions/apollo/apollo-12-the-pinpoint-mission/"},
+  "apollo-14": {text:"Apollo 14 explored the Fra Mauro uplands. Its surface work connects site selection with the practical distance astronauts must travel to reach useful samples.",question:"Does a promising science destination also provide useful illumination and a practical connection to a habitat?",source:"https://www.nasa.gov/missions/apollo/apollo-14-mission-details/"},
+  "apollo-16": {text:"Apollo 16 investigated the Descartes highlands with a lunar rover. Highland terrain offers a different setting from the smoother volcanic plains visited by earlier crews.",question:"Compare this terrain with Apollo 11. Which differences are visible in our elevation grid, and which would need finer data?",source:"https://www.nasa.gov/specials/apollo50th/missions.html"},
+  "apollo-17": {text:"Apollo 17 explored Taurus–Littrow in December 1972. A valley beside substantial relief provides a useful setting for examining the relationship between local terrain and the sky.",question:"Could a nearby ridge affect an observer’s visibility even when the body is above the mathematical horizon?",source:"https://science.nasa.gov/solar-system/moon/history-of-lunar-exploration/"},
 };

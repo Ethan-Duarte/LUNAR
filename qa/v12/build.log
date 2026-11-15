@@ -1,0 +1,21 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> lunar-field-atlas@1.2.0-preview.1 build
+> tsc -b && vite build
+
+vite v8.3.8 building client environment for production...
+transforming...
+✓ 610 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                             1.14 kB │ gzip:   0.70 kB
+dist/assets/planner.worker-BVlJ10NM.js     20.01 kB
+dist/assets/index-Dh9nQf2C.css             18.37 kB │ gzip:   4.86 kB
+dist/assets/index-DmtE2TZf.js           1,329.48 kB │ gzip: 375.00 kB
+
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 1.54s

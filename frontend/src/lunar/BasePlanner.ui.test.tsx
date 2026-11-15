@@ -88,3 +88,32 @@ it("undoes and redoes facility placement without reloading the workspace", () =>
   fireEvent.click(screen.getByText("Redo"));
   expect(screen.getByRole("button", { name: /habitat 1 ·/ })).toBeTruthy();
 });
+it('walks through explicit placement and restores the previous draft',()=>{
+ render(<BasePlanner {...props}/>);
+ fireEvent.click(screen.getByText('Use selected observer'));
+ fireEvent.change(screen.getByLabelText('Name'),{target:{value:'My original habitat'}});
+ fireEvent.click(screen.getByText('Start guided Base lesson'));
+ expect(screen.queryByRole('button',{name:/My original habitat ·/})).toBeNull();
+ fireEvent.click(screen.getByText('Next step'));
+ expect((screen.getByText('Next step') as HTMLButtonElement).disabled).toBe(true);
+ fireEvent.click(screen.getByText('Use selected observer'));
+ fireEvent.click(screen.getByText('Next step'));
+ expect((screen.getByLabelText('New component') as HTMLSelectElement).value).toBe('power');
+ fireEvent.click(screen.getByText('Use selected observer'));
+ fireEvent.click(screen.getByText('Next step'));
+ expect(screen.getByText('Evaluate and read the answer')).toBeTruthy();
+ fireEvent.click(screen.getByText('Return to my design'));
+ expect(screen.getByRole('button',{name:/My original habitat ·/})).toBeTruthy();
+})
+it('inspects by default and adds only once after selecting Add component',()=>{
+ render(<BasePlanner {...props}/>);
+ const map=screen.getByRole('img',{name:/Measured elevation base map/});
+ vi.spyOn(map,'getBoundingClientRect').mockReturnValue({left:0,top:0,width:320,height:320,right:320,bottom:320,x:0,y:0,toJSON:()=>({})});
+ fireEvent.click(map,{clientX:160,clientY:160});
+ expect(screen.queryByRole('button',{name:/habitat 1 ·/})).toBeNull();
+ fireEvent.click(screen.getByRole('button',{name:'Add component',exact:true}));
+ fireEvent.click(map,{clientX:160,clientY:160});
+ expect(screen.getByRole('button',{name:/habitat 1 ·/})).toBeTruthy();
+ fireEvent.click(map,{clientX:180,clientY:180});
+ expect(screen.queryByRole('button',{name:/habitat 2 ·/})).toBeNull();
+})

@@ -52,3 +52,11 @@ Base connections are not traversable routes. Sampled terrain LOS is not an RF li
 ## Required next evidence
 
 Investigate the two largest Earth-holdout outliers against reference metadata, terrain profiles, datum/frame and raster registration. Validate individual Earthrise/Earthset events externally. Test footprint robustness and global terrain regimes separately. Maintain fixed thresholds and preserve unresolved failures.
+
+## V1.2 preview usability checkpoint (2026-11-15)
+
+- Added explicit Inspect/Add/Move map modes, a seven-step Base lesson with failure/repair, contextual help, and disconnected-facility diagnostics.
+- File cancellation/empty selection never starts import; failed imports show errors. Render error boundaries provide recovery controls. Exact reported browser crash remains un-reproduced.
+- Removed the separate observer terrain patch; refine the existing measured mesh around the observer. Hardware visual acceptance pending.
+- Added original Mission/Landscape/Try it/Sources education with three NASA-credited Apollo photographs and provenance hashes.
+- Scientific model thresholds unchanged; independent Earth holdout remains failed. See UPDATE_V1_2.md for acceptance checks.

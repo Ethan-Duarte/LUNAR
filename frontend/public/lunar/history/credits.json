@@ -1,0 +1,23 @@
+[
+  {
+    "file": "apollo-11.jpg",
+    "source": "https://www.nasa.gov/wp-content/uploads/static/apollo50th/img/moonwalk.jpg",
+    "context": "https://www.nasa.gov/specials/apollo50th/missions.html",
+    "credit": "NASA",
+    "sha256": "4650f52b92c0b5ea8a3e86883fea26cd409573250cd2eaccefa69757cf7f61f2"
+  },
+  {
+    "file": "apollo-15.jpg",
+    "source": "https://www.nasa.gov/wp-content/uploads/static/apollo50th/img/apollo15-missions.jpg",
+    "context": "https://www.nasa.gov/specials/apollo50th/missions.html",
+    "credit": "NASA",
+    "sha256": "f405a924741d70cdee253484b14233e19737961931f2e671582351116e5ff969"
+  },
+  {
+    "file": "apollo-16.jpg",
+    "source": "https://www.nasa.gov/wp-content/uploads/static/apollo50th/img/apollo16-missions.jpg",
+    "context": "https://www.nasa.gov/specials/apollo50th/missions.html",
+    "credit": "NASA",
+    "sha256": "83edfc72c4d4d0217d53cc13c84132c0cc831cbdb68ff892a8b95e7b36d7f110"
+  }
+]

@@ -1,3 +1,7 @@
+# LUNAR V1.2 preview
+
+This checkpoint focuses on deliberate Base placement, an actual guided lesson, historical education and interface recovery. [Update and acceptance guide](UPDATE_V1_2.md). Visual acceptance remains pending; existing scientific limitations still apply.
+
 # LUNAR
 
 **Lunar Utility for Navigation, Analysis, & Reconnaissance — V1.1 engineering preview**

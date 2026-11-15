@@ -5,6 +5,9 @@ import type { Ephem } from "../lib/ephem";
 import { sourceHeight, type HeightSource } from "../lib/terrain";
 import { localFrame, R_KM, upVector } from "../lib/geo";
 import { useStore } from "../store";
+import {BASE_LESSON,lessonCanAdvance} from "./baseLesson";
+import {Help} from "./Help";
+import {ProjectFileInput} from "./ProjectFileInput";
 import { exportFile } from "./science";
 import { distanceKm, type Facility, type Role } from "./network";
 import {
@@ -121,6 +124,8 @@ export function BasePlanner({
     [role, setRole] = useState<Role>("habitat"),
     [selected, setSelected] = useState<string | null>(null),
     [placing, setPlacing] = useState(false),
+    [placementMode,setPlacementMode]=useState<"inspect"|"add"|"move">("inspect"),
+    [lesson,setLesson]=useState<number|null>(null),
     [radius, setRadius] = useState(2),
     [maxTower, setMaxTower] = useState(50),
     [report, setReport] = useState<Report | null>(null),
@@ -132,6 +137,7 @@ export function BasePlanner({
     [busy, setBusy] = useState(false),
     [searchNote, setSearchNote] = useState(""),
     [duration, setDuration] = useState(0);
+  const lessonBackup=useRef<unknown>(null);
   const history = useRef<{ past: Facility[][]; future: Facility[][] }>({
     past: [],
     future: [],
@@ -205,6 +211,7 @@ export function BasePlanner({
     ]);
     setSelected(id);
     setPlacing(false);
+    setPlacementMode("inspect");
     setStatus("Facility added. Recalculate after editing.");
   }
   function mapPlace(lat: number, lon: number, id?: string) {
@@ -212,14 +219,16 @@ export function BasePlanner({
       setSelected(id);
       return;
     }
-    if (placing && selected) {
+    if (placementMode === "move" && selected) {
       update(selected, { lat, lon });
       setPlacing(false);
-    } else add(lat, lon);
+      setPlacementMode("inspect");
+    } else if(placementMode === "add") add(lat, lon);
+    else setStatus("Inspect mode: select a facility, or choose Add component / Move component before clicking ground.");
   }
   useEffect(() => {
     onPlaceReady?.(mapPlace);
-  }, [onPlaceReady, facilities, role, mast, placing, selected]);
+  }, [onPlaceReady, facilities, role, mast, placing, selected,placementMode]);
   function update(id: string, changes: Partial<Facility>) {
     setFacilities((f) =>
       f.map((x) => (x.id === id ? { ...x, ...changes } : x)),
@@ -393,6 +402,10 @@ export function BasePlanner({
     hi = Math.max(...valid.map((p) => p.h)),
     picked = facilities.find((f) => f.id === selected),
     r = report?.result;
+  const lessonStep=lesson===null?null:BASE_LESSON[lesson];
+  useEffect(()=>{if(lesson===1)setRole("habitat");if(lesson===2)setRole("power")},[lesson]);
+  function startLesson(){lessonBackup.current=JSON.parse(JSON.stringify(project()));setFacilities([]);setSelected(null);setSettings({...DEFAULT_ENGINEERING,days:2,loadKW:1,requireEarth:false,maxSlopeDeg:90});setPlacementMode("inspect");setLesson(0)}
+  function endLesson(restorePrevious:boolean){if(restorePrevious&&lessonBackup.current)restore(lessonBackup.current);setLesson(null);setPlacementMode("inspect")}
   const numeric = (
     label: string,
     key: keyof EngineeringSettings,
@@ -400,7 +413,7 @@ export function BasePlanner({
     max: number,
     step: number,
   ) => (
-    <label>
+    <div className="base-field"><label>
       {label}
       <input
         type="number"
@@ -410,10 +423,10 @@ export function BasePlanner({
         value={settings[key] as number}
         onChange={(e) => setting(key, +e.target.value as never)}
       />
-    </label>
+    </label>{SETTING_HELP[key]&&<Help title={label}><p>{SETTING_HELP[key]}</p></Help>}</div>
   );
   return (
-    <>
+    <div className="base-workspace" data-lesson-target={lessonStep?.target??"none"}>
       <p className="v1-eyebrow">LUNAR / CONNECTED BASE ENGINEERING</p>
       <h1>Design a place to operate.</h1>
       <p>
@@ -426,6 +439,8 @@ export function BasePlanner({
           Advanced mode exposes the complete engineering workspace.
         </p>
       )}
+      {lessonStep&&lesson!==null?<section className="base-lesson" aria-label="Guided Base lesson"><p className="v1-eyebrow">STEP {lesson+1} / {BASE_LESSON.length}</p><h2>{lessonStep.title}</h2><p>{lessonStep.body}</p>{lesson===4&&<button onClick={()=>{setFacilities(f=>f.map(x=>x.role==='power'?{...x,areaM2:0}:x));setSettings(v=>({...v,batteryKWh:0,loadKW:1,days:2}))}}>Try insufficient power</button>}{lesson===5&&<button onClick={()=>{setFacilities(f=>f.map(x=>x.role==='power'?{...x,areaM2:20}:x));setSettings(v=>({...v,batteryKWh:100,loadKW:1,days:2}))}}>Restore lesson power</button>}<div className="v1-actions"><button disabled={lesson===0} onClick={()=>setLesson(lesson-1)}>Back</button>{lesson<BASE_LESSON.length-1?<button disabled={!lessonCanAdvance(lesson,facilities,r??null)} onClick={()=>setLesson(lesson+1)}>Next step</button>:<button onClick={()=>endLesson(false)}>Keep this design</button>}<button onClick={()=>endLesson(true)}>Return to my design</button></div><p className="v1-note">Next unlocks when the step’s task is complete. The lesson relaxes slope/Earth requirements to isolate electricity; restore realistic constraints afterward.</p></section>:<button className="v1-primary" onClick={startLesson}>Start guided Base lesson</button>}
+      <section data-guide="components"><div className="v1-segment" aria-label="Base map interaction">{([['inspect','Inspect'],['add','Add component'],['move','Move component']] as const).map(([mode,label])=><button key={mode} aria-pressed={placementMode===mode} disabled={mode==='move'&&!selected} onClick={()=>{setPlacementMode(mode);setPlacing(mode==='move')}}>{label}</button>)}</div><p role="status" className="base-mode">{placementMode==='inspect'?'Inspect: clicking empty ground never adds a component.':placementMode==='add'?`Add: click ground once to place a ${role}.`:'Move: click a new position for the selected component.'}</p>
       <div className="v1-fields">
         <label>
           New component
@@ -485,19 +500,18 @@ export function BasePlanner({
           onLocate(-89.4399, 222.8524, "Connecting Ridge tutorial");
         }}
       >
-        Load electrical tutorial
+        Load example design
       </button>
-      <p className="v1-note">
-        Click empty ground to add a {role}. Select a facility, then “Move on
-        map” to relocate it. Habitat/resource anchors start fixed for searches.
-      </p>
+      <Help title="Placing components"><p>Use Inspect to select existing facilities. Add component places one facility and returns to Inspect. Move component relocates the selected facility once. Fixed means a location stays fixed during a search; it does not prevent manual edits.</p></Help></section>
       <svg
         className="base-map"
         viewBox="0 0 320 320"
         role="img"
         aria-label="Measured elevation base map; click to place a facility"
         onClick={(e) => {
+          if(placementMode === "inspect"){setStatus("Inspect mode: use Add component to place a facility.");return}
           const box = e.currentTarget.getBoundingClientRect();
+          if(box.width<=0||box.height<=0)return;
           const east =
               ((((e.clientX - box.left) / box.width) * 320 - 160) / 140) *
               extent,
@@ -578,7 +592,8 @@ export function BasePlanner({
                       ? "#78b9dc"
                       : "#e5ecee"
                 }
-                stroke="#111"
+                stroke={r?.disconnectedIds?.includes(f.id)?"#f18278":"#111"}
+                strokeWidth={r?.disconnectedIds?.includes(f.id)?3:1}
               />
               <text x={p[0] + 9} y={p[1] - 8} fill="white" fontSize="10">
                 {f.name}
@@ -701,7 +716,7 @@ export function BasePlanner({
             Fixed location during search
           </label>
           <div className="v1-actions">
-            <button aria-pressed={placing} onClick={() => setPlacing(!placing)}>
+            <button aria-pressed={placing} onClick={() => {setPlacing(!placing);setPlacementMode(placing?"inspect":"move")}}>
               {placing ? "Click new position…" : "Move on map / terrain"}
             </button>
             <button
@@ -720,7 +735,7 @@ export function BasePlanner({
           </div>
         </section>
       )}
-      <h2>Mission and electrical assumptions</h2>
+      <h2>Mission and electrical assumptions</h2><Help title="Power, energy and this mission"><p>kW is a rate; kWh is energy over time. A constant 1 kW demand consumes 24 kWh per day. Demand is for the whole base, plus any additional per-component loads. Adding a habitat with 0 additional load does not automatically add another 1 kW.</p></Help>
       <label>
         Start (UTC)
         <input
@@ -830,7 +845,7 @@ export function BasePlanner({
           weather, station visibility/scheduling or pointing model.
         </p>
       </details>
-      <h2>Constraints and bounded search</h2>
+      <h2>Constraints and bounded search</h2><Help title="What a search can change"><p>Fix a habitat or resource anchor. Leave one to three other facilities movable. Search tests nine positions around the first habitat, checks connections and resizes shortlisted arrays against current storage. It samples candidates; it does not prove a continuous global optimum.</p></Help>
       <div className="v1-fields">
         {numeric(
           "Maximum corridor / radio link (km)",
@@ -878,7 +893,7 @@ export function BasePlanner({
         move. Resource, habitat and other fixed anchors stay put. This is
         geometric Earth access, not DSN scheduling or an RF link budget.
       </p>
-      <div className="v1-actions">
+      <div className="v1-actions" data-guide="evaluate">
         <button
           className="v1-primary"
           disabled={busy || !ready || !facilities.length}
@@ -930,6 +945,8 @@ export function BasePlanner({
               ? "Meets the selected screening constraints"
               : "Design needs changes"}
           </h2>
+          <Help title="Reading the verdict"><p>All selected constraints must pass. A precharged battery can supply demand even when arrays are disconnected; that does not make the layout connected or sustainable. Electrical demand, connectivity, terrain and Earth access are separate checks.</p></Help>
+          {!r.electricalConnected&&<p className="v1-alert">Generation below means power delivered to the shared bus. A disconnected layout is conservatively assigned zero delivered solar power; the arrays may still receive sunlight. Inspect the highlighted components and connection table.</p>}
           {r.failures.map((f, i) => (
             <p className="v1-alert" key={i}>
               {f}
@@ -1121,7 +1138,7 @@ export function BasePlanner({
           ))}
         </>
       )}
-      <div className="v1-actions">
+      <div className="v1-actions" data-guide="save">
         <button
           onClick={() =>
             exportFile(
@@ -1146,18 +1163,8 @@ export function BasePlanner({
           Keep alternative
         </button>
       </div>
-      <label className="v1-upload">
-        Open base project
-        <input
-          type="file"
-          accept=".json,application/json"
-          onChange={(e) => {
-            const f = e.target.files?.[0];
-            if (f) void open(f);
-            e.target.value = "";
-          }}
-        />
-      </label>
+      <Help title="Saving and opening"><p>Save complete base project preserves facilities, dates and assumptions. Opening a project replaces those inputs and asks you to recalculate. Cancelling the file chooser leaves the current design unchanged. Keep alternative is a session snapshot; export it before closing.</p></Help>
+      <ProjectFileInput label="Open base project" onOpen={open}/>
       {snapshots.map((s, i) => (
         <div className="v1-facility" key={i}>
           <b>{s.name}</b>
@@ -1190,7 +1197,7 @@ export function BasePlanner({
           <p key={l}>{l}</p>
         ))}
       </details>
-    </>
+    </div>
   );
 }
 const LIMITS = [
@@ -1265,3 +1272,20 @@ function PowerChart({ report }: { report: Report }) {
     </figure>
   );
 }
+
+const SETTING_HELP:Partial<Record<keyof EngineeringSettings,string>>={
+ loadKW:'Constant total base demand. Energy consumed = kW × hours. Per-component additional loads are added to this number.',
+ batteryKWh:'Usable stored energy, not power. A 100 kWh battery cannot supply 1 kW indefinitely: even ideal storage lasts only 100 hours without generation.',
+ reserveSoc:'Minimum permitted fraction of usable capacity. A reserve of 0.2 means at least 20% must remain throughout the mission.',
+ efficiency:'Fraction of sunlight converted to electricity. 0.25 means 25%, before system derating and storage losses.',
+ derate:'Other generation losses, multiplied by efficiency. 0.8 retains 80%; it is not a measured performance prediction.',
+ days:'Finite study duration starting at the UTC date above. Extend it to include nights and eclipses; a short successful window does not prove long-term sustainability.',
+ initialSoc:'Fraction charged at the START. This energy must already be available; the model does not assume it is replenished each cycle.',
+ maxLinkKm:'Maximum length for a tested straight corridor or radio hop. It does not establish routed cable distance or RF reliability.',
+ exclusionKm:'Minimum selected pad–habitat spacing. This is a user planning rule, not a validated plume or debris safety distance.',
+ maxOutageHours:'Longest allowed loss of geometric Earth access. Relays can help only if a valid path reaches an Earth-visible node.',
+ footprintM:'Radius for nine common placement offsets. This samples sensitivity, not a probability of safe landing or a DEM error confidence interval.',
+ maxSlopeDeg:'Facility-centre slope limit on available elevation data. It does not resolve rocks or certify an entire foundation.',
+ chargeEfficiency:'Fraction of surplus electrical energy stored. 0.95 stores 95% and loses 5%.',
+ dischargeEfficiency:'Fraction of removed battery energy delivered to the load. 0.95 delivers 95% and loses 5%.'
+};

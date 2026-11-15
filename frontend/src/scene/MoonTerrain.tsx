@@ -1,6 +1,7 @@
 // LUNAR modification (2026-11-15): branding, workspace integration, settings isolation, display shadows or WebGL fallback. Original Apache-2.0 source: daniel27-space/lunar-navigator; see NOTICE.
 // LUNAR adaptation: adjustable display-only shadow floor; upstream geometry and lighting retained.
 import { useStore } from '../store'
+import {meshCoordinate} from '../lunar/meshFocus'
 // A detailed terrain surface: the south-pole tiles or an 80 m patch around a mission site.
 // Geometry is built on the real sphere (body-fixed km), so the Sun's body-fixed direction
 // lights it directly. Shadows are ray-marched through the elevation
@@ -11,7 +12,7 @@ import { overMarker } from './markers'
 import { invalidate, useThree, type ThreeEvent } from '@react-three/fiber'
 import { latLonOf, R2D, type Vec3 } from '../lib/geo'
 import { globalHeightAt, type GlobalDem } from '../lib/globalDem'
-import { frameDirection, sampleDir, sampleXY, type Level, type Terrain } from '../lib/terrain'
+import { frameDirection, frameProject, sampleDir, sampleXY, type Level, type Terrain } from '../lib/terrain'
 import { heightfieldHit } from './pickRay'
 import { useBusy } from './MoonCanvas'
 import type { Detail, LayerMode } from '../store'
@@ -83,8 +84,11 @@ export function globeMeshHeight(g: GlobalDem, d: Vec3, segments: [number, number
   return b + (c - b) * fv + (dd - c) * fu
 }
 
-function buildGeometry(t: Terrain, global: GlobalDem | null, GRID: number, globe: [number, number]): THREE.BufferGeometry {
+function buildGeometry(t: Terrain, global: GlobalDem | null, GRID: number, globe: [number, number], focus?: {lat:number;lon:number}): THREE.BufferGeometry {
   const l0 = t.levels[0]
+  const la=focus?focus.lat*Math.PI/180:0,lo=focus?focus.lon*Math.PI/180:0
+  const centre=focus?frameProject(t.frame,Math.cos(la)*Math.cos(lo),Math.cos(la)*Math.sin(lo),Math.sin(la),t.radiusM):null
+  const focusXY=centre&&centre[0]>l0.xMin&&centre[0]<l0.xMax&&centre[1]>l0.yMin&&centre[1]<l0.yMax?centre:null
   const fadeKm = fadeKmOf(t)
   const n = GRID + 1
   const pos = new Float32Array(n * n * 3)
@@ -95,8 +99,8 @@ function buildGeometry(t: Terrain, global: GlobalDem | null, GRID: number, globe
   for (let j = 0; j < n; j++) {
     for (let i = 0; i < n; i++) {
       const k = j * n + i
-      const x = l0.xMin + ((l0.xMax - l0.xMin) * i) / GRID
-      const y = l0.yMax - ((l0.yMax - l0.yMin) * j) / GRID
+      const x = meshCoordinate(i/GRID,l0.xMin,l0.xMax,focusXY?.[0])
+      const y = meshCoordinate(1-j/GRID,l0.yMin,l0.yMax,focusXY?.[1])
       // Pull edge vertices half a pixel inward so they sample real data.
       const xs = Math.min(Math.max(x, l0.xMin + l0.pixel), l0.xMax - l0.pixel)
       const ys = Math.min(Math.max(y, l0.yMin + l0.pixel), l0.yMax - l0.pixel)
@@ -425,6 +429,7 @@ interface Props {
   relief: GlobeRelief | null
   /** true for the south-pole tiles, which have the NASA overlay layers; a site patch has none */
   overlays: boolean
+  focus?: {lat:number;lon:number}
   /** how much detail to draw; affects the picture only */
   detail: Detail
   /** finer terrains drawn on top of this one; this surface is skipped under them */
@@ -435,13 +440,13 @@ interface Props {
 /** Shadow tracing while the view is moving: as many steps, and as long, as the Low setting uses all the time. */
 const MOVING = { steps: 48, growth: 1.2 }
 
-export function MoonTerrain({ terrain, sunDir, sunRad, layer, score, dataBase, map, relief, overlays, cuts, detail, onPick }: Props) {
+export function MoonTerrain({ terrain, sunDir, sunRad, layer, score, dataBase, map, relief, overlays, cuts, detail, onPick, focus }: Props) {
   const moving = useBusy()
   const gl = useThree((s) => s.gl)
   const global = relief ? relief.dem : null
-  const grid = overlays || terrain.id === "observer-focus" ? detail.grid : Math.min(detail.grid, 384)
+  const grid = overlays || focus ? detail.grid : Math.min(detail.grid, 384)
   const [globeW, globeH] = detail.globe
-  const geometry = useMemo(() => buildGeometry(terrain, global, grid, [globeW, globeH]), [terrain, global, grid, globeW, globeH])
+  const geometry = useMemo(() => buildGeometry(terrain, global, grid, [globeW, globeH],focus), [terrain, global, grid, globeW, globeH,focus?.lat,focus?.lon])
   const material = useMemo(() => {
     const linear = !!gl.getContext().getExtension('OES_texture_float_linear')
     const l0 = terrain.levels[0]

@@ -27,3 +27,11 @@ Still pending from the full agreed roadmap:
 - Multilingual UI, complete accessibility audit, judge report/video/submission materials.
 
 No claim of complete competitor parity or accuracy superiority is made. The development branch has not been pushed because the GitHub integration still returns 403.
+
+## V1.2 preview usability checkpoint (2026-11-15)
+
+- Added explicit Inspect/Add/Move map modes, a seven-step Base lesson with failure/repair, contextual help, and disconnected-facility diagnostics.
+- File cancellation/empty selection never starts import; failed imports show errors. Render error boundaries provide recovery controls. Exact reported browser crash remains un-reproduced.
+- Removed the separate observer terrain patch; refine the existing measured mesh around the observer. Hardware visual acceptance pending.
+- Added original Mission/Landscape/Try it/Sources education with three NASA-credited Apollo photographs and provenance hashes.
+- Scientific model thresholds unchanged; independent Earth holdout remains failed. See UPDATE_V1_2.md for acceptance checks.

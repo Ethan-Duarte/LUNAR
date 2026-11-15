@@ -38,8 +38,10 @@ import { useSiteAnalysis, type SiteAnalysis } from "./ui/useSiteAnalysis";
 import { ScienceWorkspace } from "./lunar/ScienceWorkspace";
 import { exportFile } from "./lunar/science";
 import { observationProject } from "./lunar/project";
-import { MISSION_NOTES } from "./lunar/missionNotes";
-import { focusTerrain } from "./lunar/focusTerrain";
+import {InterfaceBoundary} from "./lunar/InterfaceBoundary";
+import {ProjectFileInput} from "./lunar/ProjectFileInput";
+import {MissionEducation} from "./lunar/MissionEducation";
+
 import { BaseOverlay } from "./lunar/BaseOverlay";
 import type { Link } from "./lunar/engineering";
 import type { Facility } from "./lunar/network";
@@ -62,6 +64,7 @@ export default function App() {
     [patches, setPatches] = useState<Record<string, Terrain>>({}),
     [missions, setMissions] = useState<Mission[]>([]),
     [error, setError] = useState("");
+  const [educationId,setEducationId]=useState<string|null>(null);
   const [tab, setTab] = useState("analyze"),
     [advanced, setAdvanced] = useState(false),
     [hidden, setHidden] = useState(false),
@@ -250,26 +253,8 @@ export default function App() {
   const analyses = [a, b, c].filter((v): v is SiteAnalysis => !!v),
     active = analyses.find((a) => a.pin.id === activeId) ?? analyses.at(-1);
   const bodies = ephem ? bodyVectors(ephem, t) : null;
-  const selectedFocus = useMemo(
-    () =>
-      active &&
-      relief &&
-      terrain &&
-      (view === "site" || view === "approach") &&
-      ["natural", "elevation", "slope"].includes(layer)
-        ? focusTerrain(
-            sourceOf(active.pin.lat, active.pin.lon),
-            active.pin.lat,
-            active.pin.lon,
-          )
-        : null,
-    [active?.pin.lat, active?.pin.lon, sourceOf, relief, terrain, view, layer],
-  );
-  const shown = wanted
-    .map((id) => patches[id])
-    .filter((v): v is Terrain => !!v && v.render !== false);
-  const displayTiles = selectedFocus ? [...shown, selectedFocus] : shown;
-  const focusedDetail=useMemo(()=>({...detail,grid:selectedFocus?selectedFocus.levels[0].size-1:detail.grid}),[detail,selectedFocus]);
+  const shown = wanted.map(id=>patches[id]).filter((v):v is Terrain=>!!v&&v.render!==false);
+  const surfaceFocus = active && (view === "site" || view === "approach") ? {lat:active.pin.lat,lon:active.pin.lon} : undefined;
   useEffect(() => {
     invalidate();
   });
@@ -325,7 +310,7 @@ export default function App() {
       JSON.stringify(
         {
           schema: "lunar-project-1",
-          version: "1.1.0-preview",
+          version: "1.2.0-preview",
           pins,
           time: t,
           observer,
@@ -375,7 +360,7 @@ export default function App() {
       <header className="v1-header">
         <a className="v1-brand" href="#" onClick={(e) => e.preventDefault()}>
           <span className="brand-orbit" />
-          LUNAR <small>FIELD ATLAS / 1.1 PREVIEW</small>
+          LUNAR <small>FIELD ATLAS / 1.2 PREVIEW</small>
         </a>
         <div className="v1-header-right">
           <span className="v1-live">
@@ -567,18 +552,7 @@ export default function App() {
                 )}
                 <div className="v1-project">
                   <button onClick={save}>Save project ↓</button>
-                  <label>
-                    Open project
-                    <input
-                      type="file"
-                      accept="application/json,.json"
-                      onChange={(e) => {
-                        const f = e.target.files?.[0];
-                        if (f) void restore(f);
-                        e.target.value = "";
-                      }}
-                    />
-                  </label>
+                  <ProjectFileInput label="Open project" onOpen={restore}/>
                 </div>
               </>
             )}
@@ -863,6 +837,7 @@ export default function App() {
                   The catalog’s landing date is historical context, not a replay
                   of that mission.
                 </p>
+                {missions.find(m=>m.id===educationId)&&<MissionEducation key={educationId} mission={missions.find(m=>m.id===educationId)!} timeLabel={date(t).replace('T',' ')} onStudy={()=>{const m=missions.find(m=>m.id===educationId)!;locate(m.lat,m.lon,m.name)}} onSurface={()=>{const m=missions.find(m=>m.id===educationId)!;locate(m.lat,m.lon,m.name);useStore.getState().goTo({kind:'approach',lat:m.lat,lon:m.lon,hM:elevation(m.lat,m.lon)})}}/>}
                 {[
                   ["landed", "Historical landings"],
                   ["crashed", "Landing attempts"],
@@ -879,25 +854,10 @@ export default function App() {
                             {m.agency} · {m.date_utc.slice(0, 10)} ·{" "}
                             {m.lat.toFixed(3)}°, {m.lon.toFixed(3)}°
                           </p>
-                          {MISSION_NOTES[m.id] && (
-                            <>
-                              <p>{MISSION_NOTES[m.id].text}</p>
-                              <p className="v1-note">
-                                Try this: {MISSION_NOTES[m.id].question}
-                              </p>
-                              <a
-                                href={MISSION_NOTES[m.id].source}
-                                target="_blank"
-                                rel="noreferrer"
-                              >
-                                NASA mission history ↗
-                              </a>
-                            </>
-                          )}
                           <div>
                             <button
                               disabled={!ready}
-                              onClick={() => locate(m.lat, m.lon, m.name)}
+                              onClick={() => {setEducationId(m.id);locate(m.lat, m.lon, m.name)}}
                             >
                               Study this location ↗
                             </button>
@@ -967,13 +927,13 @@ export default function App() {
             ))}
           </div>
           <div className="v1-canvas">
-            <MoonCanvas quality={quality}>
+            <InterfaceBoundary label="3D view"><MoonCanvas quality={quality}>
               <color attach="background" args={["#03060b"]} />
               <Globe
                 sunDir={unit(bodies?.sun ?? [1, 0, 0])}
                 cuts={[
                   ...(terrain ? [cut(terrain)] : []),
-                  ...displayTiles.map(cut),
+                  ...shown.map(cut),
                 ]}
                 map={map}
                 relief={relief}
@@ -994,14 +954,15 @@ export default function App() {
                   map={map}
                   relief={relief}
                   overlays
+                  focus={surfaceFocus}
                   detail={detail}
-                  cuts={displayTiles.map(cut)}
+                  cuts={shown.map(cut)}
                   onPick={(a, b) =>
                     tab === "base" ? basePick.current?.(a, b) : pin(a, b)
                   }
                 />
               )}{" "}
-              {displayTiles.map((tile) => (
+              {shown.map((tile) => (
                 <MoonTerrain
                   key={tile.id}
                   terrain={tile}
@@ -1012,14 +973,8 @@ export default function App() {
                   map={map}
                   relief={relief}
                   overlays={false}
-                  cuts={
-                    tile === selectedFocus
-                      ? []
-                      : selectedFocus
-                        ? [cut(selectedFocus)]
-                        : []
-                  }
-                  detail={tile === selectedFocus ? focusedDetail : detail}
+                  detail={detail}
+                  focus={surfaceFocus}
                   onPick={(a, b) =>
                     tab === "base" ? basePick.current?.(a, b) : pin(a, b)
                   }
@@ -1040,7 +995,7 @@ export default function App() {
               <Rig elevation={elevation} />
               <MovingDetail />
               {bodies && <LunarCompass sun={bodies.sun} earth={bodies.earth} />}
-            </MoonCanvas>
+            </MoonCanvas></InterfaceBoundary>
           </div>
           <div className="v1-scene-bottom">
             <span>

@@ -20,3 +20,11 @@
 - Added apparent circular-disc Earth occultation to new Python single-site analyses. Archived studies remain unchanged; terrain/eclipsing disc combination is explicitly approximate.
 - Added a fixed-coordinate cross-engine Earth-holdout audit and transparent scientific-status documentation.
 - Moved the V1 launcher to port 5195 with a build-specific URL and printed source folder to reduce old-server/cache confusion.
+
+## V1.2 preview usability checkpoint (2026-11-15)
+
+- Added explicit Inspect/Add/Move map modes, a seven-step Base lesson with failure/repair, contextual help, and disconnected-facility diagnostics.
+- File cancellation/empty selection never starts import; failed imports show errors. Render error boundaries provide recovery controls. Exact reported browser crash remains un-reproduced.
+- Removed the separate observer terrain patch; refine the existing measured mesh around the observer. Hardware visual acceptance pending.
+- Added original Mission/Landscape/Try it/Sources education with three NASA-credited Apollo photographs and provenance hashes.
+- Scientific model thresholds unchanged; independent Earth holdout remains failed. See UPDATE_V1_2.md for acceptance checks.

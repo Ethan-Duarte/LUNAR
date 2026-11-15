@@ -346,6 +346,7 @@ export function evaluateDesign(
     reach = habitats[0]
       ? reachable(habitats[0].id, electricLinks, s.maxLinkKm)
       : new Set<string>();
+  const disconnectedIds=electrical.filter(x=>!reach.has(x.id)).map(x=>x.id);
   const electricalConnected =
     habitats.length > 0 &&
     arrays.length > 0 &&
@@ -423,9 +424,7 @@ export function evaluateDesign(
   if (!habitats.length) failures.push("Add a habitat anchor");
   if (!arrays.length) failures.push("Add a solar array");
   if (!electricalConnected)
-    failures.push(
-      "Electrical facilities need connected, clear straight corridors within the link limit",
-    );
+    failures.push("Electrical facilities need connected, clear straight corridors within the link limit. Disconnected: "+electrical.filter(x=>disconnectedIds.includes(x.id)).map(x=>x.name).join(', '));
   if (power.unmetKWh > 1e-6)
     failures.push(`${power.unmetKWh.toFixed(2)} kWh unmet demand`);
   if (power.minSoc < s.reserveSoc - 1e-6)
@@ -461,6 +460,7 @@ export function evaluateDesign(
     feasible: failures.length === 0,
     failures,
     electricalConnected,
+    disconnectedIds,
     power,
     requiredBatteryKWh,
     withoutEclipseMinimumBatteryKWh: sizing
