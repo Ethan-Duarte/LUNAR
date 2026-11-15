@@ -28,3 +28,11 @@
 - Removed the separate observer terrain patch; refine the existing measured mesh around the observer. Hardware visual acceptance pending.
 - Added original Mission/Landscape/Try it/Sources education with three NASA-credited Apollo photographs and provenance hashes.
 - Scientific model thresholds unchanged; independent Earth holdout remains failed. See UPDATE_V1_2.md for acceptance checks.
+
+## V1.3 preview (2026-11-15)
+
+- Viewer-mounted, collapsible Base guide; mission selection scrolls to education.
+- Calendar-controlled scrub range and hourly geometric-daylight viewing shortcut; study dates remain independent.
+- Original educational crewed/robotic lander archetypes, illustrative Apollo rover, measured local ground and labeled studio/simulation lighting. No competitor showcase assets in the new scene.
+- Retained Base result comparison, assumptions mismatch warnings, ranking explanation and sampled blackout jumps.
+- Scientific acceptance thresholds unchanged; Earth holdout still failed. No hardware visual or competitor superiority claim. See UPDATE_V1_3.md.

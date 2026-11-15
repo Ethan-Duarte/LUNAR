@@ -102,7 +102,7 @@ it('walks through explicit placement and restores the previous draft',()=>{
  fireEvent.click(screen.getByText('Use selected observer'));
  fireEvent.click(screen.getByText('Next step'));
  expect(screen.getByText('Evaluate and read the answer')).toBeTruthy();
- fireEvent.click(screen.getByText('Return to my design'));
+ fireEvent.click(screen.getByRole('button',{name:'Return to my design'}));
  expect(screen.getByRole('button',{name:/My original habitat ·/})).toBeTruthy();
 })
 it('inspects by default and adds only once after selecting Add component',()=>{
@@ -116,4 +116,28 @@ it('inspects by default and adds only once after selecting Add component',()=>{
  expect(screen.getByRole('button',{name:/habitat 1 ·/})).toBeTruthy();
  fireEvent.click(map,{clientX:180,clientY:180});
  expect(screen.queryByRole('button',{name:/habitat 2 ·/})).toBeNull();
+})
+it('renders guidance in the viewer host and collapses the explanation',()=>{
+ const host=document.createElement('div');document.body.appendChild(host);const view=render(<BasePlanner {...props} guideHost={host}/>);
+ fireEvent.click(screen.getByText('Start guided Base lesson'));
+ expect(host.querySelector('[aria-label="Guided Base lesson"]')).toBeTruthy();expect(view.container.querySelector('[aria-label="Guided Base lesson"]')).toBeNull();
+ fireEvent.click(screen.getByText('Collapse'));expect(screen.queryByText(/We will place a habitat and array/)).toBeNull();
+ fireEvent.click(screen.getByText('Expand'));expect(screen.getByText(/We will place a habitat and array/)).toBeTruthy();
+ fireEvent.click(screen.getByRole('button',{name:'Return to my design'}));expect(host.children.length).toBe(0);host.remove();
+})
+it('retains an evaluated baseline through a layout edit and compares the next report',async()=>{
+ const {act,waitFor}=await import('@testing-library/react');const {DEFAULT_ENGINEERING}=await import('./engineering');
+ const report={schema:'lunar-base-report',model:'test',start:props.windowStart,settings:{...DEFAULT_ENGINEERING},criteria:{earthMaskDeg:0},facilities:[],profiles:[],links:[],result:{feasible:true,failures:[],electricalConnected:true,disconnectedIds:[],power:{socKWh:[100,99],unmetKW:[0],generatedKWh:10,loadKWh:1,unmetKWh:0,curtailedKWh:0,chargeLossKWh:0,dischargeLossKWh:0,initialKWh:100,finalKWh:99,minSoc:.99,longestShortfallHours:0},requiredBatteryKWh:1,withoutEclipseMinimumBatteryKWh:1,eclipseLostGenerationKWh:0,eclipseExtraUnmetKWh:0,eclipseEvents:[],contact:[true],contactShare:1,longestContactLossHours:0,generation:[1],loadKW:1,totalArrayM2:20,totalLinkKm:0},arrayScale:null,azimuthStepDeg:.5,horizonRadiusKm:300};
+ let instance:any;class FakeWorker{onmessage:any;constructor(){instance=this}terminate(){}postMessage(){}}
+ vi.stubGlobal('Worker',FakeWorker);
+ render(<BasePlanner {...props} ephem={{t0Ms:0,stepS:3600,count:2,data:new Float32Array(16),kernels:[]}}/>);
+ fireEvent.click(screen.getByText('Use selected observer'));
+ fireEvent.click(screen.getByRole('button',{name:'Evaluate design'}));
+ act(()=>instance.onmessage({data:{done:true,report}}));
+ fireEvent.click(screen.getByText('Keep current result as comparison baseline'));
+ fireEvent.change(screen.getByLabelText('Name'),{target:{value:'Changed layout'}});
+ await waitFor(()=>expect(screen.getByText('Evaluate the changed design to fill the Current column.')).toBeTruthy());
+ fireEvent.click(screen.getByRole('button',{name:'Evaluate design'}));
+ act(()=>instance.onmessage({data:{done:true,report:{...report,result:{...report.result,power:{...report.result.power,generatedKWh:20}}}}}));
+ expect(screen.getByText('20.00 kWh')).toBeTruthy();expect(screen.getByText('10.00 kWh')).toBeTruthy();vi.unstubAllGlobals();
 })

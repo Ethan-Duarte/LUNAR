@@ -1,6 +1,6 @@
-# LUNAR V1.2 preview
+# LUNAR V1.3 preview
 
-This checkpoint focuses on deliberate Base placement, an actual guided lesson, historical education and interface recovery. [Update and acceptance guide](UPDATE_V1_2.md). Visual acceptance remains pending; existing scientific limitations still apply.
+Viewer-mounted guidance, calendar scrub ranges, daylight navigation, original expedition scenes and retained Base comparisons. [Update and acceptance guide](UPDATE_V1_3.md). Visual acceptance remains pending; existing scientific limitations still apply.
 
 # LUNAR
 

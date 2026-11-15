@@ -1,3 +1,3 @@
-# Complete V1.2 source
+# Complete V1.3 source
 
-Read UPDATE_V1_2.md. Copy these contents into your existing repository root, keep .git, commit and push main. No deletion or reset is required.
+Read UPDATE_V1_3.md. Copy contents to your existing repository root, preserve .git, commit and push main. No reset or deletion is needed.

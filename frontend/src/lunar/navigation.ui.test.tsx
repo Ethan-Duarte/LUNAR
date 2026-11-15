@@ -25,6 +25,7 @@ const fixtures = vi.hoisted(() => {
     },
   };
 });
+vi.mock("./MissionScene",()=>({MissionScene:()=> <div>Expedition scene loaded</div>}));
 vi.mock("../scene/MoonCanvas", () => ({ MoonCanvas: () => null }));
 vi.mock("../scene/shading", async (original) => ({
   ...(await original<typeof import("../scene/shading")>()),

@@ -1,5 +1,5 @@
 // LUNAR V1.0: original product interface. Adapted rendering/geometry remain Apache-2.0 attributed in NOTICE.
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { invalidate } from "@react-three/fiber";
 import {
@@ -7,6 +7,7 @@ import {
   bodyVectors,
   clockRange,
   ephemEndMs,
+  skyAt,
   type Ephem,
 } from "./lib/ephem";
 import {
@@ -40,6 +41,8 @@ import { exportFile } from "./lunar/science";
 import { observationProject } from "./lunar/project";
 import {InterfaceBoundary} from "./lunar/InterfaceBoundary";
 import {ProjectFileInput} from "./lunar/ProjectFileInput";
+import {TimelineControls} from "./lunar/TimelineControls";
+import {findDaylight} from "./lunar/daylight";
 import {MissionEducation} from "./lunar/MissionEducation";
 
 import { BaseOverlay } from "./lunar/BaseOverlay";
@@ -57,6 +60,7 @@ const cut = (t: Terrain): Cut => ({
   frame: t.frame,
   halfKm: t.levels[0].xMax / 1000,
 });
+const MissionScene=lazy(()=>import("./lunar/MissionScene").then(m=>({default:m.MissionScene})));
 export default function App() {
   const [ephem, setEphem] = useState<Ephem | null>(null),
     [terrain, setTerrain] = useState<Terrain | null>(null),
@@ -64,6 +68,10 @@ export default function App() {
     [patches, setPatches] = useState<Record<string, Terrain>>({}),
     [missions, setMissions] = useState<Mission[]>([]),
     [error, setError] = useState("");
+  const [sceneMissionId,setSceneMissionId]=useState<string|null>(null);
+  const [guideHost,setGuideHost]=useState<HTMLDivElement|null>(null);
+  const educationRef=useRef<HTMLDivElement>(null);
+  const [daylightNote,setDaylightNote]=useState("");
   const [educationId,setEducationId]=useState<string|null>(null);
   const [tab, setTab] = useState("analyze"),
     [advanced, setAdvanced] = useState(false),
@@ -252,6 +260,10 @@ export default function App() {
   );
   const analyses = [a, b, c].filter((v): v is SiteAnalysis => !!v),
     active = analyses.find((a) => a.pin.id === activeId) ?? analyses.at(-1);
+  const sceneMission=missions.find(m=>m.id===sceneMissionId);
+  const sceneSource=useMemo(()=>sceneMission?sourceOf(sceneMission.lat,sceneMission.lon):null,[sceneMission,sourceOf]);
+  useEffect(()=>{if(tab!=="sites")setSceneMissionId(null)},[tab]);
+  useEffect(()=>setDaylightNote(""),[active?.pin.id]);
   const bodies = ephem ? bodyVectors(ephem, t) : null;
   const shown = wanted.map(id=>patches[id]).filter((v):v is Terrain=>!!v&&v.render!==false);
   const surfaceFocus = active && (view === "site" || view === "approach") ? {lat:active.pin.lat,lon:active.pin.lon} : undefined;
@@ -310,7 +322,7 @@ export default function App() {
       JSON.stringify(
         {
           schema: "lunar-project-1",
-          version: "1.2.0-preview",
+          version: "1.3.0-preview",
           pins,
           time: t,
           observer,
@@ -360,7 +372,7 @@ export default function App() {
       <header className="v1-header">
         <a className="v1-brand" href="#" onClick={(e) => e.preventDefault()}>
           <span className="brand-orbit" />
-          LUNAR <small>FIELD ATLAS / 1.2 PREVIEW</small>
+          LUNAR <small>FIELD ATLAS / 1.3 PREVIEW</small>
         </a>
         <div className="v1-header-right">
           <span className="v1-live">
@@ -809,6 +821,8 @@ export default function App() {
             )}
             <div hidden={tab !== "base"}>
               <BasePlanner
+                guideHost={tab==="base"?guideHost:null}
+                onRevealGuide={()=>setHidden(false)}
                 active={active}
                 ready={ready}
                 sourceOf={sourceOf}
@@ -837,7 +851,7 @@ export default function App() {
                   The catalog’s landing date is historical context, not a replay
                   of that mission.
                 </p>
-                {missions.find(m=>m.id===educationId)&&<MissionEducation key={educationId} mission={missions.find(m=>m.id===educationId)!} timeLabel={date(t).replace('T',' ')} onStudy={()=>{const m=missions.find(m=>m.id===educationId)!;locate(m.lat,m.lon,m.name)}} onSurface={()=>{const m=missions.find(m=>m.id===educationId)!;locate(m.lat,m.lon,m.name);useStore.getState().goTo({kind:'approach',lat:m.lat,lon:m.lon,hM:elevation(m.lat,m.lon)})}}/>}
+                <div ref={educationRef}>{missions.find(m=>m.id===educationId)&&<MissionEducation key={educationId} mission={missions.find(m=>m.id===educationId)!} onScene={()=>setSceneMissionId(educationId)} timeLabel={date(t).replace('T',' ')} onStudy={()=>{setSceneMissionId(null);const m=missions.find(m=>m.id===educationId)!;locate(m.lat,m.lon,m.name)}} onSurface={()=>{setSceneMissionId(null);const m=missions.find(m=>m.id===educationId)!;locate(m.lat,m.lon,m.name);useStore.getState().goTo({kind:'approach',lat:m.lat,lon:m.lon,hM:elevation(m.lat,m.lon)})}}/>}</div>
                 {[
                   ["landed", "Historical landings"],
                   ["crashed", "Landing attempts"],
@@ -857,7 +871,7 @@ export default function App() {
                           <div>
                             <button
                               disabled={!ready}
-                              onClick={() => {setEducationId(m.id);locate(m.lat, m.lon, m.name)}}
+                              onClick={() => {setEducationId(m.id);setSceneMissionId(m.status==="landed"?m.id:null);locate(m.lat, m.lon, m.name);requestAnimationFrame(()=>educationRef.current?.scrollIntoView?.({behavior:"smooth",block:"start"}))}}
                             >
                               Study this location ↗
                             </button>
@@ -881,26 +895,26 @@ export default function App() {
           <div className="v1-scene-tools">
             <div className="v1-segment">
               <button
-                onClick={() => useStore.getState().goTo({ kind: "globe" })}
+                onClick={() => {setSceneMissionId(null);useStore.getState().goTo({ kind: "globe" })}}
                 aria-pressed={view === "globe"}
               >
                 Globe
               </button>
               <button
-                onClick={() => useStore.getState().goTo({ kind: "pole" })}
+                onClick={() => {setSceneMissionId(null);useStore.getState().goTo({ kind: "pole" })}}
                 aria-pressed={view === "pole"}
               >
                 South pole
               </button>
               {active && (
                 <button
-                  onClick={() =>
+                  onClick={() => {setSceneMissionId(null);
                     useStore.getState().goTo({
                       kind: "approach",
                       lat: active.pin.lat,
                       lon: active.pin.lon,
                       hM: active.hM,
-                    })
+                    })}
                   }
                 >
                   Surface
@@ -911,7 +925,10 @@ export default function App() {
               {hidden ? "Show analysis" : "Hide analysis"}
             </button>
           </div>
-          <div className="v1-bearings">
+          {sceneMission&&sceneSource&&<InterfaceBoundary label="Mission scene"><Suspense fallback={<div className="mission-scene">Loading expedition scene…</div>}><MissionScene key={sceneMission.id} mission={sceneMission} source={sceneSource} sun={ephem?skyAt(ephem,t,sceneMission.lat,sceneMission.lon,elevation(sceneMission.lat,sceneMission.lon)).sun:undefined} onClose={()=>setSceneMissionId(null)}/></Suspense></InterfaceBoundary>}
+          <div className="viewer-guide-host" ref={setGuideHost}/>
+          <div className="viewer-daylight"><button disabled={!active||!ephem} onClick={()=>{if(!active||!ephem)return;const next=findDaylight(ephem,active.horizon,active.hM,t);if(next===null){setDaylightNote("No fully clear solar-disc sample found in the next 60 days within the ephemerides.");return}useStore.getState().setPlaying(false);useStore.getState().setTime(next);setDaylightNote(active.pin.label+" daylight sample: "+date(next).replace("T"," ")+" UTC. Hourly search; study dates unchanged.")}}>Find daylight</button>{daylightNote&&<p role="status">{daylightNote}</p>}</div>
+          <div className="v1-bearings" style={{display:sceneMission?"none":undefined}}>
             {["sun", "earth"].map((name) => (
               <span
                 id={"lunar-bearing-" + name}
@@ -927,7 +944,7 @@ export default function App() {
             ))}
           </div>
           <div className="v1-canvas">
-            <InterfaceBoundary label="3D view"><MoonCanvas quality={quality}>
+            {!sceneMission&&<InterfaceBoundary label="3D view"><MoonCanvas quality={quality}>
               <color attach="background" args={["#03060b"]} />
               <Globe
                 sunDir={unit(bodies?.sun ?? [1, 0, 0])}
@@ -995,9 +1012,9 @@ export default function App() {
               <Rig elevation={elevation} />
               <MovingDetail />
               {bodies && <LunarCompass sun={bodies.sun} earth={bodies.earth} />}
-            </MoonCanvas></InterfaceBoundary>
+            </MoonCanvas></InterfaceBoundary>}
           </div>
-          <div className="v1-scene-bottom">
+          <div className="v1-scene-bottom" style={{display:sceneMission?"none":undefined}}>
             <span>
               {active
                 ? active.pin.label +
@@ -1081,18 +1098,7 @@ export default function App() {
             }
           }}
         />
-        <input
-          aria-label="Shared timeline"
-          type="range"
-          min={ephem ? clockRange(ephem)[0] : t - 1}
-          max={ephem ? clockRange(ephem)[1] : t + 1}
-          value={t}
-          step={60000}
-          onChange={(e) => {
-            useStore.getState().setPlaying(false);
-            useStore.getState().setTime(+e.target.value);
-          }}
-        />
+        <TimelineControls time={t} bounds={ephem?clockRange(ephem):[t-86400000,t+86400000]} onTime={v=>{useStore.getState().setPlaying(false);useStore.getState().setTime(v)}}/>
         <select
           aria-label="Playback speed"
           value={useStore((s) => s.rate)}

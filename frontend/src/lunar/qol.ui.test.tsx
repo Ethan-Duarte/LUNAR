@@ -31,3 +31,10 @@ it('educational tabs change content without moving the site or simulation',()=>{
  fireEvent.click(screen.getByRole('button',{name:'Try it'}));expect(screen.getByText('A short field exercise')).toBeTruthy();expect(study).not.toHaveBeenCalled();expect(surface).not.toHaveBeenCalled();
  fireEvent.click(screen.getByText('Begin at this location'));expect(study).toHaveBeenCalledOnce();
 })
+it('does not imply comparison superiority when dates or initial storage differ',async()=>{
+ const {BaseComparison}=await import('./BaseComparison');const {DEFAULT_ENGINEERING}=await import('./engineering');
+ const result={power:{generatedKWh:10,unmetKWh:0},requiredBatteryKWh:50,contactShare:.5,electricalConnected:true,feasible:true};
+ const baseline={model:'test',start:Date.parse('2026-11-14T00:00:00Z'),settings:{...DEFAULT_ENGINEERING},criteria:{earthMaskDeg:0},azimuthStepDeg:1,horizonRadiusKm:300,result} as any;
+ render(<BaseComparison baseline={baseline} current={{...baseline,settings:{...baseline.settings,initialSoc:0}}} onClear={()=>{}}/>);
+ expect(screen.getByText(/Assumptions differ/).textContent).toContain('initialSoc');expect(screen.getByText('Delivered solar')).toBeTruthy();expect(screen.getByText(/scenario comparison/)).toBeTruthy();
+})

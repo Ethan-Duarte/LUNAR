@@ -1,10 +1,12 @@
 // Original LUNAR connected-base engineering workspace. NASA-derived terrain, explicit model limits.
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import {createPortal} from "react-dom";
 import type { SiteAnalysis } from "../ui/useSiteAnalysis";
 import type { Ephem } from "../lib/ephem";
 import { sourceHeight, type HeightSource } from "../lib/terrain";
 import { localFrame, R_KM, upVector } from "../lib/geo";
 import { useStore } from "../store";
+import {BaseComparison,failureIntervals} from "./BaseComparison";
 import {BASE_LESSON,lessonCanAdvance} from "./baseLesson";
 import {Help} from "./Help";
 import {ProjectFileInput} from "./ProjectFileInput";
@@ -106,7 +108,11 @@ export function BasePlanner({
   onLayout,
   onLinks,
   onPlaceReady,
+  guideHost,
+  onRevealGuide,
 }: {
+  guideHost?: HTMLElement|null;
+  onRevealGuide?:()=>void;
   active?: SiteAnalysis;
   ready: boolean;
   sourceOf: (lat: number, lon: number) => HeightSource;
@@ -126,9 +132,11 @@ export function BasePlanner({
     [placing, setPlacing] = useState(false),
     [placementMode,setPlacementMode]=useState<"inspect"|"add"|"move">("inspect"),
     [lesson,setLesson]=useState<number|null>(null),
+    [guideCollapsed,setGuideCollapsed]=useState(false),
     [radius, setRadius] = useState(2),
     [maxTower, setMaxTower] = useState(50),
     [report, setReport] = useState<Report | null>(null),
+    [comparison,setComparison]=useState<Report|null>(null),
     [alternatives, setAlternatives] = useState<RankedDesign[]>([]),
     [snapshots, setSnapshots] = useState<{ name: string; project: unknown }[]>(
       [],
@@ -244,7 +252,7 @@ export function BasePlanner({
   function project() {
     return {
       schema: "lunar-base-2",
-      version: "1.1-preview",
+      version: "1.3-preview",
       facilities,
       settings,
       start: windowStart,
@@ -252,6 +260,7 @@ export function BasePlanner({
       radiusKm: radius,
       maxTowerM: maxTower,
       report,
+      comparisonBaseline:comparison,
       limits: LIMITS,
     };
   }
@@ -292,6 +301,7 @@ export function BasePlanner({
       );
     }
     setSelected(null);
+    setComparison(null);
     setReport(null);
     setStatus(
       "Project restored; recalculate with current data. Previous report remains in the exported file.",
@@ -425,6 +435,7 @@ export function BasePlanner({
       />
     </label>{SETTING_HELP[key]&&<Help title={label}><p>{SETTING_HELP[key]}</p></Help>}</div>
   );
+  const guide:ReactNode=(lessonStep&&lesson!==null?<section className="base-lesson viewer-lesson" aria-label="Guided Base lesson"><p className="v1-eyebrow">STEP {lesson+1} / {BASE_LESSON.length}</p><h2>{lessonStep.title}</h2><div className="v1-actions"><button onClick={()=>setGuideCollapsed(!guideCollapsed)}>{guideCollapsed?"Expand":"Collapse"}</button><button onClick={()=>{onRevealGuide?.();requestAnimationFrame(()=>document.querySelector(`[data-guide="${lessonStep.target==='lesson'?'components':lessonStep.target}"]`)?.scrollIntoView?.({block:"center",behavior:"smooth"}))}}>Show this control</button></div>{!guideCollapsed&&<p>{lessonStep.body}</p>}{lesson===4&&<button onClick={()=>{setFacilities(f=>f.map(x=>x.role==='power'?{...x,areaM2:0}:x));setSettings(v=>({...v,batteryKWh:0,loadKW:1,days:2}))}}>Try insufficient power</button>}{lesson===5&&<button onClick={()=>{setFacilities(f=>f.map(x=>x.role==='power'?{...x,areaM2:20}:x));setSettings(v=>({...v,batteryKWh:100,loadKW:1,days:2}))}}>Restore lesson power</button>}<div className="v1-actions"><button disabled={lesson===0} onClick={()=>setLesson(lesson-1)}>Back</button>{lesson<BASE_LESSON.length-1?<button disabled={!lessonCanAdvance(lesson,facilities,r??null)} onClick={()=>setLesson(lesson+1)}>Next step</button>:<button onClick={()=>endLesson(false)}>Keep this design</button>}<button aria-label="Return to my design" onClick={()=>endLesson(true)}>Exit / restore my design</button></div><p className="v1-note">Next unlocks when the step’s task is complete. The lesson relaxes slope/Earth requirements to isolate electricity; restore realistic constraints afterward.</p></section>:<button className="v1-primary" onClick={startLesson}>Start guided Base lesson</button>);
   return (
     <div className="base-workspace" data-lesson-target={lessonStep?.target??"none"}>
       <p className="v1-eyebrow">LUNAR / CONNECTED BASE ENGINEERING</p>
@@ -439,7 +450,8 @@ export function BasePlanner({
           Advanced mode exposes the complete engineering workspace.
         </p>
       )}
-      {lessonStep&&lesson!==null?<section className="base-lesson" aria-label="Guided Base lesson"><p className="v1-eyebrow">STEP {lesson+1} / {BASE_LESSON.length}</p><h2>{lessonStep.title}</h2><p>{lessonStep.body}</p>{lesson===4&&<button onClick={()=>{setFacilities(f=>f.map(x=>x.role==='power'?{...x,areaM2:0}:x));setSettings(v=>({...v,batteryKWh:0,loadKW:1,days:2}))}}>Try insufficient power</button>}{lesson===5&&<button onClick={()=>{setFacilities(f=>f.map(x=>x.role==='power'?{...x,areaM2:20}:x));setSettings(v=>({...v,batteryKWh:100,loadKW:1,days:2}))}}>Restore lesson power</button>}<div className="v1-actions"><button disabled={lesson===0} onClick={()=>setLesson(lesson-1)}>Back</button>{lesson<BASE_LESSON.length-1?<button disabled={!lessonCanAdvance(lesson,facilities,r??null)} onClick={()=>setLesson(lesson+1)}>Next step</button>:<button onClick={()=>endLesson(false)}>Keep this design</button>}<button onClick={()=>endLesson(true)}>Return to my design</button></div><p className="v1-note">Next unlocks when the step’s task is complete. The lesson relaxes slope/Earth requirements to isolate electricity; restore realistic constraints afterward.</p></section>:<button className="v1-primary" onClick={startLesson}>Start guided Base lesson</button>}
+      {guideHost&&lessonStep?createPortal(guide,guideHost):guide}
+
       <section data-guide="components"><div className="v1-segment" aria-label="Base map interaction">{([['inspect','Inspect'],['add','Add component'],['move','Move component']] as const).map(([mode,label])=><button key={mode} aria-pressed={placementMode===mode} disabled={mode==='move'&&!selected} onClick={()=>{setPlacementMode(mode);setPlacing(mode==='move')}}>{label}</button>)}</div><p role="status" className="base-mode">{placementMode==='inspect'?'Inspect: clicking empty ground never adds a component.':placementMode==='add'?`Add: click ground once to place a ${role}.`:'Move: click a new position for the selected component.'}</p>
       <div className="v1-fields">
         <label>
@@ -938,6 +950,7 @@ export function BasePlanner({
       {duration > 0 && !busy && (
         <small>Last calculation: {duration.toFixed(1)} s on this device.</small>
       )}
+      {comparison&&<BaseComparison baseline={comparison} current={report} onClear={()=>setComparison(null)}/>}
       {r && report && (
         <>
           <h2>
@@ -945,6 +958,7 @@ export function BasePlanner({
               ? "Meets the selected screening constraints"
               : "Design needs changes"}
           </h2>
+          <button onClick={()=>setComparison(structuredClone(report))}>Keep current result as comparison baseline</button>
           <Help title="Reading the verdict"><p>All selected constraints must pass. A precharged battery can supply demand even when arrays are disconnected; that does not make the layout connected or sustainable. Electrical demand, connectivity, terrain and Earth access are separate checks.</p></Help>
           {!r.electricalConnected&&<p className="v1-alert">Generation below means power delivered to the shared bus. A disconnected layout is conservatively assigned zero delivered solar power; the arrays may still receive sunlight. Inspect the highlighted components and connection table.</p>}
           {r.failures.map((f, i) => (
@@ -971,6 +985,7 @@ export function BasePlanner({
             </div>
           </div>
           <PowerChart report={report} />
+          <details className="v1-detail"><summary>Inspect blackout intervals</summary><p>Sampled intervals, not exact transition times. Jump moves the viewing clock; the study period is unchanged.</p>{[['Unmet power',failureIntervals(r.power.unmetKW,v=>Number(v)>1e-6)],['Earth contact loss',failureIntervals(r.contact,v=>!v)]] .map(([name,events])=><div key={name as string}><h3>{name as string}</h3>{!(events as {start:number;end:number}[]).length&&<p>No sampled interval.</p>}{(events as {start:number;end:number}[]).slice(0,30).map((e,i)=><p key={i}><button onClick={()=>{const time=report.start+e.start*report.settings.stepMinutes*60000,bounds=useStore.getState().timeRange;if(bounds&&(time<bounds[0]||time>bounds[1])){setStatus("This interval is outside the viewer clock range. Inspect its exported samples instead.");return}useStore.getState().setPlaying(false);useStore.getState().setTime(time);const h=report.facilities.find(f=>f.role==='habitat');if(h)onLocate(h.lat,h.lon,h.name)}}>Jump to {new Date(report.start+e.start*report.settings.stepMinutes*60000).toISOString().slice(0,16)} UTC</button> · {((e.end-e.start)*report.settings.stepMinutes/60).toFixed(2)} h</p>)}{(events as unknown[]).length>30&&<p>First 30 intervals shown; full samples are in the exported report.</p>}</div>)}</details>
           <p>
             Battery ends at {r.power.finalKWh.toFixed(1)} kWh; longest
             unmet-power spell {r.power.longestShortfallHours.toFixed(2)} h.
@@ -1090,7 +1105,7 @@ export function BasePlanner({
       {alternatives.length > 0 && (
         <>
           <h2>Search alternatives</h2>
-          <p className="v1-note">{searchNote}</p>
+          <p className="v1-note">{searchNote}</p><p>Ranking prioritizes passing constraints, then lower unmet demand, higher Earth access, smaller arrays, lower recommended storage, lower towers and shorter connections. Applying an alternative changes facilities only; evaluate it and compare against a retained baseline.</p>
           {alternatives.map((a, i) => (
             <article className="v1-facility" key={i}>
               <h3>
