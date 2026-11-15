@@ -84,14 +84,14 @@ export function globeMeshHeight(g: GlobalDem, d: Vec3, segments: [number, number
   return b + (c - b) * fv + (dd - c) * fu
 }
 
-function buildGeometry(t: Terrain, global: GlobalDem | null, GRID: number, globe: [number, number], focus?: {lat:number;lon:number}): THREE.BufferGeometry {
+export function buildGeometry(t: Terrain, global: GlobalDem | null, GRID: number, globe: [number, number], focus?: {lat:number;lon:number}, renderTransform?:THREE.Matrix4): THREE.BufferGeometry {
   const l0 = t.levels[0]
   const la=focus?focus.lat*Math.PI/180:0,lo=focus?focus.lon*Math.PI/180:0
   const centre=focus?frameProject(t.frame,Math.cos(la)*Math.cos(lo),Math.cos(la)*Math.sin(lo),Math.sin(la),t.radiusM):null
   const focusXY=centre&&centre[0]>l0.xMin&&centre[0]<l0.xMax&&centre[1]>l0.yMin&&centre[1]<l0.yMax?centre:null
   const fadeKm = fadeKmOf(t)
   const n = GRID + 1
-  const pos = new Float32Array(n * n * 3)
+  const pos = new Float64Array(n * n * 3)
   const xy = new Float32Array(n * n * 2)
   const valid = new Uint8Array(n * n)
   const rKm = t.radiusM / 1000
@@ -143,7 +143,7 @@ function buildGeometry(t: Terrain, global: GlobalDem | null, GRID: number, globe
   for (let i = GRID; i > 0; i--) rim.push(GRID * n + i) // bottom row, right to left
   for (let j = GRID; j > 0; j--) rim.push(j * n) // left column, upwards
   const total = n * n + rim.length
-  const pos2 = new Float32Array(total * 3)
+  const pos2 = new Float64Array(total * 3)
   const xy2 = new Float32Array(total * 2)
   pos2.set(pos)
   xy2.set(xy)
@@ -168,7 +168,11 @@ function buildGeometry(t: Terrain, global: GlobalDem | null, GRID: number, globe
     index.push(a, a2, b, b, a2, b2)
   }
   const g = new THREE.BufferGeometry()
-  g.setAttribute('position', new THREE.BufferAttribute(pos2, 3))
+  // Transform in double precision before uploading local floats; avoids metre-scale
+  // cancellation between Moon-centred vertices and an instrument-scale camera.
+  const positions=new Float32Array(pos2.length),v=new THREE.Vector3()
+  for(let i=0;i<total;i++){v.fromArray(pos2,i*3);if(renderTransform)v.applyMatrix4(renderTransform);v.toArray(positions,i*3)}
+  g.setAttribute('position', new THREE.BufferAttribute(positions, 3))
   g.setAttribute('aXY', new THREE.BufferAttribute(xy2, 2))
   g.setIndex(index)
   g.computeBoundingSphere()
@@ -242,6 +246,7 @@ uniform vec3 uAy;
 uniform vec3 uUp;
 uniform vec3 uSun;    // unit, body-fixed, towards the Sun
 uniform float uSunRad; // angular radius, radians
+uniform float uSolarFactor; // optional eclipse attenuation, display only
 uniform int uSteps;    // shadow steps to take this frame (fewer while the view is moving)
 uniform float uGrowth; // how much each step is longer than the last
 uniform int uMode;    // 0 natural, 1 elevation, 2 slope, 3 avg sunlight, 4 avg Earth, 5 PSR, 6 site finder
@@ -346,7 +351,7 @@ void main() {
     t *= uGrowth;
   }
   float lit = clamp(minA / uSunRad * 0.5 + 0.5, 0.0, 1.0);
-  float direct = max(dot(n, uSun), 0.0) * lit;
+  float direct = max(dot(n, uSun), 0.0) * lit * uSolarFactor;
 
   vec3 albedo = albedoAt(up);
   vec3 col;
@@ -430,6 +435,11 @@ interface Props {
   /** true for the south-pole tiles, which have the NASA overlay layers; a site patch has none */
   overlays: boolean
   focus?: {lat:number;lon:number}
+  /** Local educational scenes transform their camera back to body-fixed km for exposure. */
+  cameraToBody?: THREE.Matrix4
+  renderTransform?: THREE.Matrix4
+  solarFactor?: number
+  interactive?: boolean
   /** how much detail to draw; affects the picture only */
   detail: Detail
   /** finer terrains drawn on top of this one; this surface is skipped under them */
@@ -440,13 +450,13 @@ interface Props {
 /** Shadow tracing while the view is moving: as many steps, and as long, as the Low setting uses all the time. */
 const MOVING = { steps: 48, growth: 1.2 }
 
-export function MoonTerrain({ terrain, sunDir, sunRad, layer, score, dataBase, map, relief, overlays, cuts, detail, onPick, focus }: Props) {
+export function MoonTerrain({ terrain, sunDir, sunRad, layer, score, dataBase, map, relief, overlays, cuts, detail, onPick, focus, cameraToBody, renderTransform, solarFactor=1, interactive=true }: Props) {
   const moving = useBusy()
   const gl = useThree((s) => s.gl)
   const global = relief ? relief.dem : null
   const grid = overlays || focus ? detail.grid : Math.min(detail.grid, 384)
   const [globeW, globeH] = detail.globe
-  const geometry = useMemo(() => buildGeometry(terrain, global, grid, [globeW, globeH],focus), [terrain, global, grid, globeW, globeH,focus?.lat,focus?.lon])
+  const geometry = useMemo(() => buildGeometry(terrain, global, grid, [globeW, globeH],focus,renderTransform), [terrain, global, grid, globeW, globeH,focus?.lat,focus?.lon,renderTransform])
   const material = useMemo(() => {
     const linear = !!gl.getContext().getExtension('OES_texture_float_linear')
     const l0 = terrain.levels[0]
@@ -473,6 +483,7 @@ export function MoonTerrain({ terrain, sunDir, sunRad, layer, score, dataBase, m
         uR: { value: terrain.radiusM / 1000 },
         uSun: { value: new THREE.Vector3(1, 0, 0) },
         uSunRad: { value: 0.00465 },
+        uSolarFactor: {value:1},
         uSteps: { value: detail.steps },
         uGrowth: { value: detail.growth },
         uMode: { value: 0 },
@@ -497,6 +508,7 @@ export function MoonTerrain({ terrain, sunDir, sunRad, layer, score, dataBase, m
   applyCuts(material.uniforms as never, cuts ?? [])
   material.uniforms.uSun.value.set(sunDir[0], sunDir[1], sunDir[2])
   material.uniforms.uSunRad.value = sunRad
+  material.uniforms.uSolarFactor.value = solarFactor
   // While the view is moving the shadow is traced in fewer, longer steps (the Low setting's), which
   // is most of the cost of a frame; at rest it is traced in full.
   material.uniforms.uSteps.value = moving ? Math.min(detail.steps, MOVING.steps) : detail.steps
@@ -533,11 +545,11 @@ export function MoonTerrain({ terrain, sunDir, sunRad, layer, score, dataBase, m
     <mesh
       geometry={geometry}
       material={material}
-      raycast={raycast}
+      raycast={interactive?raycast:()=>{}}
       onClick={handleClick}
       onBeforeRender={(_r, _s, camera) => {
         material.uniforms.uShadowFill.value = useStore.getState().shadowFill
-        material.uniforms.uExpo.value = exposureFor(camera.position, material.uniforms.uSun.value)
+        material.uniforms.uExpo.value = exposureFor(cameraToBody?camera.position.clone().applyMatrix4(cameraToBody):camera.position, material.uniforms.uSun.value)
       }}
     />
   )

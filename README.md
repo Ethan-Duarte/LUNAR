@@ -1,6 +1,6 @@
-# LUNAR V1.3 preview
+# LUNAR V1.4 preview
 
-Viewer-mounted guidance, calendar scrub ranges, daylight navigation, original expedition scenes and retained Base comparisons. [Update and acceptance guide](UPDATE_V1_3.md). Visual acceptance remains pending; existing scientific limitations still apply.
+Right-side mission information and shared terrain shadow rendering complete the historical pass. [Update and acceptance guide](UPDATE_V1_4.md). Next: [science and usability](VALIDATION_NEXT.md). Visual acceptance remains pending; existing scientific limitations still apply.
 
 # LUNAR
 

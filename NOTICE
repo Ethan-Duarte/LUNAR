@@ -26,3 +26,5 @@ LUNAR 1.1-preview.1 modifications: original connected-base engineering model, wo
 LUNAR V1.2 modifications (2026-11-15): adaptive mesh sampling, import recovery, original contextual education and guided Base interface. NASA Apollo photos and source/credit hashes: frontend/public/lunar/history/credits.json.
 
 LUNAR V1.3 modifications (2026-11-15): original educational spacecraft/rover archetypes and local scene, viewer guidance portal, timeline controls, daylight navigation, Base comparisons and blackout navigation. No upstream showcase vehicle assets are used in the new MissionScene. Existing licensed technical foundation remains attributed above.
+
+LUNAR V1.4 modifications (2026-11-15): original mission information panel, hardware explanations, support placement and display transforms. Existing Apache-2.0 MoonTerrain renderer is reused and modified for optional local coordinates, camera exposure conversion and eclipse attenuation; original technical attribution above remains in force.

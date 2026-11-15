@@ -1,3 +1,3 @@
-# Complete V1.3 source
+# Complete V1.4 source
 
-Read UPDATE_V1_3.md. Copy contents to your existing repository root, preserve .git, commit and push main. No reset or deletion is needed.
+Read UPDATE_V1_4.md. Copy contents into your existing repository root, preserve .git, commit and push main. No reset or deletion is needed. Historical features are frozen after this checkpoint; VALIDATION_NEXT.md records the next science/usability scope.

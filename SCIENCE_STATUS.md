@@ -68,3 +68,11 @@ Investigate the two largest Earth-holdout outliers against reference metadata, t
 - Original educational crewed/robotic lander archetypes, illustrative Apollo rover, measured local ground and labeled studio/simulation lighting. No competitor showcase assets in the new scene.
 - Retained Base result comparison, assumptions mismatch warnings, ranking explanation and sampled blackout jumps.
 - Scientific acceptance thresholds unchanged; Earth holdout still failed. No hardware visual or competitor superiority claim. See UPDATE_V1_3.md.
+
+## V1.4 preview — final historical pass (2026-11-15)
+
+- Independent right-side mission file / narrow-screen drawer, persistent education tabs, original hardware explanations and terrain-spacing labels.
+- Simulation sunlight by default. Shared observatory terrain renderer in local coordinates, observer-horizon/eclipse gating for spacecraft, improved support placement and framing.
+- Double-precision localization before GPU upload; direct body-frame Sun and exposure conventions retained.
+- Numerical visibility, Base physics and acceptance thresholds unchanged. GPU visual acceptance remains pending; Earth holdout remains failed.
+- Historical additions frozen apart from blocking defects. See UPDATE_V1_4.md and VALIDATION_NEXT.md.

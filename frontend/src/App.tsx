@@ -23,7 +23,7 @@ import {
 import { globalHeightAt } from "./lib/globalDem";
 import { horizonAt } from "./lib/horizon";
 import { sitePosKm, unit } from "./lib/geo";
-import { computeSeries, isSunlit, hasComm } from "./lib/windows";
+import { computeSeries, isSunlit, hasComm, eclipseFactor } from "./lib/windows";
 import { rankWindows, windowStats } from "./lib/landing";
 import { loadFinderGrid, runFinder, type FinderGrid } from "./lib/finder";
 import { Globe } from "./scene/Globe";
@@ -43,6 +43,8 @@ import {InterfaceBoundary} from "./lunar/InterfaceBoundary";
 import {ProjectFileInput} from "./lunar/ProjectFileInput";
 import {TimelineControls} from "./lunar/TimelineControls";
 import {findDaylight} from "./lunar/daylight";
+import {sceneTerrainLabel} from "./lunar/historicalLighting";
+import {MissionInfoPanel} from "./lunar/MissionInfoPanel";
 import {MissionEducation} from "./lunar/MissionEducation";
 
 import { BaseOverlay } from "./lunar/BaseOverlay";
@@ -68,6 +70,8 @@ export default function App() {
     [patches, setPatches] = useState<Record<string, Terrain>>({}),
     [missions, setMissions] = useState<Mission[]>([]),
     [error, setError] = useState("");
+  const [pendingDaylight,setPendingDaylight]=useState<string|null>(null);
+  const [missionInfoOpen,setMissionInfoOpen]=useState(true);
   const [sceneMissionId,setSceneMissionId]=useState<string|null>(null);
   const [guideHost,setGuideHost]=useState<HTMLDivElement|null>(null);
   const educationRef=useRef<HTMLDivElement>(null);
@@ -264,6 +268,8 @@ export default function App() {
   const sceneSource=useMemo(()=>sceneMission?sourceOf(sceneMission.lat,sceneMission.lon):null,[sceneMission,sourceOf]);
   useEffect(()=>{if(tab!=="sites")setSceneMissionId(null)},[tab]);
   useEffect(()=>setDaylightNote(""),[active?.pin.id]);
+  function findObserverDaylight(){if(!active||!ephem)return;const next=findDaylight(ephem,active.horizon,active.hM,t);if(next===null){setDaylightNote("No fully clear solar-disc sample found in the next 60 days within the ephemerides.");return}useStore.getState().setPlaying(false);useStore.getState().setTime(next);setDaylightNote(active.pin.label+" daylight sample: "+date(next).replace("T"," ")+" UTC. Hourly search; study dates unchanged.")}
+  useEffect(()=>{if(!pendingDaylight||!active||!ephem)return;const m=missions.find(m=>m.id===pendingDaylight);if(m&&Math.abs(active.pin.lat-m.lat)<1e-6&&Math.abs(((active.pin.lon-m.lon+540)%360)-180)<1e-6){setPendingDaylight(null);findObserverDaylight()}},[pendingDaylight,active,ephem]);
   const bodies = ephem ? bodyVectors(ephem, t) : null;
   const shown = wanted.map(id=>patches[id]).filter((v):v is Terrain=>!!v&&v.render!==false);
   const surfaceFocus = active && (view === "site" || view === "approach") ? {lat:active.pin.lat,lon:active.pin.lon} : undefined;
@@ -322,7 +328,7 @@ export default function App() {
       JSON.stringify(
         {
           schema: "lunar-project-1",
-          version: "1.3.0-preview",
+          version: "1.4.0-preview",
           pins,
           time: t,
           observer,
@@ -372,7 +378,7 @@ export default function App() {
       <header className="v1-header">
         <a className="v1-brand" href="#" onClick={(e) => e.preventDefault()}>
           <span className="brand-orbit" />
-          LUNAR <small>FIELD ATLAS / 1.3 PREVIEW</small>
+          LUNAR <small>FIELD ATLAS / 1.4 PREVIEW</small>
         </a>
         <div className="v1-header-right">
           <span className="v1-live">
@@ -851,7 +857,7 @@ export default function App() {
                   The catalog’s landing date is historical context, not a replay
                   of that mission.
                 </p>
-                <div ref={educationRef}>{missions.find(m=>m.id===educationId)&&<MissionEducation key={educationId} mission={missions.find(m=>m.id===educationId)!} onScene={()=>setSceneMissionId(educationId)} timeLabel={date(t).replace('T',' ')} onStudy={()=>{setSceneMissionId(null);const m=missions.find(m=>m.id===educationId)!;locate(m.lat,m.lon,m.name)}} onSurface={()=>{setSceneMissionId(null);const m=missions.find(m=>m.id===educationId)!;locate(m.lat,m.lon,m.name);useStore.getState().goTo({kind:'approach',lat:m.lat,lon:m.lon,hM:elevation(m.lat,m.lon)})}}/>}</div>
+                <div ref={educationRef}>{educationId&&<p className="v1-note">The selected mission’s information is beside the viewer. <button onClick={()=>setMissionInfoOpen(true)}>Open mission info</button></p>}</div>
                 {[
                   ["landed", "Historical landings"],
                   ["crashed", "Landing attempts"],
@@ -871,7 +877,7 @@ export default function App() {
                           <div>
                             <button
                               disabled={!ready}
-                              onClick={() => {setEducationId(m.id);setSceneMissionId(m.status==="landed"?m.id:null);locate(m.lat, m.lon, m.name);requestAnimationFrame(()=>educationRef.current?.scrollIntoView?.({behavior:"smooth",block:"start"}))}}
+                              onClick={() => {setEducationId(m.id);setMissionInfoOpen(true);setSceneMissionId(m.status==="landed"?m.id:null);locate(m.lat, m.lon, m.name);requestAnimationFrame(()=>educationRef.current?.scrollIntoView?.({behavior:"smooth",block:"start"}))}}
                             >
                               Study this location ↗
                             </button>
@@ -891,7 +897,7 @@ export default function App() {
             )}
           </div>
         </aside>
-        <section className="v1-scene" aria-label="Lunar terrain observatory">
+        <section className="v1-scene" data-mission-info={tab==="sites"&&educationId&&missionInfoOpen?"open":"closed"} aria-label="Lunar terrain observatory">
           <div className="v1-scene-tools">
             <div className="v1-segment">
               <button
@@ -925,9 +931,10 @@ export default function App() {
               {hidden ? "Show analysis" : "Hide analysis"}
             </button>
           </div>
-          {sceneMission&&sceneSource&&<InterfaceBoundary label="Mission scene"><Suspense fallback={<div className="mission-scene">Loading expedition scene…</div>}><MissionScene key={sceneMission.id} mission={sceneMission} source={sceneSource} sun={ephem?skyAt(ephem,t,sceneMission.lat,sceneMission.lon,elevation(sceneMission.lat,sceneMission.lon)).sun:undefined} onClose={()=>setSceneMissionId(null)}/></Suspense></InterfaceBoundary>}
+          {sceneMission&&sceneSource&&<InterfaceBoundary label="Mission scene"><Suspense fallback={<div className="mission-scene">Loading expedition scene…</div>}><MissionScene key={sceneMission.id} mission={sceneMission} source={sceneSource} dataBase={BASE} quality={quality} sunDirection={bodies?unit(bodies.sun):undefined} map={map} relief={relief} horizon={active&&Math.abs(active.pin.lat-sceneMission.lat)<1e-6&&Math.abs(((active.pin.lon-sceneMission.lon+540)%360)-180)<1e-6?active.horizon:undefined} eclipse={ephem?eclipseFactor(skyAt(ephem,t,sceneMission.lat,sceneMission.lon,elevation(sceneMission.lat,sceneMission.lon))):1} sun={ephem?skyAt(ephem,t,sceneMission.lat,sceneMission.lon,elevation(sceneMission.lat,sceneMission.lon)).sun:undefined} onClose={()=>setSceneMissionId(null)}/></Suspense></InterfaceBoundary>}
+          {tab==="sites"&&missions.find(m=>m.id===educationId)&&<MissionInfoPanel mission={missions.find(m=>m.id===educationId)!} open={missionInfoOpen} onToggle={()=>setMissionInfoOpen(v=>!v)} onBrowse={()=>{setHidden(false);requestAnimationFrame(()=>educationRef.current?.scrollIntoView?.({behavior:"smooth",block:"start"}))}} onDaylight={()=>{const m=missions.find(m=>m.id===educationId)!;if(!active||Math.abs(active.pin.lat-m.lat)>1e-6||Math.abs(((active.pin.lon-m.lon+540)%360)-180)>1e-6){locate(m.lat,m.lon,m.name);setPendingDaylight(m.id);return}findObserverDaylight()}}><MissionEducation key={educationId} mission={missions.find(m=>m.id===educationId)!} terrainLabel={sceneSource?sceneTerrainLabel(sceneSource,missions.find(m=>m.id===educationId)!.lat,missions.find(m=>m.id===educationId)!.lon):undefined} timeLabel={date(t).replace('T',' ')} onScene={()=>{const m=missions.find(m=>m.id===educationId)!;locate(m.lat,m.lon,m.name);setSceneMissionId(educationId)}} onStudy={()=>{setSceneMissionId(null);const m=missions.find(m=>m.id===educationId)!;locate(m.lat,m.lon,m.name)}} onSurface={()=>{setSceneMissionId(null);const m=missions.find(m=>m.id===educationId)!;locate(m.lat,m.lon,m.name);useStore.getState().goTo({kind:'approach',lat:m.lat,lon:m.lon,hM:elevation(m.lat,m.lon)})}}/></MissionInfoPanel>}
           <div className="viewer-guide-host" ref={setGuideHost}/>
-          <div className="viewer-daylight"><button disabled={!active||!ephem} onClick={()=>{if(!active||!ephem)return;const next=findDaylight(ephem,active.horizon,active.hM,t);if(next===null){setDaylightNote("No fully clear solar-disc sample found in the next 60 days within the ephemerides.");return}useStore.getState().setPlaying(false);useStore.getState().setTime(next);setDaylightNote(active.pin.label+" daylight sample: "+date(next).replace("T"," ")+" UTC. Hourly search; study dates unchanged.")}}>Find daylight</button>{daylightNote&&<p role="status">{daylightNote}</p>}</div>
+          <div className="viewer-daylight"><button id="find-observer-daylight" disabled={!active||!ephem} onClick={findObserverDaylight}>Find daylight</button>{daylightNote&&<p role="status">{daylightNote}</p>}</div>
           <div className="v1-bearings" style={{display:sceneMission?"none":undefined}}>
             {["sun", "earth"].map((name) => (
               <span
