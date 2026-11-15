@@ -1,0 +1,145 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> lunar-field-atlas@1.0.0 test
+> vitest run --reporter=dot
+
+
+ RUN  v5.1.0 /workspace/scratch/7dfc364995d9/work/LUNAR_v1.0/frontend
+
+···················(node:118) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+························(node:150) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+··························································stdout | src/lib/finder.test.ts > site finder on the published layers > Solar-powered lander: every shortlisted spot meets every limit
+Solar-powered lander: 1196 km2 eligible, 8 candidates {
+  rank: 1,
+  lat: -84.79919301827971,
+  lon: 29.096479318745654,
+  score: 0.5540569424629211,
+  slopeDeg: 3.75,
+  sun: 0.47200000286102295,
+  earth: 0.9319999814033508,
+  psrKm: 2.201094627380371,
+  inPsr: false
+}
+
+··································stdout | src/lib/finder.test.ts > site finder on the published layers > Ice prospecting: every shortlisted spot meets every limit
+Ice prospecting: 15 km2 eligible, 8 candidates {
+  rank: 1,
+  lat: -87.40923479211384,
+  lon: 24.67686317033706,
+  score: 0.22325927019119263,
+  slopeDeg: 3.25,
+  sun: 0.03999999910593033,
+  earth: 0.5,
+  psrKm: 2.5700035095214844,
+  inPsr: false
+}
+
+(node:189) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+·······stdout | src/lib/crest.real.test.ts > 20 m crest patch at the connecting ridge > with the patch, the longest night is close to the published 4.62 days
+with 20 m patch: longest night 4.67 d, in light 91.86 %
+
+··stdout | src/lib/finder.test.ts > site finder on the published layers > Base next to ice: every shortlisted spot meets every limit
+Base next to ice: 560 km2 eligible, 8 candidates {
+  rank: 1,
+  lat: -84.80482014439531,
+  lon: 28.761158370307715,
+  score: 0.5655328035354614,
+  slopeDeg: 2.75,
+  sun: 0.47999998927116394,
+  earth: 0.8799999952316284,
+  psrKm: 1.1875,
+  inPsr: false
+}
+
+··stdout | src/lib/horizon.real.test.ts > horizon at south-pole points vs the Python reference > Shackleton rim connecting ridge matches to 0.001 degrees
+Shackleton rim connecting ridge: worst difference 5.62e-7 deg
+
+·························stdout | src/lib/crest.real.test.ts > 20 m crest patch at the connecting ridge > without it, the 80 m tiles give the long night the validation study found
+80 m tiles only: longest night 9.25 d, in light 91.37 %
+
+·stdout | src/lib/horizon.real.test.ts > horizon at south-pole points vs the Python reference > Shackleton crater floor matches to 0.001 degrees
+Shackleton crater floor: worst difference 1.43e-6 deg
+
+···stdout | src/lib/ephem.test.ts > Sun and Earth angles vs JPL Horizons > matches Horizons to better than 0.02 degrees on the sky
+worst angular difference vs Horizons: 0.00007 deg
+
+··················stdout | src/lib/horizon.real.test.ts > horizon at south-pole points vs the Python reference > Malapert massif matches to 0.001 degrees
+Malapert massif: worst difference 8.83e-7 deg
+
+·······················stdout | src/lib/horizon.real.test.ts > horizon at south-pole points vs the Python reference > Nobile rim matches to 0.001 degrees
+Nobile rim: worst difference 9.26e-7 deg
+
+····-stdout | src/lib/horizon.real.test.ts > horizon at south-pole points vs the Python reference > Haworth floor matches to 0.001 degrees
+Haworth floor: worst difference 9.68e-7 deg
+
+···stdout | src/lib/horizon.real.test.ts > horizon at south-pole points vs the Python reference > Near DEM edge 81S matches to 0.001 degrees
+Near DEM edge 81S: worst difference 6.69e-7 deg
+
+·stdout | src/lib/horizon.real.test.ts > horizon at mission-site patches vs the Python reference > Apollo 17 site matches to 0.001 degrees
+Apollo 17 site: worst difference 8.35e-7 deg
+
+··stdout | src/lunar/baseline.test.ts > records the supplied Singapore engine against preserved LUNAR scenarios without hiding differences
+Matched hourly differences (percentage points): [
+  { id: 'ridge-2m', sun: -1.041666666666674, earth: 0 },
+  { id: 'ridge-10m', sun: -0.04629629629629983, earth: 0 },
+  { id: 'earth-control', sun: 0, earth: 0.09259259259259967 }
+]
+
+·stdout | src/lib/horizon.real.test.ts > horizon at mission-site patches vs the Python reference > Apollo 15 site matches to 0.001 degrees
+Apollo 15 site: worst difference 9.11e-7 deg
+
+·stdout | src/lib/horizon.real.test.ts > horizon at mission-site patches vs the Python reference > IM-1 Odysseus site matches to 0.001 degrees
+IM-1 Odysseus site: worst difference 9.17e-7 deg
+
+·stdout | src/lib/horizon.real.test.ts > horizon at mission-site patches vs the Python reference > Chandrayaan-3 site matches to 0.001 degrees
+Chandrayaan-3 site: worst difference 5.92e-7 deg
+
+·stdout | src/lib/horizon.real.test.ts > horizon at mission-site patches vs the Python reference > 10 km east of Apollo 11 site matches to 0.001 degrees
+10 km east of Apollo 11 site: worst difference 5.43e-7 deg
+
+·stdout | src/lib/horizon.real.test.ts > horizon at mission-site patches vs the Python reference > Whole-Moon map only 30N 100W matches to 0.001 degrees
+Whole-Moon map only 30N 100W: worst difference 7.28e-7 deg
+
+·stdout | src/lib/horizon.real.test.ts > horizon at mission-site patches vs the Python reference > Connecting ridge 20 m patch centre matches to 0.001 degrees
+Connecting ridge 20 m patch centre: worst difference 6.00e-7 deg
+
+·stdout | src/lib/horizon.real.test.ts > horizon at mission-site patches vs the Python reference > Shackleton rim 20 m patch centre matches to 0.001 degrees
+Shackleton rim 20 m patch centre: worst difference 7.01e-7 deg
+
+·stdout | src/lib/horizon.real.test.ts > horizon at mission-site patches vs the Python reference > de Gerlache rim 20 m patch centre matches to 0.001 degrees
+de Gerlache rim 20 m patch centre: worst difference 5.62e-7 deg
+
+·stdout | src/lib/horizon.real.test.ts > horizon at mission-site patches vs the Python reference > Malapert massif 20 m patch centre matches to 0.001 degrees
+Malapert massif 20 m patch centre: worst difference 5.93e-7 deg
+
+·stdout | src/lib/horizon.real.test.ts > horizon at mission-site patches vs the Python reference > Glaser spot 2 on the connecting ridge matches to 0.001 degrees
+Glaser spot 2 on the connecting ridge: worst difference 5.82e-7 deg
+
+·stdout | src/lib/horizon.real.test.ts > horizon at mission-site patches vs the Python reference > IM-2 Athena site (20 m patch) matches to 0.001 degrees
+IM-2 Athena site (20 m patch): worst difference 5.87e-7 deg
+
+·stdout | src/lib/horizon.real.test.ts > horizon at mission-site patches vs the Python reference > LCROSS Centaur impact site (20 m patch) matches to 0.001 degrees
+LCROSS Centaur impact site (20 m patch): worst difference 9.25e-7 deg
+
+·stdout | src/lib/horizon.real.test.ts > horizon at mission-site patches vs the Python reference > Griffin Mission 1 site (20 m patch) matches to 0.001 degrees
+Griffin Mission 1 site (20 m patch): worst difference 7.03e-7 deg
+
+·stdout | src/lib/horizon.real.test.ts > horizon at mission-site patches vs the Python reference > IM-1 Odysseus site (20 m patch) matches to 0.001 degrees
+IM-1 Odysseus site (20 m patch): worst difference 9.44e-7 deg
+
+·
+
+ Test Files  32 passed | 1 skipped (33)
+      Tests  241 passed | 1 skipped (242)
+   Start at  05:44:43
+   Duration  7.11s (tests 62%, import 34%, transform 3%, worker 1%)
+
+    Isolate  33 workers spawned · ~198ms startup each (spawn + environment, per file)
+             at least ~619ms faster with isolate: false — reuses workers across files instead of one per file
+

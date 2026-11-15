@@ -1,0 +1,22 @@
+LUNAR V1.0 — November 15, 2026
+
+Technical derivative of Lunar Navigator, daniel27-space and contributors:
+https://github.com/daniel27-space/lunar-navigator
+Apache License 2.0; full license in LICENSE and LICENSE-APACHE-2.0.
+
+Retained technical foundation: Three.js terrain/globe/shadow implementation,
+camera controls, browser ephemeris/horizon/disc/window/finder/landing algorithms,
+scientific terrain data preparation and original regression fixtures.
+No endorsement or affiliation with the upstream team is implied.
+
+LUNAR modifications: original product interface and guide, Basic/Advanced,
+original SVG bearings, base-layout screening, project handling, scientific
+workspace, native global DEM input, adjustable shadow fill, WebGL fallback,
+Python eclipse model, validation audit, launch/build/release tools and docs.
+Modified upstream files retain notices; additional source paths are listed in
+qa/upstream_changes.json. Original LUNAR archives remain separate from new work.
+
+Non-NASA welcome/mission artwork, screenshots, promotional narratives and
+spacecraft showcases are not used by the V1 application. NASA-origin terrain
+and imagery retain their credits in their metadata. Original upstream docs are
+preserved under upstream-docs and upstream-pipeline for attribution/provenance.

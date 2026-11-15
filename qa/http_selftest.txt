@@ -1,0 +1,15 @@
+127.0.0.1 - - [15/Nov/2026 05:47:13] "HEAD / HTTP/1.1" 200 -
+PASS /: text/html
+127.0.0.1 - - [15/Nov/2026 05:47:13] "HEAD /lunar/data/manifest.json HTTP/1.1" 200 -
+PASS /lunar/data/manifest.json: application/json
+127.0.0.1 - - [15/Nov/2026 05:47:13] "HEAD /lunar/data/sites/ridge-2m.json HTTP/1.1" 200 -
+PASS /lunar/data/sites/ridge-2m.json: application/json
+127.0.0.1 - - [15/Nov/2026 05:47:13] "HEAD /data/missions.json HTTP/1.1" 200 -
+PASS /data/missions.json: application/json
+127.0.0.1 - - [15/Nov/2026 05:47:13] "HEAD /data/globe/globe.json HTTP/1.1" 200 -
+PASS /data/globe/globe.json: application/json
+127.0.0.1 - - [15/Nov/2026 05:47:13] "HEAD /assets/index-Dl2cjWMS.css HTTP/1.1" 200 -
+PASS /assets/index-Dl2cjWMS.css: text/css
+127.0.0.1 - - [15/Nov/2026 05:47:13] "HEAD /assets/index-CTiT-tVM.js HTTP/1.1" 200 -
+PASS /assets/index-CTiT-tVM.js: text/javascript
+PASS Windows .js MIME override; all required assets served.

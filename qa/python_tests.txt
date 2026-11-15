@@ -1,0 +1,14 @@
+................................................................         [100%]
+=============================== warnings summary ===============================
+tests/test_auto_lola.py::test_visual_tiles_are_real_grids_from_same_geotiff
+tests/test_auto_lola.py::test_visual_tiles_are_real_grids_from_same_geotiff
+tests/test_auto_lola.py::test_cli_auto_refines_and_exports_3d_from_same_dem
+tests/test_auto_lola.py::test_cli_auto_refines_and_exports_3d_from_same_dem
+tests/test_regional_terrain.py::test_regional_levels_from_one_georeferenced_source
+tests/test_regional_terrain.py::test_regional_levels_from_one_georeferenced_source
+tests/test_regional_terrain.py::test_regional_levels_from_one_georeferenced_source
+  /workspace/scratch/7dfc364995d9/work/LUNAR_v1.0/engine/scripts/export_lola_tiles.py:51: PendingDeprecationWarning: Use `@` matmul instead of `*` mul operator for matrix multiplication
+    cols,rows=inv*(px,py)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+64 passed, 7 warnings in 8.70s

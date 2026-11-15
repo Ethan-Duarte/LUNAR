@@ -1,0 +1,27 @@
+# Runtime / local data
+frontend/node_modules/
+frontend/dist/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.nbc
+*.nbi
+.venv/
+.validation-env/
+engine/data/validation_cache/
+engine/data/dems/*.part
+engine/data/dems/LOLA_GLOBAL_16PPD_UINT.tif
+# Official scientific downloads remain reproducible through setup scripts.
+engine/data/dems/LDEM_80S_80MPP_ADJ.TIF
+engine/data/dems/LDEM_60S_240MPP_ADJ.TIF
+
+# Generated viewer and official kernel downloads
+app/
+engine/data/kernels/*.bsp
+engine/data/kernels/*.bpc
+engine/data/kernels/*.tpc
+engine/data/kernels/*.tls
+engine/data/kernels/*.tf
+*.zip
+*.tsbuildinfo
+RELEASE_MANIFEST.json

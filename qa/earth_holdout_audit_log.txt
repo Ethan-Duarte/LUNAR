@@ -1,0 +1,49 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> lunar-field-atlas@1.0.0 test
+> vitest run src/lunar/holdout.audit.test.ts --reporter=dot
+
+
+ RUN  v5.1.0 /workspace/scratch/7dfc364995d9/work/LUNAR_v1.0/frontend
+
+stdout | src/lunar/holdout.audit.test.ts > reruns both terrain representations on the fixed Earth holdout
+supplied-reference-browser 20 /185
+supplied-reference-browser 40 /185
+supplied-reference-browser 60 /185
+supplied-reference-browser 80 /185
+supplied-reference-browser 100 /185
+supplied-reference-browser 120 /185
+supplied-reference-browser 140 /185
+supplied-reference-browser 160 /185
+supplied-reference-browser 180 /185
+LUNAR-V1-native-global 20 /185
+LUNAR-V1-native-global 40 /185
+LUNAR-V1-native-global 60 /185
+LUNAR-V1-native-global 80 /185
+LUNAR-V1-native-global 100 /185
+LUNAR-V1-native-global 120 /185
+LUNAR-V1-native-global 140 /185
+LUNAR-V1-native-global 160 /185
+LUNAR-V1-native-global 180 /185
+[
+  {
+    engine: 'supplied-reference-browser',
+    rms: 0.031343741684984903,
+    bias: 0.01033811652347109,
+    status: 'FAIL'
+  },
+  {
+    engine: 'LUNAR-V1-native-global',
+    rms: 0.031343741684984903,
+    bias: 0.01033811652347109,
+    status: 'FAIL'
+  }
+]
+
+·
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  05:33:28
+   Duration  103.29s (tests 100%)
+

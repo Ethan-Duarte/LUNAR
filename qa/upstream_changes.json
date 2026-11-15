@@ -1,0 +1,17 @@
+[
+  "frontend/package.json",
+  "frontend/package-lock.json",
+  "frontend/index.html",
+  "frontend/vite.config.ts",
+  "frontend/src/App.tsx",
+  "frontend/src/store.ts",
+  "frontend/public/favicon.svg",
+  "frontend/src/ui/useSiteAnalysis.ts",
+  "frontend/src/scene/shading.ts",
+  "frontend/src/scene/Globe.tsx",
+  "frontend/src/scene/MoonTerrain.tsx",
+  "frontend/src/scene/MoonCanvas.tsx",
+  "frontend/src/lib/testData.ts",
+  "frontend/public/data/missions.json",
+  "frontend/public/data/globe/globe.json"
+]
