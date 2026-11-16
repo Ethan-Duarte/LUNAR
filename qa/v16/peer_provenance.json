@@ -1,0 +1,19 @@
+{
+  "repository": "https://github.com/NetRunnerXD/lunar-horizon-wheel",
+  "commit": "0c0c5f5c00e2be530f8e36053222883ebb402587",
+  "original_suite": "49 passed",
+  "matched_adapters": "2 passed",
+  "file_sha256": {
+    "src/physics.ts": "545b9295d3873e686187617a96837c78fcdae5a481d93c498473163fcd592bcf",
+    "src/Operability.tsx": "f740a839599d6215b5721a834f1ea698dc1fb03409f75c38516001c8969467b8",
+    "src/Traverse.tsx": "660f9d71f1f7b241bc7af84afa40e7703b9285e11744330e333b484943a9279e",
+    "src/NetworkView.tsx": "5ee2d734d498fdd000c807f3ebe284dff91f9aa537573967af8d7eacdb3a7f28",
+    "src/CloneUncertainty.tsx": "6d0b46f26c97f9f6c29f90004ec453dbdde0fbce37a0fc677ec668014b4fe7bc",
+    "src/AdvancedViews.tsx": "bb3ecf21e825959c3b8acb269842c6ff533b043c2604e7d4cf2b1155679215a5",
+    "src/data.test.ts": "fda86e863b4832491f4e4a63e0cb7464cd0ce2b6318c872b39c77c6d8eeae350",
+    "METHODS.md": "a55c336517fa4adceebacd103e6785b96224c51fbc9519e48b2f8b290ed5c7b7",
+    "package-lock.json": "15f624ca6d70af4d3c4b6aadf2cf563f99201ce8c70ce1a08472502a2e2bd092",
+    "public/data/clone_ensemble.json": "784e2415cb08d0d5c88652605a3b87fc35006044fe3add23d1e97506eb943e06"
+  },
+  "scope": "Inspected code, existing public regression suite, matched scalar and synthetic-horizon adapters; no full data pipeline or live UI reproduction."
+}

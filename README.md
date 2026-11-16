@@ -1,6 +1,6 @@
-# LUNAR V1.5 preview
+# LUNAR V1.6 preview
 
-Fixed Earth holdout reproduced, original NASA reference pixels verified, analytic Base and search checks extended. The Earth discrepancy remains unresolved. [Results](V1_5_VALIDATION.md) · [Update and user checks](UPDATE_V1_5.md). Visual acceptance remains pending; existing scientific limitations still apply.
+Connected-base timing, a longer power case and a pinned competitor audit. [Comparison](HORIZON_WHEEL_AUDIT.md) · [Science evidence](V1_6_SCIENCE.md) · [Update and checks](UPDATE_V1_6.md). Broad parity is not established; the Earth discrepancy remains unresolved. Visual acceptance remains pending; existing scientific limitations still apply.
 
 # LUNAR
 

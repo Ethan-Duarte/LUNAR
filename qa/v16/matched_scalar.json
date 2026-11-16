@@ -1,0 +1,33 @@
+{
+  "case": "Matched scalar checks, not site/DSN/end-to-end parity",
+  "power": {
+    "peerBatteryWh": 600,
+    "lunarBatteryWh": 599.9999880004907,
+    "assumptions": "Identical generation trace; 100 W load; full start; 50% usable capacity; ideal charge/discharge; Sun at 0 degrees to remove panel-normal differences"
+  },
+  "radio": {
+    "peer": {
+      "fsplDb": 222.64969263180654,
+      "eirpDbw": 22,
+      "cn0DbHz": 77.96516796941457,
+      "maxRateBps": 17640739.911654137,
+      "rx": {
+        "gainDbi": 68.2,
+        "tsysK": 33
+      }
+    },
+    "lunar": {
+      "fsplDb": 222.64969240992315,
+      "receivedDbw": -135.44969240992316,
+      "ebN0Db": 47.96433536451562,
+      "marginDb": 45.46433536451562
+    },
+    "lunarCn0DbHz": 77.96433536451562,
+    "cn0DifferenceDb": -0.0008326048989459878,
+    "assumptions": "8.42 GHz, 384400 km, 10 W, 12 dBi transmit, 68.2 dBi receive, 33 K, 3 dB lumped losses; no DSN geometry comparison"
+  },
+  "limits": [
+    "Peer uses rounded Boltzmann constant 228.6 dB; LUNAR uses exact SI k.",
+    "Matches of scalar cases do not establish matching terrain, ephemerides, eclipse, station access or mission operations."
+  ]
+}

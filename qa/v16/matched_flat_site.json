@@ -1,0 +1,18 @@
+{
+  "site": {
+    "lat": 0,
+    "lon": 0,
+    "elevationM": 0,
+    "mastM": 2
+  },
+  "start": 1794614400000,
+  "end": 1797206400000,
+  "stepMinutes": 60,
+  "samples": 720,
+  "peerMeanSunPct": 49.39611489130786,
+  "lunarMeanSunPct": 49.39573575225141,
+  "peerCentreEarthPct": 100,
+  "lunarCentreEarthPct": 100,
+  "declaredTolerancePP": 0.01,
+  "limits": "Synthetic constant zero-degree horizon; identical converted LUNAR ephemeris at hourly nodes; uniform solar disc; DSN omitted; no eclipse in selected month. End-exclusive adapter used. Not a measured-terrain or default-settings comparison."
+}

@@ -1,0 +1,31 @@
+{
+  "reference": "https://eclipse.gsfc.nasa.gov/LEplot/LEplot2001/LE2025Mar14T.pdf",
+  "referenceGreatestUT": "2025-03-14T06:58:41.7",
+  "predictedMoonCentreMinimumSeparationUTC": "2025-03-14T06:59:00.000Z",
+  "differenceMinutes": 0.305,
+  "declaredToleranceMinutes": 5,
+  "sampleMinutes": 1,
+  "site": [
+    0,
+    0
+  ],
+  "checks": [
+    {
+      "utc": "2025-03-14T03:00:00Z",
+      "unocculted": 1
+    },
+    {
+      "utc": "2025-03-14T06:45:00Z",
+      "unocculted": 0
+    },
+    {
+      "utc": "2025-03-14T07:15:00Z",
+      "unocculted": 0
+    },
+    {
+      "utc": "2025-03-14T11:00:00Z",
+      "unocculted": 1
+    }
+  ],
+  "limits": "Moon-centre alignment and safely interior/exterior event classification. Global eclipse contacts are not local surface contacts. UT versus UTC difference below one second is neglected. No contact-timing, atmosphere or terrain-mask certification."
+}

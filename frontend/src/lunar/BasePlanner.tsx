@@ -6,6 +6,7 @@ import type { Ephem } from "../lib/ephem";
 import { sourceHeight, type HeightSource } from "../lib/terrain";
 import { localFrame, R_KM, upVector } from "../lib/geo";
 import { useStore } from "../store";
+import {Readiness} from "./Readiness";
 import {BaseComparison,failureIntervals} from "./BaseComparison";
 import {BASE_LESSON,lessonCanAdvance} from "./baseLesson";
 import {Help} from "./Help";
@@ -252,7 +253,7 @@ export function BasePlanner({
   function project() {
     return {
       schema: "lunar-base-2",
-      version: "1.3-preview",
+      version: "1.6-preview",
       facilities,
       settings,
       start: windowStart,
@@ -514,6 +515,7 @@ export function BasePlanner({
       >
         Load example design
       </button>
+      <button onClick={()=>{const location={lat:-89.4399,lon:222.8524,mast:2};setFacilities([{...location,id:crypto.randomUUID(),name:'Month habitat',role:'habitat',fixed:true},{...location,id:crypto.randomUUID(),name:'Month array',role:'power',areaM2:20,fixed:false}]);setSelected(null);setSettings({...DEFAULT_ENGINEERING,days:30,stepMinutes:60,loadKW:1,batteryKWh:250,initialSoc:.2,reserveSoc:.2,requireEarth:false,maxSlopeDeg:90});useStore.getState().setPlaying(false);useStore.getState().setTime(Date.parse('2026-11-14T00:00:00Z'));useStore.getState().setWindowStart(Date.parse('2026-11-14T00:00:00Z'));setStatus('30-day power case loaded. Evaluate, then compare 0, 20 and 40 m². Earth and slope gates are relaxed; this is a co-located electrical demonstration.');onLocate(location.lat,location.lon,'Connecting Ridge month case')}}>Load 30-day power case</button><p className="v1-note">Loading an example replaces the layout; save yours first. The month case starts with 20% charge and requires replenishment. Earth and slope constraints are relaxed for this electrical demonstration.</p>
       <Help title="Placing components"><p>Use Inspect to select existing facilities. Add component places one facility and returns to Inspect. Move component relocates the selected facility once. Fixed means a location stays fixed during a search; it does not prevent manual edits.</p></Help></section>
       <svg
         className="base-map"
@@ -766,7 +768,7 @@ export function BasePlanner({
       <div className="v1-fields">
         {numeric("Duration (days)", "days", 1, 60, 1)}
         {numeric("Base demand (kW)", "loadKW", 0, 1e6, 0.1)}
-        {numeric("Usable battery (kWh)", "batteryKWh", 0, 1e7, 10)}
+        {numeric("Modeled battery capacity (kWh)", "batteryKWh", 0, 1e7, 10)}
         {numeric("Required reserve fraction", "reserveSoc", 0, 1, 0.05)}
         {numeric("Array efficiency", "efficiency", 0.01, 1, 0.01)}
         {numeric("System derating", "derate", 0.01, 1, 0.01)}
@@ -818,8 +820,7 @@ export function BasePlanner({
           </select>
         </label>
         <p>
-          Constant demand plus component loads. Usable battery excludes
-          inaccessible capacity. Initial charge is an input, not free recurring
+          Constant demand plus component loads. Battery capacity is the modeled storage ceiling; the selected reserve is held separately. Initial charge is an input, not free recurring
           energy. Panel efficiency is constant; thermal effects, degradation and
           voltage-dependent cable physics are not modeled.
         </p>
@@ -985,6 +986,7 @@ export function BasePlanner({
             </div>
           </div>
           {r.totalArrayM2===0&&<p className="v1-alert">This design has zero solar collection area. Any supplied demand relies on its initial stored energy; it cannot replenish that energy. A finite-mission pass is not sustainable solar operation.</p>}
+          <Readiness result={r} settings={report.settings} start={report.start} onInspect={time=>{const bounds=useStore.getState().timeRange;if(bounds&&(time<bounds[0]||time>bounds[1])){setStatus("Interval outside safe viewer range; inspect exported samples.");return}useStore.getState().setPlaying(false);useStore.getState().setTime(time);const h=report.facilities.find(f=>f.role==='habitat');if(h)onLocate(h.lat,h.lon,h.name)}}/>
           <PowerChart report={report} />
           <details className="v1-detail"><summary>Inspect blackout intervals</summary><p>Sampled intervals, not exact transition times. Jump moves the viewing clock; the study period is unchanged.</p>{[['Unmet power',failureIntervals(r.power.unmetKW,v=>Number(v)>1e-6)],['Earth contact loss',failureIntervals(r.contact,v=>!v)]] .map(([name,events])=><div key={name as string}><h3>{name as string}</h3>{!(events as {start:number;end:number}[]).length&&<p>No sampled interval.</p>}{(events as {start:number;end:number}[]).slice(0,30).map((e,i)=><p key={i}><button onClick={()=>{const time=report.start+e.start*report.settings.stepMinutes*60000,bounds=useStore.getState().timeRange;if(bounds&&(time<bounds[0]||time>bounds[1])){setStatus("This interval is outside the viewer clock range. Inspect its exported samples instead.");return}useStore.getState().setPlaying(false);useStore.getState().setTime(time);const h=report.facilities.find(f=>f.role==='habitat');if(h)onLocate(h.lat,h.lon,h.name)}}>Jump to {new Date(report.start+e.start*report.settings.stepMinutes*60000).toISOString().slice(0,16)} UTC</button> · {((e.end-e.start)*report.settings.stepMinutes/60).toFixed(2)} h</p>)}{(events as unknown[]).length>30&&<p>First 30 intervals shown; full samples are in the exported report.</p>}</div>)}</details>
           <p>
@@ -1291,7 +1293,7 @@ function PowerChart({ report }: { report: Report }) {
 
 const SETTING_HELP:Partial<Record<keyof EngineeringSettings,string>>={
  loadKW:'Constant total base demand. Energy consumed = kW × hours. Per-component additional loads are added to this number.',
- batteryKWh:'Usable stored energy, not power. A 100 kWh battery cannot supply 1 kW indefinitely: even ideal storage lasts only 100 hours without generation.',
+ batteryKWh:'Modeled energy capacity; initial charge and required reserve apply separately. This is energy, not power. A 100 kWh battery cannot supply 1 kW indefinitely: even ideal storage lasts only 100 hours without generation.',
  reserveSoc:'Minimum permitted fraction of usable capacity. A reserve of 0.2 means at least 20% must remain throughout the mission.',
  efficiency:'Fraction of sunlight converted to electricity. 0.25 means 25%, before system derating and storage losses.',
  derate:'Other generation losses, multiplied by efficiency. 0.8 retains 80%; it is not a measured performance prediction.',

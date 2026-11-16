@@ -84,3 +84,11 @@ Investigate the two largest Earth-holdout outliers against reference metadata, t
 - Closed-form energy/storage cases and deterministic search bounds/fixed-anchor/re-evaluation checks pass. One-day optimizer case can legitimately remove solar area because initial battery energy covers demand; the UI now warns explicitly. No sustainable-base claim.
 - 64 Python regressions passed. Regular frontend/audit counts and commands are in qa/v15 and V1_5_VALIDATION.md. GPU and unassisted usability acceptance remain pending.
 - Mission information now overlays a fixed-size viewport. Integrated metre-scale landers deferred to avoid another camera overhaul.
+
+## V1.6 comparison / mission timing checkpoint (2026-11-15)
+
+- Pinned Horizon Wheel code audit; 49 original peer tests and 2 matched adapters reproduced. Scalar battery/RF and a controlled flat-horizon site agree; broad parity is not established.
+- Added original joint power/reserve/contact timing lanes and a 30-day low-initial-charge electrical example. 0 m² fails with 672.5 kWh unmet; 20/40 m² satisfy modeled demand with siting/Earth gates explicitly relaxed.
+- Independent NASA eclipse-event timing/phase sanity check passes at one-minute resolution; no local contact-time certification.
+- Original Apollo 11 flag and explicit Expedition-versus-Surface guidance.
+- DSN station access, clone statistics and traverse routing remain gaps. Earth holdout remains FAIL. See HORIZON_WHEEL_AUDIT.md, V1_6_SCIENCE.md and qa/v16.

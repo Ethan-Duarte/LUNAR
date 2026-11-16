@@ -1,0 +1,9 @@
+
+ RUN  v5.0.4 /workspace/scratch/7dfc364995d9/horizon-wheel-audit
+
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  19:27:55
+   Duration  526ms (import 38%, tests 32%, transform 27%, worker 3%)
+

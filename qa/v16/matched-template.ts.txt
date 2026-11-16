@@ -1,0 +1,25 @@
+import {it,expect} from 'vitest'
+import {writeFileSync} from 'node:fs'
+import {powerSizing,linkBudget,series as peerSeries} from './physics'
+import {minimumBattery,DEFAULT_ENGINEERING} from __ENGINEERING__
+import {radioBudget} from __RADIO__
+it('compares explicitly matched scalar power and RF cases',()=>{
+ const f=[1,1,0,0,0,1,1,1,1,1],series={t:f.map((_,i)=>i*3600000),stepH:1,sunFrac:f,sunDistKm:f.map(()=>149597870.7),sunEl:f.map(()=>0)} as any;
+ const peerPower=powerSizing(series,{loadW:100,panelM2:1,eff:.3,batteryDod:.5,chargeEff:1});
+ const generation=f.map(v=>1361*v*.3/1000),lunarBattery=minimumBattery(generation,.1,1,{...DEFAULT_ENGINEERING,initialSoc:1,reserveSoc:.5,chargeEfficiency:1,dischargeEfficiency:1});
+ expect(peerPower.batteryWh).toBeCloseTo(600,6);expect(lunarBattery!*1000).toBeCloseTo(peerPower.batteryWh,4);
+ const peerRadio=linkBudget({band:'X',txPowerW:10,txGainDbi:12,lossesDb:3,dsnDish:34,reqEbN0Db:2.5,marginDb:3},384400),lunarRadio=radioBudget(384400,{...DEFAULT_ENGINEERING,frequencyGHz:8.42,txPowerW:10,txGainDbi:12,earthRxGainDbi:68.2,noiseK:33,rateKbps:1,requiredEbN0Db:2.5,implementationLossDb:3},true);
+ const lunarCn0=lunarRadio.ebN0Db+10*Math.log10(1000);
+ expect(Math.abs(peerRadio.fsplDb-lunarRadio.fsplDb)).toBeLessThan(1e-5);expect(Math.abs(peerRadio.cn0DbHz-lunarCn0)).toBeLessThan(.002);
+ writeFileSync(__OUTPUT__,JSON.stringify({case:'Matched scalar checks, not site/DSN/end-to-end parity',power:{peerBatteryWh:peerPower.batteryWh,lunarBatteryWh:lunarBattery!*1000,assumptions:'Identical generation trace; 100 W load; full start; 50% usable capacity; ideal charge/discharge; Sun at 0 degrees to remove panel-normal differences'},radio:{peer:peerRadio,lunar:lunarRadio,lunarCn0DbHz:lunarCn0,cn0DifferenceDb:lunarCn0-peerRadio.cn0DbHz,assumptions:'8.42 GHz, 384400 km, 10 W, 12 dBi transmit, 68.2 dBi receive, 33 K, 3 dB lumped losses; no DSN geometry comparison'},limits:['Peer uses rounded Boltzmann constant 228.6 dB; LUNAR uses exact SI k.','Matches of scalar cases do not establish matching terrain, ephemerides, eclipse, station access or mission operations.']},null,2))
+})
+
+import {computeSeries} from __WINDOWS__
+import {readEphem} from __TEST_DATA__
+it('compares a controlled flat-horizon site at common hourly epochs with a uniform Sun',()=>{
+ const e=readEphem(),v=new Float32Array(e.count*6);for(let i=0;i<e.count;i++)for(let body=0;body<2;body++)for(let k=0;k<3;k++)v[i*6+body*3+k]=e.data[i*8+body*4+k]*e.data[i*8+body*4+3];
+ const start=Date.parse('2026-11-14T00:00:00Z'),end=start+30*86400000,horizon=new Float32Array(720),peer=peerSeries({id:'controlled',name:'Controlled flat site',lat:0,lon:0,elevation_m:0,mast_m:2,horizon_step_deg:.5,horizon:Array.from(horizon)} as any,{start:e.t0Ms,stepS:e.stepS,n:e.count,v,dsn:new Int16Array(e.count*3),stations:[]} as any,start,end,{stepMin:60,model:'uniform'}),lunar=computeSeries(e,{lat:0,lon:0,observerHeightM:2,azStepDeg:.5,elevDeg:horizon,distKm:new Float32Array(720)},0,start,end-3600000,3600000);
+ const mean=(a:ArrayLike<number>)=>Array.from(a).reduce((s,x)=>s+x,0)/a.length,peerSun=mean(peer.sunFrac),lunarSun=mean(lunar.sunFrac),peerEarth=peer.earthVis.filter(Boolean).length/peer.t.length,lunarEarth=Array.from(lunar.earthClear).filter(x=>x>=0).length/lunar.count;
+ expect(peer.t.length).toBe(lunar.count);expect(Math.abs(peerSun-lunarSun)*100).toBeLessThan(.01);expect(Math.abs(peerEarth-lunarEarth)*100).toBeLessThan(.01);
+ writeFileSync(__SITE_OUTPUT__,JSON.stringify({site:{lat:0,lon:0,elevationM:0,mastM:2},start,end,stepMinutes:60,samples:lunar.count,peerMeanSunPct:peerSun*100,lunarMeanSunPct:lunarSun*100,peerCentreEarthPct:peerEarth*100,lunarCentreEarthPct:lunarEarth*100,declaredTolerancePP:.01,limits:'Synthetic constant zero-degree horizon; identical converted LUNAR ephemeris at hourly nodes; uniform solar disc; DSN omitted; no eclipse in selected month. End-exclusive adapter used. Not a measured-terrain or default-settings comparison.'},null,2))
+})

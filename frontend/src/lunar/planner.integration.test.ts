@@ -303,3 +303,11 @@ it("finds a minimum tested relay height on a curvature-limited synthetic corrido
   expect(result.alternatives[0].feasible).toBe(true);
   expect(result.alternatives[0].towerM).toBe(5);
 }, 120000);
+it('requires actual replenishment in a 30-day low-start-charge lunar power demonstration',async()=>{
+ const index=readPatchIndex()!,crest=index.patches.find(p=>p.kind==='crest20')!,terrain=readPolarTerrain(),patch=readPatch(index,crest.id),ephem=readEphem(),source={terrains:[patch,terrain],global:readCurrentGlobalDem()},start=Date.parse('2026-11-14T00:00:00Z');
+ const settings={...DEFAULT_ENGINEERING,days:30,stepMinutes:60,batteryKWh:250,initialSoc:.2,reserveSoc:.2,requireEarth:false,maxSlopeDeg:90};
+ const facilities=[{id:'hab',name:'Demonstration habitat',role:'habitat' as const,lat:-89.4399,lon:222.8524,mast:2,fixed:true},{id:'solar',name:'Demonstration array',role:'power' as const,lat:-89.4399,lon:222.8524,mast:2,areaM2:0}];
+ const rows=[];for(const areaM2 of [0,20,40]){const run=await execute({kind:'evaluate',facilities:facilities.map(f=>f.role==='power'?{...f,areaM2}:f),source,ephem,start,settings,radiusKm:.1,earthMaskDeg:0,maxTowerM:20});expect(run.error).toBeUndefined();const r=run.report.result;rows.push({areaM2,result:r,profiles:run.report.profiles});expect(r.power.loadKWh).toBeCloseTo(720,6)}
+ expect(rows[0].result.power.unmetKWh).toBeGreaterThan(600);expect(rows[2].result.power.generatedKWh).toBeGreaterThan(rows[1].result.power.generatedKWh);expect(rows[2].result.power.unmetKWh).toBeLessThan(rows[0].result.power.unmetKWh);
+ mkdirSync(new URL('../../../qa/v16/',import.meta.url),{recursive:true});writeFileSync(new URL('../../../qa/v16/month_power.json',import.meta.url),JSON.stringify({site:facilities[0],start,settings,rows,limits:'Actual shipped JPL/LOLA inputs. Co-located electrical lesson, slope/Earth gates relaxed. Finite month, not an operational siting or repeating-cycle validation.'},null,2));
+},120000)

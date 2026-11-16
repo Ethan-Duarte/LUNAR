@@ -141,3 +141,7 @@ it('retains an evaluated baseline through a layout edit and compares the next re
  act(()=>instance.onmessage({data:{done:true,report:{...report,result:{...report.result,power:{...report.result.power,generatedKWh:20}}}}}));
  expect(screen.getByText('20.00 kWh')).toBeTruthy();expect(screen.getByText('10.00 kWh')).toBeTruthy();vi.unstubAllGlobals();
 })
+it('loads the long power demonstration with explicit low initial charge and relaxed siting gates',()=>{
+ render(<BasePlanner {...props}/>);fireEvent.click(screen.getByText('Load 30-day power case'));
+ expect((screen.getByLabelText('Duration (days)') as HTMLInputElement).value).toBe('30');expect((screen.getByLabelText('Initial state of charge') as HTMLInputElement).value).toBe('0.2');expect((screen.getByLabelText('Modeled battery capacity (kWh)') as HTMLInputElement).value).toBe('250');expect(screen.getByRole('button',{name:/Month array ·/})).toBeTruthy();expect(onLocate).toHaveBeenCalledWith(-89.4399,222.8524,'Connecting Ridge month case');
+})
