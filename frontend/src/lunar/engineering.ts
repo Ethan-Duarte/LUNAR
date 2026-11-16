@@ -4,6 +4,7 @@ import { distanceKm, lineOfSight, type Facility } from "./network";
 import type { HeightSource } from "../lib/terrain";
 export interface EngineeringSettings extends RadioAssumptions {
   rfEnabled: boolean;
+  requireDsn?: boolean;
   footprintM: number;
   days: number;
   stepMinutes: number;
@@ -26,6 +27,7 @@ export interface EngineeringSettings extends RadioAssumptions {
 }
 export const DEFAULT_ENGINEERING: EngineeringSettings = {
   rfEnabled: false,
+  requireDsn:false,
   footprintM: 100,
   frequencyGHz: 2.2,
   txPowerW: 5,
@@ -218,6 +220,7 @@ export interface FacilityProfile {
   terrainSun: number[];
   eclipse: number[];
   earth: boolean[];
+  dsn?: boolean[];
   sunEl: number[];
   sunDistanceAU?: number[];
   earthDistanceKm?: number[];
@@ -413,6 +416,9 @@ export function evaluateDesign(
         ),
     ),
     longestContactLossHours = longestFalse(contact, dt);
+  const dsnKnown=habitats.length>0&&[...new Set(radioReach.flatMap(g=>[...g]))].every(id=>by.get(id)?.dsn?.length===n);
+  const dsnContact=dsnKnown?Array.from({length:n},(_,i)=>radioReach.every(group=>[...group].some(id=>by.get(id)?.dsn?.[i]&&(!s.rfEnabled||radioBudget(by.get(id)?.earthDistanceKm?.[i]??384400,s,true).marginDb>=0)))):undefined;
+  const longestDsnLossHours=dsnContact?longestFalse(dsnContact,dt):null;
   const conflicts = f
     .filter((x) => x.role === "landing")
     .flatMap((a) =>
@@ -421,6 +427,8 @@ export function evaluateDesign(
         .map((b) => `${a.name} is inside ${b.name}'s pad exclusion`),
     );
   const failures: string[] = [];
+  if(s.requireDsn&&!dsnKnown)failures.push('Station-specific DSN geometry unavailable for this study; no DSN pass can be established');
+  if(s.requireDsn&&longestDsnLossHours!==null&&longestDsnLossHours>s.maxOutageHours+1e-8)failures.push(`DSN outage ${longestDsnLossHours.toFixed(2)} h exceeds ${s.maxOutageHours.toFixed(2)} h limit`);
   if (!habitats.length) failures.push("Add a habitat anchor");
   if (!arrays.length) failures.push("Add a solar array");
   if (!electricalConnected)
@@ -471,6 +479,9 @@ export function evaluateDesign(
     eclipseExtraUnmetKWh: power.unmetKWh - noEclipse.unmetKWh,
     eclipseEvents,
     contact,
+    dsnContact,
+    longestDsnLossHours,
+    dsnShare:dsnContact?dsnContact.filter(Boolean).length/n:null,
     contactShare: contact.filter(Boolean).length / n,
     longestContactLossHours,
     generation,

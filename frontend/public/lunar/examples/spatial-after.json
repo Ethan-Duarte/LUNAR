@@ -1,0 +1,78 @@
+{
+  "schema": "lunar-base-2",
+  "version": "1.7-preview",
+  "facilities": [
+    {
+      "id": "demo-hab",
+      "name": "Habitat",
+      "role": "habitat",
+      "lat": -89.4399,
+      "lon": 222.8524,
+      "mast": 2,
+      "fixed": true
+    },
+    {
+      "id": "demo-array",
+      "name": "Solar array",
+      "role": "power",
+      "lat": -89.42670884551356,
+      "lon": -137.14760000000004,
+      "mast": 2,
+      "areaM2": 20,
+      "fixed": true
+    },
+    {
+      "id": "demo-relay",
+      "name": "Relay / bus junction",
+      "role": "relay",
+      "lat": -89.43330442275614,
+      "lon": -137.14760000000004,
+      "mast": 10,
+      "fixed": false
+    }
+  ],
+  "settings": {
+    "rfEnabled": false,
+    "requireDsn": false,
+    "footprintM": 100,
+    "frequencyGHz": 2.2,
+    "txPowerW": 5,
+    "txGainDbi": 20,
+    "rxGainDbi": 20,
+    "earthRxGainDbi": 55,
+    "noiseK": 300,
+    "rateKbps": 100,
+    "requiredEbN0Db": 10,
+    "implementationLossDb": 3,
+    "days": 30,
+    "stepMinutes": 60,
+    "loadKW": 1,
+    "efficiency": 0.25,
+    "derate": 0.8,
+    "batteryKWh": 250,
+    "initialSoc": 0.2,
+    "chargeEfficiency": 0.95,
+    "dischargeEfficiency": 0.95,
+    "reserveSoc": 0.2,
+    "maxLinkKm": 2,
+    "exclusionKm": 2,
+    "cableLossPerKm": 0.005,
+    "requireEarth": false,
+    "maxOutageHours": 24,
+    "maxSlopeDeg": 90,
+    "panelMode": "tracking",
+    "solarFlux": 1361
+  },
+  "start": 1794614400000,
+  "criteria": {
+    "criteria": {
+      "minSunFrac": 0.5,
+      "earthMaskDeg": 0
+    },
+    "observerM": 2
+  },
+  "radiusKm": 2,
+  "maxTowerM": 50,
+  "report": null,
+  "note": "Selected illustrative case over measured terrain. Ideal bus needs clear straight corridors via relay nodes; no cable routing/structural model. Earth and slope gates relaxed. Reevaluate after loading."
+}

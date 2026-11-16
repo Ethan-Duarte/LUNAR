@@ -1,0 +1,116 @@
+{
+  "checks": [
+    {
+      "station": "DSS-14 Goldstone",
+      "utc": "2026-11-14T00:05:00+00:00",
+      "horizonsElevationDeg": 26.61243345,
+      "spiceElevationDeg": 26.612370140277235,
+      "tableElevationDeg": 26.602222442626953,
+      "errorDeg": -0.01021100737304792,
+      "directErrorDeg": -6.3309722765581e-05
+    },
+    {
+      "station": "DSS-14 Goldstone",
+      "utc": "2026-11-14T06:05:00+00:00",
+      "horizonsElevationDeg": -22.491598348,
+      "spiceElevationDeg": -22.491617294009327,
+      "tableElevationDeg": -22.492982864379883,
+      "errorDeg": -0.0013845163798826832,
+      "directErrorDeg": -1.8946009326725743e-05
+    },
+    {
+      "station": "DSS-14 Goldstone",
+      "utc": "2026-11-14T12:05:00+00:00",
+      "horizonsElevationDeg": -78.325145538,
+      "spiceElevationDeg": -78.32508888297633,
+      "tableElevationDeg": -78.29000854492188,
+      "errorDeg": 0.03513699307812601,
+      "directErrorDeg": 5.6655023669804905e-05
+    },
+    {
+      "station": "DSS-14 Goldstone",
+      "utc": "2026-11-14T18:05:00+00:00",
+      "horizonsElevationDeg": -12.017127501,
+      "spiceElevationDeg": -12.017151509914344,
+      "tableElevationDeg": -12.01899528503418,
+      "errorDeg": -0.0018677840341805307,
+      "directErrorDeg": -2.4008914344619825e-05
+    },
+    {
+      "station": "DSS-63 Madrid",
+      "utc": "2026-11-14T00:05:00+00:00",
+      "horizonsElevationDeg": -43.24140142,
+      "spiceElevationDeg": -43.24140250713913,
+      "tableElevationDeg": -43.24132537841797,
+      "errorDeg": 7.60415820337812e-05,
+      "directErrorDeg": -1.0871391253886031e-06
+    },
+    {
+      "station": "DSS-63 Madrid",
+      "utc": "2026-11-14T06:05:00+00:00",
+      "horizonsElevationDeg": -60.009735138,
+      "spiceElevationDeg": -60.009721297457595,
+      "tableElevationDeg": -60.00629425048828,
+      "errorDeg": 0.0034408875117222237,
+      "directErrorDeg": 1.3840542408161127e-05
+    },
+    {
+      "station": "DSS-63 Madrid",
+      "utc": "2026-11-14T12:05:00+00:00",
+      "horizonsElevationDeg": 2.633376227,
+      "spiceElevationDeg": 2.6333535604530187,
+      "tableElevationDeg": 2.629495620727539,
+      "errorDeg": -0.003880606272460785,
+      "directErrorDeg": -2.2666546981131575e-05
+    },
+    {
+      "station": "DSS-63 Madrid",
+      "utc": "2026-11-14T18:05:00+00:00",
+      "horizonsElevationDeg": 20.054988124,
+      "spiceElevationDeg": 20.054952775816208,
+      "tableElevationDeg": 20.0468807220459,
+      "errorDeg": -0.008107401954102755,
+      "directErrorDeg": -3.534818379336002e-05
+    },
+    {
+      "station": "DSS-43 Canberra",
+      "utc": "2026-11-14T00:05:00+00:00",
+      "horizonsElevationDeg": 20.178386631,
+      "spiceElevationDeg": 20.178410029646162,
+      "tableElevationDeg": 20.180095672607422,
+      "errorDeg": 0.001709041607423245,
+      "directErrorDeg": 2.3398646163741432e-05
+    },
+    {
+      "station": "DSS-43 Canberra",
+      "utc": "2026-11-14T06:05:00+00:00",
+      "horizonsElevationDeg": 78.993263404,
+      "spiceElevationDeg": 78.99319690476976,
+      "tableElevationDeg": 78.95152282714844,
+      "errorDeg": -0.0417405768515664,
+      "directErrorDeg": -6.649923024326654e-05
+    },
+    {
+      "station": "DSS-43 Canberra",
+      "utc": "2026-11-14T12:05:00+00:00",
+      "horizonsElevationDeg": 11.53505412,
+      "spiceElevationDeg": 11.535080770527047,
+      "tableElevationDeg": 11.537135124206543,
+      "errorDeg": 0.0020810042065431134,
+      "directErrorDeg": 2.6650527047422656e-05
+    },
+    {
+      "station": "DSS-43 Canberra",
+      "utc": "2026-11-14T18:05:00+00:00",
+      "horizonsElevationDeg": -31.110098154,
+      "spiceElevationDeg": -31.11002457959607,
+      "tableElevationDeg": -31.09912872314453,
+      "errorDeg": 0.010969430855467976,
+      "directErrorDeg": 7.357440392752324e-05
+    }
+  ],
+  "declaredToleranceDeg": 0.05,
+  "maxErrorDeg": 0.0417405768515664,
+  "scope": "12 independent Earth-station Moon-elevation samples at ten-minute table midpoints. Not a complete transition-time or lunar-station direction validation.",
+  "status": "PASS"
+}

@@ -3,6 +3,7 @@ import { afterEach, it, expect, vi } from "vitest";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import { BasePlanner } from "./BasePlanner";
 import type { SiteAnalysis } from "../ui/useSiteAnalysis";
+vi.mock("./dsn",async original=>({...await original<any>(),loadDsn:async()=>{throw Error("DSN unavailable in synthetic UI fixture")}}));
 const onLocate = vi.fn(),
   source = {
     terrains: [],
@@ -144,4 +145,7 @@ it('retains an evaluated baseline through a layout edit and compares the next re
 it('loads the long power demonstration with explicit low initial charge and relaxed siting gates',()=>{
  render(<BasePlanner {...props}/>);fireEvent.click(screen.getByText('Load 30-day power case'));
  expect((screen.getByLabelText('Duration (days)') as HTMLInputElement).value).toBe('30');expect((screen.getByLabelText('Initial state of charge') as HTMLInputElement).value).toBe('0.2');expect((screen.getByLabelText('Modeled battery capacity (kWh)') as HTMLInputElement).value).toBe('250');expect(screen.getByRole('button',{name:/Month array ·/})).toBeTruthy();expect(onLocate).toHaveBeenCalledWith(-89.4399,222.8524,'Connecting Ridge month case');
+})
+it('removes a component directly from its row and restores it with Undo',()=>{
+ render(<BasePlanner {...props}/>);fireEvent.click(screen.getByText('Use selected observer'));fireEvent.click(screen.getByRole('button',{name:'Remove habitat 1'}));expect(screen.queryByRole('button',{name:/habitat 1 ·/})).toBeNull();fireEvent.click(screen.getByText('Undo facility edit'));expect(screen.getByRole('button',{name:/habitat 1 ·/})).toBeTruthy();
 })

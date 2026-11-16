@@ -38,13 +38,13 @@ function FieldRover({ground}:{ground:(x:number,z:number)=>number}){const base=gr
  <Strut from={[1,.9,0]} to={[1,2.3,0]} radius={.025}/><mesh position={[1,2.4,0]} rotation={[.6,0,0]} castShadow><sphereGeometry args={[.4,16,12,0,Math.PI*2,0,Math.PI/2]}/><meshStandardMaterial color="#d9dddc" side={THREE.DoubleSide} roughness={.6}/></mesh>
  </group>}
 function ApolloFlag({ground}:{ground:(x:number,z:number)=>number}){
- const x=5,z=-3,y=ground(x,z),stars=Array.from({length:9},(_,row)=>Array.from({length:row%2?5:6},(_,col)=>({row,col}))).flat()
+ const x=5,z=-3,y=ground(x,z)-.15,stars=Array.from({length:9},(_,row)=>Array.from({length:row%2?5:6},(_,col)=>({row,col}))).flat()
  const star=useMemo(()=>{const s=new THREE.Shape();for(let i=0;i<10;i++){const a=Math.PI/2+i*Math.PI/5,r=i%2?.0045:.011;s[i?'lineTo':'moveTo'](Math.cos(a)*r,Math.sin(a)*r)}s.closePath();return s},[])
  return <group position={[x,y,z]} rotation={[0,-.4,0]}>
  <Strut from={[0,0,0]} to={[0,2.1,0]} radius={.018}/><Strut from={[0,2.08,0]} to={[1.25,2.08,0]} radius={.012}/>
  {Array.from({length:13},(_,i)=><mesh key={i} position={[.625,2.03-i*.055,0]} castShadow><boxGeometry args={[1.25,.055,.012]}/><meshStandardMaterial color={i%2?'#eee9df':'#a92d36'} roughness={.95}/></mesh>)}
- <mesh position={[.25,1.865,.009]} castShadow><boxGeometry args={[.5,.385,.014]}/><meshStandardMaterial color="#243a6e" roughness={.95}/></mesh>
- {stars.map(({row,col},i)=><mesh key={i} position={[.04+col*.075+(row%2?.035:0),2.02-row*.041,.019]}><shapeGeometry args={[star]}/><meshStandardMaterial color="#f5f1e5" side={THREE.DoubleSide}/></mesh>)}
+ {[-1,1].map(side=><mesh key={side} position={[.25,1.865,.009*side]} castShadow><boxGeometry args={[.5,.385,.014]}/><meshStandardMaterial color="#243a6e" roughness={.95}/></mesh>)}
+ {[-1,1].flatMap(side=>stars.map(({row,col},i)=><mesh key={side+':'+i} position={[.04+col*.075+(row%2?.035:0),2.02-row*.041,.019*side]}><shapeGeometry args={[star]}/><meshStandardMaterial color="#f5f1e5" side={THREE.DoubleSide}/></mesh>))}
  </group>
 }
 function RoboticCraft({ground}:{ground:(x:number,z:number)=>number}){const feet=[0,1,2].map(i=>{const a=i*2*Math.PI/3;return [2.2*Math.cos(a),2.2*Math.sin(a)]});const base=Math.max(...feet.map(([x,z])=>ground(x,z)));return <group position={[0,base,0]}>

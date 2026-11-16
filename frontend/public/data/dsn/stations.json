@@ -1,0 +1,43 @@
+{
+  "schema": "lunar-dsn-1",
+  "start": "2026-11-01T00:00:00+00:00",
+  "end": "2027-01-01T00:00:00+00:00",
+  "stepSeconds": 600,
+  "count": 8785,
+  "frame": "MOON_ME; Earth orientation ITRF93",
+  "stationSource": "https://deepspace.jpl.nasa.gov/dsndocs/810-005/301/301M.pdf Table 6",
+  "stations": [
+    {
+      "name": "DSS-14 Goldstone",
+      "lon": -116.88953820000003,
+      "lat": 35.42590101105331,
+      "alt": 1.0017955300328
+    },
+    {
+      "name": "DSS-63 Madrid",
+      "lon": -4.248008500000056,
+      "lat": 40.43120983443591,
+      "alt": 0.865222377683183
+    },
+    {
+      "name": "DSS-43 Canberra",
+      "lon": 148.9812673,
+      "lat": -35.402424322326375,
+      "alt": 0.6892715631350997
+    }
+  ],
+  "layout": "sample, station, [Moon-to-station apparent xyz km, Moon-centre elevation at Earth station deg]",
+  "kernelSHA256": {
+    "naif0012.tls": "678e32bdb5a744117a467cd9601cd6b373f0e9bc9bbde1371d5eee39600a039b",
+    "pck00011.tpc": "3dff7b1dbeceaa01f25467767d3fa25816051c85d162d1edf04acb310ee28bb1",
+    "de440s.bsp": "c1c7feeab882263fc493a9d5a5b2ddd71b54826cdf65d8d17a76126b260a49f2",
+    "earth_latest_high_prec.bpc": "46ee76c01900da82d6c789ff5e28b66383a18846b8fa3dda3e6b66dbb055c865",
+    "moon_pa_de440_200625.bpc": "60cd55aa401ea2ea97360636f567554bfe4e37bb829f901b4460a455dfaf783f",
+    "moon_de440_250416.tf": "a47c71e9c9f33796bdafb2c9d69a7ee447b6016ecad80f71cd6f3e479f9cf768"
+  },
+  "limitations": [
+    "10-minute interpolation; Moon-centre Earth-station mask of 10 degrees is a chosen planning assumption, not an antenna operating limit.",
+    "No station scheduling, weather, antenna resource allocation or occultation by Earth terrain.",
+    "Earth-orientation kernel includes predictions. No extrapolation outside table."
+  ]
+}

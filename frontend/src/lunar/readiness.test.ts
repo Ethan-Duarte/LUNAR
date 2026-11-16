@@ -10,3 +10,7 @@ it('forms the joint mask from simultaneous samples rather than multiplying perce
 it('allows battery-supported operation at night while exposing no delivered solar',()=>{
  const r=readiness({generation:[0],power:{unmetKW:[0],socKWh:[100,90]},electricalConnected:true,contact:[true]} as any,{...DEFAULT_ENGINEERING,batteryKWh:100,reserveSoc:.2});expect(r.solar).toEqual([false]);expect(r.joint).toEqual([true]);
 })
+it('includes DSN only when required and never treats missing DSN evidence as a pass',()=>{
+ const result={generation:[1],power:{unmetKW:[0],socKWh:[100,90]},electricalConnected:true,contact:[true],dsnContact:[false]} as any;
+ expect(readiness(result,{...DEFAULT_ENGINEERING,requireDsn:true}).joint).toEqual([false]);expect(readiness(result,{...DEFAULT_ENGINEERING,requireDsn:false}).joint).toEqual([true]);delete result.dsnContact;expect(readiness(result,{...DEFAULT_ENGINEERING,requireDsn:true}).joint).toEqual([false]);
+})

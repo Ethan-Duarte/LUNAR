@@ -1,107 +1,48 @@
-// Geometry on the lunar reference sphere. Conventions are fixed by docs/DATA_CONTRACT.md:
-// MOON_ME body-fixed frame, R = 1737.4 km, east-positive longitude, azimuth clockwise from north.
-
-export const R_KM = 1737.4
-export const D2R = Math.PI / 180
-export const R2D = 180 / Math.PI
-export const SUN_RADIUS_KM = 695700
-export const EARTH_RADIUS_KM = 6378.137
-
-export type Vec3 = [number, number, number]
-
-export const dot = (a: Vec3, b: Vec3) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2]
-export const norm = (a: Vec3) => Math.hypot(a[0], a[1], a[2])
-export const unit = (a: Vec3): Vec3 => {
-  const n = norm(a)
-  return [a[0] / n, a[1] / n, a[2] / n]
+/** LUNAR spherical-coordinate kernel. Units: kilometres, degrees, east-positive longitude.
+ * Equations: spherical Cartesian coordinates, orthonormal ENU rotation, and south-polar
+ * stereographic projection. Reimplemented for the existing public interface. */
+export type Vec3=[number,number,number]
+export const R_KM=1737.4, D2R=Math.PI/180, R2D=180/Math.PI
+export const SUN_RADIUS_KM=695700, EARTH_RADIUS_KM=6378.137
+export interface LocalFrame {e:Vec3;n:Vec3;u:Vec3}
+export interface AzEl {az:number;el:number}
+const polar=(angle:number)=>[Math.cos(angle*D2R),Math.sin(angle*D2R)] as const
+export function dot(a:Vec3,b:Vec3):number{return a.reduce((sum,x,i)=>sum+x*b[i],0)}
+export function norm(v:Vec3):number{return Math.hypot(...v)}
+export function unit(v:Vec3):Vec3 {const length=norm(v);return v.map(x=>x/length) as Vec3}
+export function upVector(latitude:number,longitude:number):Vec3{
+ const [parallel,z]=polar(latitude),[x,y]=polar(longitude)
+ return [parallel*x,parallel*y,z]
 }
-
-/** Unit vector from the Moon's centre through (lat, lon). */
-export function upVector(latDeg: number, lonDeg: number): Vec3 {
-  const la = latDeg * D2R
-  const lo = lonDeg * D2R
-  return [Math.cos(la) * Math.cos(lo), Math.cos(la) * Math.sin(lo), Math.sin(la)]
+export function sitePosKm(latitude:number,longitude:number,heightMetres:number):Vec3{
+ return upVector(latitude,longitude).map(x=>x*(R_KM+heightMetres*.001)) as Vec3
 }
-
-/** Body-fixed position in km of a site at elevation hM metres above the reference sphere. */
-export function sitePosKm(latDeg: number, lonDeg: number, hM: number): Vec3 {
-  const u = upVector(latDeg, lonDeg)
-  const r = R_KM + hM / 1000
-  return [u[0] * r, u[1] * r, u[2] * r]
+export function localFrame(latitude:number,longitude:number):LocalFrame{
+ const [c,s]=polar(longitude),up=upVector(latitude,longitude),east:Vec3=[-s,c,0]
+ const north:Vec3=[up[1]*east[2]-up[2]*east[1],up[2]*east[0]-up[0]*east[2],up[0]*east[1]-up[1]*east[0]]
+ return {e:east,n:north,u:up}
 }
-
-export interface LocalFrame {
-  e: Vec3
-  n: Vec3
-  u: Vec3
+export function azEl(direction:Vec3,basis:LocalFrame):AzEl{
+ const east=dot(basis.e,direction),north=dot(basis.n,direction)
+ const bearing=Math.atan2(east,north)*R2D
+ return {az:bearing<0?bearing+360:bearing,el:Math.atan2(dot(basis.u,direction),Math.hypot(east,north))*R2D}
 }
-
-/** East, North, Up unit vectors at (lat, lon) on the sphere. */
-export function localFrame(latDeg: number, lonDeg: number): LocalFrame {
-  const la = latDeg * D2R
-  const lo = lonDeg * D2R
-  const sl = Math.sin(la)
-  const cl = Math.cos(la)
-  const so = Math.sin(lo)
-  const co = Math.cos(lo)
-  return { e: [-so, co, 0], n: [-sl * co, -sl * so, cl], u: [cl * co, cl * so, sl] }
+export function dirFromAzEl(azimuth:number,elevation:number,basis:LocalFrame):Vec3{
+ const [ca,sa]=polar(azimuth),[ce,se]=polar(elevation)
+ return [0,1,2].map(i=>ce*(sa*basis.e[i]+ca*basis.n[i])+se*basis.u[i]) as Vec3
 }
-
-export interface AzEl {
-  /** degrees clockwise from north, 0..360 */
-  az: number
-  /** degrees above the local horizontal plane */
-  el: number
+export function latLonOf(v:Vec3):{lat:number;lon:number}{
+ return {lat:Math.atan2(v[2],Math.hypot(v[0],v[1]))*R2D,lon:Math.atan2(v[1],v[0])*R2D}
 }
-
-/** Azimuth and elevation of a body-fixed direction (any length) in a local frame. */
-export function azEl(v: Vec3, f: LocalFrame): AzEl {
-  const E = dot(v, f.e)
-  const N = dot(v, f.n)
-  const U = dot(v, f.u)
-  let az = Math.atan2(E, N) * R2D
-  if (az < 0) az += 360
-  return { az, el: Math.atan2(U, Math.hypot(E, N)) * R2D }
+export function spProject(latitude:number,longitude:number,radius:number):[number,number]{
+ const [c,s]=polar(longitude),distance=2*radius*Math.tan((latitude+90)*D2R*.5)
+ return [distance*s,distance*c]
 }
-
-/** Body-fixed unit direction for an azimuth/elevation in a local frame. */
-export function dirFromAzEl(azDeg: number, elDeg: number, f: LocalFrame): Vec3 {
-  const a = azDeg * D2R
-  const e = elDeg * D2R
-  const ce = Math.cos(e)
-  const E = Math.sin(a) * ce
-  const N = Math.cos(a) * ce
-  const U = Math.sin(e)
-  return [
-    E * f.e[0] + N * f.n[0] + U * f.u[0],
-    E * f.e[1] + N * f.n[1] + U * f.u[1],
-    E * f.e[2] + N * f.n[2] + U * f.u[2],
-  ]
+export function spUnproject(x:number,y:number,radius:number):{lat:number;lon:number}{
+ return {lat:(2*Math.atan2(Math.hypot(x,y),2*radius))*R2D-90,lon:Math.atan2(x,y)*R2D}
 }
-
-/** Latitude and longitude (degrees, lon in -180..180) of a body-fixed vector. */
-export function latLonOf(p: Vec3): { lat: number; lon: number } {
-  const r = norm(p)
-  return { lat: Math.asin(p[2] / r) * R2D, lon: Math.atan2(p[1], p[0]) * R2D }
-}
-
-// South polar stereographic, true scale at the pole (the LOLA polar product projection).
-// x = r sin(lon), y = r cos(lon), r = 2R tan((90 + lat) / 2). Units follow radius.
-
-export function spProject(latDeg: number, lonDeg: number, radius: number): [number, number] {
-  const r = 2 * radius * Math.tan(((90 + latDeg) / 2) * D2R)
-  const lo = lonDeg * D2R
-  return [r * Math.sin(lo), r * Math.cos(lo)]
-}
-
-export function spUnproject(x: number, y: number, radius: number): { lat: number; lon: number } {
-  const r = Math.hypot(x, y)
-  return { lat: 2 * Math.atan(r / (2 * radius)) * R2D - 90, lon: Math.atan2(x, y) * R2D }
-}
-
-/** Body-fixed unit vector for a south polar stereographic (x, y). No trig, exact at the pole. */
-export function spDirection(x: number, y: number, radius: number): Vec3 {
-  const rho2 = (x * x + y * y) / (4 * radius * radius)
-  const k = 1 / (1 + rho2)
-  return [(y / radius) * k, (x / radius) * k, -(1 - rho2) * k]
+export function spDirection(x:number,y:number,radius:number):Vec3{
+ // Inverse stereographic projection directly in homogeneous coordinates.
+ const diameter=2*radius,denominator=diameter*diameter+x*x+y*y
+ return [2*diameter*y/denominator,2*diameter*x/denominator,(x*x+y*y-diameter*diameter)/denominator]
 }

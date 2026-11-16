@@ -136,7 +136,7 @@ describe('scenarioCsv', () => {
     expect(head.every((l) => l.startsWith('# '))).toBe(true)
     expect(head.slice(0, 11)).toEqual([
       '# Lunar Landing Site Navigator - scenario export',
-      '# App: https://daniel27-space.github.io/lunar-navigator/',
+      '# App: https://ethan-duarte.github.io/LUNAR/',
       '# Exported (UTC): 2026-11-14T14:01:30Z',
       '# Clock time (UTC): 2026-11-14T13:20:00Z',
       '# Analysis period (UTC): 2026-11-12T13:00:00Z to 2027-01-11T13:00:00Z (60 days)',
@@ -236,6 +236,6 @@ describe('scenarioCsv', () => {
   })
 
   it('names the file by the export time', () => {
-    expect(scenarioFileName(Date.UTC(2026, 10, 14, 14, 1, 30))).toBe('lunar-navigator_2026-11-14T1401Z.csv')
+    expect(scenarioFileName(Date.UTC(2026, 10, 14, 14, 1, 30))).toBe('LUNAR_2026-11-14T1401Z.csv')
   })
 })

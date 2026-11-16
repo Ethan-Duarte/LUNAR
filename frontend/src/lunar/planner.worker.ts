@@ -1,4 +1,5 @@
 /// <reference lib="webworker" />
+import {dsnCovers,stationAccess,type DsnTable} from "./dsn";
 import { computeHorizon } from "../lib/horizon";
 import { skyAt, ephemEndMs, type Ephem } from "../lib/ephem";
 import { upVector, localFrame, R_KM } from "../lib/geo";
@@ -20,6 +21,7 @@ export interface PlannerRequest {
   facilities: Facility[];
   source: HeightSource;
   ephem: Ephem;
+  dsn?:DsnTable;
   start: number;
   settings: EngineeringSettings;
   radiusKm: number;
@@ -67,6 +69,8 @@ self.onmessage = async (e: MessageEvent<PlannerRequest>) => {
       q.maxTowerM > 100
     )
       throw Error("Search radius must be 0–10 km and tower limit 2–100 m");
+    const dsnAvailable=q.dsn&&dsnCovers(q.dsn,q.start,q.start+s.days*864e5);
+    if(s.requireDsn&&!dsnAvailable)throw Error('DSN geometry covers 2026-11-01 through 2027-01-01 UTC only. Choose a covered study or disable the DSN requirement.');
     const cache = new Map<string, FacilityProfile>();
     function profile(f: Facility, azStep = 0.5) {
       const key = [f.lat, f.lon, f.mast, azStep].join(":");
@@ -139,6 +143,7 @@ self.onmessage = async (e: MessageEvent<PlannerRequest>) => {
         terrainSun: Array.from(series.terrainSunFrac!),
         eclipse: Array.from(series.eclipseVisible!),
         earth: Array.from(series.earthClear, (v) => v >= q.earthMaskDeg),
+        dsn:dsnAvailable?Array.from({length:series.count},(_,i)=>stationAccess(q.dsn!,q.start+i*s.stepMinutes*60000,f.lat,f.lon,ground+f.mast,h,q.earthMaskDeg)!.some(Boolean)):undefined,
         sunEl: Array.from(series.sunEl),
         sunDistanceAU,
         earthDistanceKm,
@@ -175,7 +180,8 @@ self.onmessage = async (e: MessageEvent<PlannerRequest>) => {
         done: true,
         report: {
           schema: "lunar-engineering-1",
-          model: "1.1-preview",
+          model: "1.7-preview",
+          dsn:q.dsn?{start:q.dsn.start,end:q.dsn.start+(q.dsn.count-1)*q.dsn.stepMs,stations:q.dsn.stations,stepMs:q.dsn.stepMs}:null,
           start: q.start,
           settings: s,
           criteria: { earthMaskDeg: q.earthMaskDeg },

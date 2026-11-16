@@ -1,0 +1,1 @@
+Partial rewrite experiment. Read REWRITE_STATUS.md. Preserve .git when replacing source. This build still contains derived code and is NOT cleared for competitive submission. GPU appearance needs review.

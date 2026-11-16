@@ -41,6 +41,7 @@ import { exportFile } from "./lunar/science";
 import { observationProject } from "./lunar/project";
 import {InterfaceBoundary} from "./lunar/InterfaceBoundary";
 import {ProjectFileInput} from "./lunar/ProjectFileInput";
+import {timelineKey} from "./lunar/keyboard";
 import {TimelineControls} from "./lunar/TimelineControls";
 import {findDaylight} from "./lunar/daylight";
 import {sceneTerrainLabel} from "./lunar/historicalLighting";
@@ -153,12 +154,7 @@ export default function App() {
     id = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(id);
   }, [playing, ephem]);
-  useEffect(() => {
-    if (t < windowStart || t > windowStart + 57 * DAY)
-      useStore
-        .getState()
-        .setWindowStart(Math.floor(t / 3600000) * 3600000 - 2 * DAY);
-  }, [t, windowStart]);
+  useEffect(()=>{const key=(e:KeyboardEvent)=>{if(!ephem)return;const state=useStore.getState(),slider=document.querySelector<HTMLInputElement>('input[aria-label="Shared timeline"]'),bounds:[number,number]=slider?[+slider.min,+slider.max]:clockRange(ephem);timelineKey(e,{time:state.tMs,playing:state.playing,bounds,onTime:state.setTime,onPlay:state.setPlaying,onHelp:()=>setHelp(v=>!v),onEscape:()=>{setHelp(false);setMissionInfoOpen(false);window.dispatchEvent(new Event('lunar-cancel-placement'))}})};window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key)},[ephem]);
   const wanted = useMemo(
     () =>
       index
@@ -328,7 +324,7 @@ export default function App() {
       JSON.stringify(
         {
           schema: "lunar-project-1",
-          version: "1.6.0-preview",
+          version: "1.8.0-experiment",
           pins,
           time: t,
           observer,
@@ -378,7 +374,7 @@ export default function App() {
       <header className="v1-header">
         <a className="v1-brand" href="#" onClick={(e) => e.preventDefault()}>
           <span className="brand-orbit" />
-          LUNAR <small>FIELD ATLAS / 1.6 PREVIEW</small>
+          LUNAR <small>FIELD ATLAS / 1.8 REWRITE TEST</small>
         </a>
         <div className="v1-header-right">
           <span className="v1-live">
@@ -443,7 +439,7 @@ export default function App() {
               </div>
             )}
             {tab === "analyze" && (
-              <>
+              <><p className="v1-note">Analysis period starts {date(windowStart).replace("T"," ")} UTC. <button onClick={()=>useStore.getState().setWindowStart(t)}>Start analysis at viewing time</button></p>
                 <p className="v1-eyebrow">A POINT ON THE MOON</p>
                 <h1>At the edge of light.</h1>
                 <p className="v1-intro">
@@ -1125,7 +1121,7 @@ export default function App() {
             ×
           </button>
           <p className="v1-eyebrow">FIELD NOTES / LUNAR</p>
-          <h2>Find the relationship, not just the place.</h2>
+          <h2>Find the relationship, not just the place.</h2><p>Space: play/pause · ←/→: 10 minutes · Shift + arrows: 1 hour · Home/End: scrub-range boundaries · Escape: close/cancel · ?: help. Shortcuts leave forms and focused controls alone.</p>
           {[
             [
               "Observe",
@@ -1229,7 +1225,7 @@ function Availability({ a }: { a: SiteAnalysis }) {
           </svg>
         </div>
       ))}
-      <small>Click a band to move the shared clock.</small>
+      <small>Click a band to move the viewing clock. Study dates change only through explicit controls.</small>
     </div>
   );
 }

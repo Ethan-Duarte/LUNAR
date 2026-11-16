@@ -32,3 +32,7 @@ LUNAR V1.4 modifications (2026-11-15): original mission information panel, hardw
 LUNAR V1.5 modifications (2026-11-15): fixed-size mission overlay and stable scene camera configuration, original reference-registration audit, independent analytic Base regression cases, fixed-input diagnostic evidence, and explicit finite-mission/zero-solar-area guidance. Scientific model acceptance thresholds remain unchanged.
 
 LUNAR V1.6 modifications (2026-11-15): original joint timing display, longer electrical demonstration, original Apollo 11 flag geometry, matched-comparison adapters and eclipse-reference checks. Horizon Wheel code/data were inspected and executed in an isolated MIT-licensed checkout; no competitor source or datasets were incorporated into LUNAR. Existing technical attribution remains above.
+
+LUNAR V1.7 modifications (2026-11-16): original keyboard controls, explicit analysis-window workflow, facility removal controls, bounded station-specific DSN tables and screening, outage boundary labeling, and selected spatial demonstration. Retained licensed rendering components remain attributed above.
+
+V1.8 experiment: Globe implementation replaced by LunarGlobe; coordinate and sky-table evaluation modules reimplemented with compatible interfaces. Remaining derived components are NOT removed. Previous Apache statements are historical assertions whose upstream grant was not independently established; see REWRITE_STATUS.md.

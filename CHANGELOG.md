@@ -60,3 +60,7 @@
 - Independent NASA eclipse-event timing/phase sanity check passes at one-minute resolution; no local contact-time certification.
 - Original Apollo 11 flag and explicit Expedition-versus-Surface guidance.
 - DSN station access, clone statistics and traverse routing remain gaps. Earth holdout remains FAIL. See HORIZON_WHEEL_AUDIT.md, V1_6_SCIENCE.md and qa/v16.
+
+
+## V1.7 preview checkpoint
+Keyboard navigation, explicit analysis time, per-facility removal, stale-result clearing, boundary-censored outage labels, bounded station-specific DSN geometry and a selected spatial before/after case. See UPDATE_V1_7.md and V1_7_SCIENCE.md. Global progressive tiles deferred; Earth holdout remains FAIL.

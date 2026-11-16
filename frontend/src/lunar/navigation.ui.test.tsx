@@ -63,6 +63,7 @@ vi.mock("../lib/ephem", async (original) => {
   const m = await original<typeof import("../lib/ephem")>();
   return { ...m, loadEphem: async () => fixtures.ephem };
 });
+import {useStore} from "../store";
 import App from "../App";
 it("keeps Sites open when a historical location is selected", async () => {
   vi.stubGlobal(
@@ -102,6 +103,9 @@ it("keeps Sites open when a historical location is selected", async () => {
       .getAttribute("aria-pressed"),
   ).toBe("true");
   expect(screen.getByText("Explore the Moon’s history.")).toBeTruthy();
+  const studyStart=useStore.getState().windowStart;
+  fireEvent.change(screen.getByLabelText("Simulation UTC"),{target:{value:new Date(studyStart+100*86400000).toISOString().slice(0,16)}});
+  expect(useStore.getState().windowStart).toBe(studyStart);
   cleanup();
   vi.unstubAllGlobals();
 }, 30000);

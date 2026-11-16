@@ -6,8 +6,9 @@ import type { Ephem } from "../lib/ephem";
 import { sourceHeight, type HeightSource } from "../lib/terrain";
 import { localFrame, R_KM, upVector } from "../lib/geo";
 import { useStore } from "../store";
+import {loadDsn,type DsnTable} from "./dsn";
 import {Readiness} from "./Readiness";
-import {BaseComparison,failureIntervals} from "./BaseComparison";
+import {BaseComparison,failureIntervals,outageDurationLabel} from "./BaseComparison";
 import {BASE_LESSON,lessonCanAdvance} from "./baseLesson";
 import {Help} from "./Help";
 import {ProjectFileInput} from "./ProjectFileInput";
@@ -125,6 +126,9 @@ export function BasePlanner({
   onLinks?: (links: Link[]) => void;
   onPlaceReady?: (fn: (lat: number, lon: number, id?: string) => void) => void;
 }) {
+  const [dsn,setDsn]=useState<DsnTable|undefined>(undefined);
+  const [dsnError,setDsnError]=useState("");
+  useEffect(()=>{if(!advanced||dsn)return;let live=true;loadDsn().then(t=>{if(live)setDsn(t)},e=>{if(live)setDsnError(e.message)});return()=>{live=false}},[advanced,dsn]);
   const [boot] = useState(initial),
     [facilities, rawSetFacilities] = useState(boot.facilities),
     [settings, setSettings] = useState(boot.settings),
@@ -180,6 +184,7 @@ export function BasePlanner({
     settings,
     windowStart,
     criteria.earthMaskDeg,
+    !!dsn,
   ]);
   useEffect(() => {
     onLayout?.(facilities);
@@ -196,8 +201,10 @@ export function BasePlanner({
     setReport(null);
     setAlternatives([]);
     setSearchNote("");
+    setStatus("Inputs or terrain changed. Evaluate again; previous results are no longer current.");
   }, [inputKey, source]);
   useEffect(() => () => worker.current?.terminate(), []);
+  useEffect(()=>{const cancel=()=>{setPlacementMode('inspect');setPlacing(false)};window.addEventListener('lunar-cancel-placement',cancel);return()=>window.removeEventListener('lunar-cancel-placement',cancel)},[]);
   function add(lat: number, lon: number) {
     if (facilities.length >= 8) {
       setStatus("Eight facilities is the screening limit.");
@@ -253,7 +260,7 @@ export function BasePlanner({
   function project() {
     return {
       schema: "lunar-base-2",
-      version: "1.6-preview",
+      version: "1.7-preview",
       facilities,
       settings,
       start: windowStart,
@@ -308,6 +315,7 @@ export function BasePlanner({
       "Project restored; recalculate with current data. Previous report remains in the exported file.",
     );
   }
+  async function loadSpatial(which:'before'|'after'){try{const r=await fetch(import.meta.env.BASE_URL+'lunar/examples/spatial-'+which+'.json');if(!r.ok)throw Error('Spatial demonstration unavailable');const j=await r.json();restore(j);const h=j.facilities.find((f:Facility)=>f.role==='habitat');if(h)onLocate(h.lat,h.lon,'Connected-base demonstration');setStatus('Spatial '+which+' loaded. Evaluate. Selected terrain-clear corridor demonstration; ideal electrical bus, Earth/slope gates relaxed.')}catch(e){setStatus(e instanceof Error?e.message:String(e))}}
   async function open(file: File) {
     try {
       restore(JSON.parse(await file.text()));
@@ -366,6 +374,7 @@ export function BasePlanner({
         facilities,
         source,
         ephem,
+        dsn,
         start: windowStart,
         settings,
         radiusKm: radius,
@@ -516,6 +525,7 @@ export function BasePlanner({
         Load example design
       </button>
       <button onClick={()=>{const location={lat:-89.4399,lon:222.8524,mast:2};setFacilities([{...location,id:crypto.randomUUID(),name:'Month habitat',role:'habitat',fixed:true},{...location,id:crypto.randomUUID(),name:'Month array',role:'power',areaM2:20,fixed:false}]);setSelected(null);setSettings({...DEFAULT_ENGINEERING,days:30,stepMinutes:60,loadKW:1,batteryKWh:250,initialSoc:.2,reserveSoc:.2,requireEarth:false,maxSlopeDeg:90});useStore.getState().setPlaying(false);useStore.getState().setTime(Date.parse('2026-11-14T00:00:00Z'));useStore.getState().setWindowStart(Date.parse('2026-11-14T00:00:00Z'));setStatus('30-day power case loaded. Evaluate, then compare 0, 20 and 40 m². Earth and slope gates are relaxed; this is a co-located electrical demonstration.');onLocate(location.lat,location.lon,'Connecting Ridge month case')}}>Load 30-day power case</button><p className="v1-note">Loading an example replaces the layout; save yours first. The month case starts with 20% charge and requires replenishment. Earth and slope constraints are relaxed for this electrical demonstration.</p>
+      <div className="v1-actions"><button onClick={()=>loadSpatial("before")}>Load spatial demo · before</button><button onClick={()=>loadSpatial("after")}>Load spatial demo · after</button></div><p className="v1-note">Same separated facilities and 30-day electrical assumptions. Only the relay/junction height changes from 2 to 10 m. This is a terrain-clear corridor/ideal-bus screen, not a cable-routing or structural model.</p>
       <Help title="Placing components"><p>Use Inspect to select existing facilities. Add component places one facility and returns to Inspect. Move component relocates the selected facility once. Fixed means a location stays fixed during a search; it does not prevent manual edits.</p></Help></section>
       <svg
         className="base-map"
@@ -647,15 +657,7 @@ export function BasePlanner({
         </button>
       </div>
       <div className="base-facility-list">
-        {facilities.map((f) => (
-          <button
-            key={f.id}
-            aria-pressed={selected === f.id}
-            onClick={() => setSelected(f.id)}
-          >
-            {f.name} · {f.mast} m {f.fixed ? "· fixed" : ""}
-          </button>
-        ))}
+        {facilities.map(f=><div className="base-facility-row" key={f.id}><button aria-pressed={selected===f.id} onClick={()=>{setSelected(f.id);requestAnimationFrame(()=>document.querySelector('.v1-facility')?.scrollIntoView?.({block:'nearest',behavior:'smooth'}))}}>{f.name} · {f.mast} m {f.fixed?'· fixed':''}{f.role==='power'?` · ${f.areaM2??0} m²`:''}</button><button className="facility-delete" aria-label={'Remove '+f.name} title={'Remove '+f.name} onClick={()=>{setFacilities(facilities.filter(x=>x.id!==f.id));if(selected===f.id)setSelected(null);setStatus(f.name+' removed. Undo restores it.')}}>×</button></div>)}
       </div>
       {picked && (
         <section className="v1-facility">
@@ -749,7 +751,7 @@ export function BasePlanner({
           </div>
         </section>
       )}
-      <h2>Mission and electrical assumptions</h2><Help title="Power, energy and this mission"><p>kW is a rate; kWh is energy over time. A constant 1 kW demand consumes 24 kWh per day. Demand is for the whole base, plus any additional per-component loads. Adding a habitat with 0 additional load does not automatically add another 1 kW.</p></Help>
+      <h2>Mission and electrical assumptions</h2><label><input type="checkbox" checked={!!settings.requireDsn} onChange={e=>setting("requireDsn",e.target.checked)}/> Require station-specific DSN access</label><p className="v1-note">Goldstone, Madrid or Canberra: station sees Moon centre ≥10°, and the specific station direction clears lunar terrain. Table coverage: 1 Nov 2026–1 Jan 2027 UTC. No scheduling, weather or antenna allocation. Uses the maximum outage limit below. {dsn?"Geometry loaded.":dsnError||"Geometry loads in Advanced mode."}</p><Help title="Power, energy and this mission"><p>kW is a rate; kWh is energy over time. A constant 1 kW demand consumes 24 kWh per day. Demand is for the whole base, plus any additional per-component loads. Adding a habitat with 0 additional load does not automatically add another 1 kW.</p></Help>
       <label>
         Start (UTC)
         <input
@@ -987,8 +989,13 @@ export function BasePlanner({
           </div>
           {r.totalArrayM2===0&&<p className="v1-alert">This design has zero solar collection area. Any supplied demand relies on its initial stored energy; it cannot replenish that energy. A finite-mission pass is not sustainable solar operation.</p>}
           <Readiness result={r} settings={report.settings} start={report.start} onInspect={time=>{const bounds=useStore.getState().timeRange;if(bounds&&(time<bounds[0]||time>bounds[1])){setStatus("Interval outside safe viewer range; inspect exported samples.");return}useStore.getState().setPlaying(false);useStore.getState().setTime(time);const h=report.facilities.find(f=>f.role==='habitat');if(h)onLocate(h.lat,h.lon,h.name)}}/>
+          {r.dsnShare!=null&&<p>DSN geometric access: {(r.dsnShare*100).toFixed(1)}%; longest sampled loss {r.longestDsnLossHours?.toFixed(2)} h. Station scheduling is not modeled.</p>}
+          {r.dsnShare==null&&<p className="v1-note">Station-specific DSN access is unassessed for this study until a covering geometry table is loaded. Unknown is not a blackout or a pass.</p>}
+          {r.requiredBatteryKWh!==null&&r.requiredBatteryKWh>report.settings.batteryKWh&&<p className="v1-alert">Power-only capacity margin: {(r.requiredBatteryKWh-report.settings.batteryKWh).toFixed(1)} kWh below the tested finite-mission recommendation. Changing capacity requires reevaluation of all constraints.</p>}
+          {report.settings.requireEarth&&r.longestContactLossHours>report.settings.maxOutageHours&&<p className="v1-alert">Longest observed Earth outage exceeds the selected limit by {(r.longestContactLossHours-report.settings.maxOutageHours).toFixed(2)} h.</p>}
+          <p className="v1-note">Outages touching a study boundary may continue outside it. Their total duration is a lower bound, not a complete event measurement.</p>
           <PowerChart report={report} />
-          <details className="v1-detail"><summary>Inspect blackout intervals</summary><p>Sampled intervals, not exact transition times. Jump moves the viewing clock; the study period is unchanged.</p>{[['Unmet power',failureIntervals(r.power.unmetKW,v=>Number(v)>1e-6)],['Earth contact loss',failureIntervals(r.contact,v=>!v)]] .map(([name,events])=><div key={name as string}><h3>{name as string}</h3>{!(events as {start:number;end:number}[]).length&&<p>No sampled interval.</p>}{(events as {start:number;end:number}[]).slice(0,30).map((e,i)=><p key={i}><button onClick={()=>{const time=report.start+e.start*report.settings.stepMinutes*60000,bounds=useStore.getState().timeRange;if(bounds&&(time<bounds[0]||time>bounds[1])){setStatus("This interval is outside the viewer clock range. Inspect its exported samples instead.");return}useStore.getState().setPlaying(false);useStore.getState().setTime(time);const h=report.facilities.find(f=>f.role==='habitat');if(h)onLocate(h.lat,h.lon,h.name)}}>Jump to {new Date(report.start+e.start*report.settings.stepMinutes*60000).toISOString().slice(0,16)} UTC</button> · {((e.end-e.start)*report.settings.stepMinutes/60).toFixed(2)} h</p>)}{(events as unknown[]).length>30&&<p>First 30 intervals shown; full samples are in the exported report.</p>}</div>)}</details>
+          <details className="v1-detail"><summary>Inspect blackout intervals</summary><p>Sampled intervals, not exact transition times. Jump moves the viewing clock; the study period is unchanged.</p>{[['Unmet power',failureIntervals(r.power.unmetKW,v=>Number(v)>1e-6)],['Earth contact loss',failureIntervals(r.contact,v=>!v)]] .map(([name,events])=><div key={name as string}><h3>{name as string}</h3>{!(events as {start:number;end:number}[]).length&&<p>No sampled interval.</p>}{(events as {start:number;end:number}[]).slice(0,30).map((e,i)=><p key={i}><button onClick={()=>{const time=report.start+e.start*report.settings.stepMinutes*60000,bounds=useStore.getState().timeRange;if(bounds&&(time<bounds[0]||time>bounds[1])){setStatus("This interval is outside the viewer clock range. Inspect its exported samples instead.");return}useStore.getState().setPlaying(false);useStore.getState().setTime(time);const h=report.facilities.find(f=>f.role==='habitat');if(h)onLocate(h.lat,h.lon,h.name)}}>Jump to {new Date(report.start+e.start*report.settings.stepMinutes*60000).toISOString().slice(0,16)} UTC</button> · {outageDurationLabel(e.start,e.end,r.power.unmetKW.length,report.settings.stepMinutes)}</p>)}{(events as unknown[]).length>30&&<p>First 30 intervals shown; full samples are in the exported report.</p>}</div>)}</details>
           <p>
             Battery ends at {r.power.finalKWh.toFixed(1)} kWh; longest
             unmet-power spell {r.power.longestShortfallHours.toFixed(2)} h.

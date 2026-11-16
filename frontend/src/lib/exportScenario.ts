@@ -7,7 +7,7 @@ import type { WindowStats } from './landing'
 import { hasComm, isSunlit, summarise, type Criteria, type Series } from './windows'
 
 export const APP_NAME = 'Lunar Landing Site Navigator'
-export const APP_URL = 'https://daniel27-space.github.io/lunar-navigator/'
+export const APP_URL = 'https://ethan-duarte.github.io/LUNAR/'
 
 export interface ExportSite {
   /** badge letter: A, B or C */
@@ -92,10 +92,10 @@ function num(v: number, decimals: number): string {
 /** "2026-11-14T14:01:00Z" */
 export const isoUtc = (ms: number) => new Date(ms).toISOString().slice(0, 19) + 'Z'
 
-/** "lunar-navigator_2026-11-14T1401Z.csv" */
+/** "LUNAR_2026-11-14T1401Z.csv" */
 export function scenarioFileName(exportedAtMs: number): string {
   const iso = new Date(exportedAtMs).toISOString()
-  return `lunar-navigator_${iso.slice(0, 10)}T${iso.slice(11, 13)}${iso.slice(14, 16)}Z.csv`
+  return `LUNAR_${iso.slice(0, 10)}T${iso.slice(11, 13)}${iso.slice(14, 16)}Z.csv`
 }
 
 /**
