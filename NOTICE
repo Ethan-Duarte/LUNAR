@@ -28,3 +28,5 @@ LUNAR V1.2 modifications (2026-11-15): adaptive mesh sampling, import recovery, 
 LUNAR V1.3 modifications (2026-11-15): original educational spacecraft/rover archetypes and local scene, viewer guidance portal, timeline controls, daylight navigation, Base comparisons and blackout navigation. No upstream showcase vehicle assets are used in the new MissionScene. Existing licensed technical foundation remains attributed above.
 
 LUNAR V1.4 modifications (2026-11-15): original mission information panel, hardware explanations, support placement and display transforms. Existing Apache-2.0 MoonTerrain renderer is reused and modified for optional local coordinates, camera exposure conversion and eclipse attenuation; original technical attribution above remains in force.
+
+LUNAR V1.5 modifications (2026-11-15): fixed-size mission overlay and stable scene camera configuration, original reference-registration audit, independent analytic Base regression cases, fixed-input diagnostic evidence, and explicit finite-mission/zero-solar-area guidance. Scientific model acceptance thresholds remain unchanged.

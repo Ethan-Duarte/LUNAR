@@ -1,0 +1,1492 @@
+{
+  "source": "https://imbrium.mit.edu/EXTRAS/ILLUMINATION/IMG/AVGVISIB_85S_060M_201608_EARTH.IMG",
+  "sha256": "0958313069d6039b2474c875ff662f28dbcba2bd853d9ea458aa807b7948c11f",
+  "bytes": 51166728,
+  "checked_points": 185,
+  "max_value_difference": 0.0,
+  "max_lat_difference_deg": 2.5579538487363607e-13,
+  "max_lon_difference_deg": 0.0,
+  "rows": [
+    {
+      "index": 0,
+      "saved_reference": 0.3276,
+      "original_IMG_reference": 0.3276,
+      "difference": 0.0,
+      "latitude_difference_deg": 1.4210854715202004e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 1,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": 8.526512829121202e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 2,
+      "saved_reference": 0.44584,
+      "original_IMG_reference": 0.44584,
+      "difference": 0.0,
+      "latitude_difference_deg": 7.105427357601002e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 3,
+      "saved_reference": 0.5187200000000001,
+      "original_IMG_reference": 0.5187200000000001,
+      "difference": 0.0,
+      "latitude_difference_deg": -4.263256414560601e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 4,
+      "saved_reference": 0.41100000000000003,
+      "original_IMG_reference": 0.41100000000000003,
+      "difference": 0.0,
+      "latitude_difference_deg": -2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 5,
+      "saved_reference": 0.23948000000000003,
+      "original_IMG_reference": 0.23948000000000003,
+      "difference": 0.0,
+      "latitude_difference_deg": 1.4210854715202004e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 6,
+      "saved_reference": 0.43508,
+      "original_IMG_reference": 0.43508,
+      "difference": 0.0,
+      "latitude_difference_deg": 0.0,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 7,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": 1.4210854715202004e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 8,
+      "saved_reference": 0.22256,
+      "original_IMG_reference": 0.22256,
+      "difference": 0.0,
+      "latitude_difference_deg": -5.684341886080802e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 9,
+      "saved_reference": 0.17968,
+      "original_IMG_reference": 0.17968,
+      "difference": 0.0,
+      "latitude_difference_deg": -1.4210854715202004e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 10,
+      "saved_reference": 0.05568000000000001,
+      "original_IMG_reference": 0.05568000000000001,
+      "difference": 0.0,
+      "latitude_difference_deg": -4.263256414560601e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 11,
+      "saved_reference": 0.49964000000000003,
+      "original_IMG_reference": 0.49964000000000003,
+      "difference": 0.0,
+      "latitude_difference_deg": 2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 12,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": 4.263256414560601e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 13,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": 1.4210854715202004e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 14,
+      "saved_reference": 0.20596,
+      "original_IMG_reference": 0.20596,
+      "difference": 0.0,
+      "latitude_difference_deg": 8.526512829121202e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 15,
+      "saved_reference": 0.5554800000000001,
+      "original_IMG_reference": 0.5554800000000001,
+      "difference": 0.0,
+      "latitude_difference_deg": 1.9895196601282805e-13,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 16,
+      "saved_reference": 0.46148000000000006,
+      "original_IMG_reference": 0.46148000000000006,
+      "difference": 0.0,
+      "latitude_difference_deg": 1.4210854715202004e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 17,
+      "saved_reference": 0.5863600000000001,
+      "original_IMG_reference": 0.5863600000000001,
+      "difference": 0.0,
+      "latitude_difference_deg": 4.263256414560601e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 18,
+      "saved_reference": 0.17788,
+      "original_IMG_reference": 0.17788,
+      "difference": 0.0,
+      "latitude_difference_deg": 4.263256414560601e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 19,
+      "saved_reference": 0.23196000000000003,
+      "original_IMG_reference": 0.23196000000000003,
+      "difference": 0.0,
+      "latitude_difference_deg": -1.4210854715202004e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 20,
+      "saved_reference": 0.5452400000000001,
+      "original_IMG_reference": 0.5452400000000001,
+      "difference": 0.0,
+      "latitude_difference_deg": 1.4210854715202004e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 21,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": 4.263256414560601e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 22,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": -7.105427357601002e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 23,
+      "saved_reference": 0.37500000000000006,
+      "original_IMG_reference": 0.37500000000000006,
+      "difference": 0.0,
+      "latitude_difference_deg": -2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 24,
+      "saved_reference": 0.38728,
+      "original_IMG_reference": 0.38728,
+      "difference": 0.0,
+      "latitude_difference_deg": -4.263256414560601e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 25,
+      "saved_reference": 0.21268,
+      "original_IMG_reference": 0.21268,
+      "difference": 0.0,
+      "latitude_difference_deg": -2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 26,
+      "saved_reference": 0.18032,
+      "original_IMG_reference": 0.18032,
+      "difference": 0.0,
+      "latitude_difference_deg": -1.4210854715202004e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 27,
+      "saved_reference": 0.47236000000000006,
+      "original_IMG_reference": 0.47236000000000006,
+      "difference": 0.0,
+      "latitude_difference_deg": -1.4210854715202004e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 28,
+      "saved_reference": 0.13328,
+      "original_IMG_reference": 0.13328,
+      "difference": 0.0,
+      "latitude_difference_deg": -1.4210854715202004e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 29,
+      "saved_reference": 0.41776,
+      "original_IMG_reference": 0.41776,
+      "difference": 0.0,
+      "latitude_difference_deg": -9.947598300641403e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 30,
+      "saved_reference": 0.15264000000000003,
+      "original_IMG_reference": 0.15264000000000003,
+      "difference": 0.0,
+      "latitude_difference_deg": 2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 31,
+      "saved_reference": 0.42652,
+      "original_IMG_reference": 0.42652,
+      "difference": 0.0,
+      "latitude_difference_deg": -4.263256414560601e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 32,
+      "saved_reference": 0.44888000000000006,
+      "original_IMG_reference": 0.44888000000000006,
+      "difference": 0.0,
+      "latitude_difference_deg": 2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 33,
+      "saved_reference": 0.55156,
+      "original_IMG_reference": 0.55156,
+      "difference": 0.0,
+      "latitude_difference_deg": 0.0,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 34,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": -7.105427357601002e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 35,
+      "saved_reference": 0.13888,
+      "original_IMG_reference": 0.13888,
+      "difference": 0.0,
+      "latitude_difference_deg": 4.263256414560601e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 36,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": 1.4210854715202004e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 37,
+      "saved_reference": 0.5443600000000001,
+      "original_IMG_reference": 0.5443600000000001,
+      "difference": 0.0,
+      "latitude_difference_deg": 1.4210854715202004e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 38,
+      "saved_reference": 0.5673600000000001,
+      "original_IMG_reference": 0.5673600000000001,
+      "difference": 0.0,
+      "latitude_difference_deg": 5.684341886080802e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 39,
+      "saved_reference": 0.01008,
+      "original_IMG_reference": 0.01008,
+      "difference": 0.0,
+      "latitude_difference_deg": -2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 40,
+      "saved_reference": 0.32908000000000004,
+      "original_IMG_reference": 0.32908000000000004,
+      "difference": 0.0,
+      "latitude_difference_deg": 5.684341886080802e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 41,
+      "saved_reference": 0.44708000000000003,
+      "original_IMG_reference": 0.44708000000000003,
+      "difference": 0.0,
+      "latitude_difference_deg": -2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 42,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": -2.5579538487363607e-13,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 43,
+      "saved_reference": 0.51868,
+      "original_IMG_reference": 0.51868,
+      "difference": 0.0,
+      "latitude_difference_deg": -1.4210854715202004e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 44,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": -2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 45,
+      "saved_reference": 0.26012,
+      "original_IMG_reference": 0.26012,
+      "difference": 0.0,
+      "latitude_difference_deg": 7.105427357601002e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 46,
+      "saved_reference": 0.5676,
+      "original_IMG_reference": 0.5676,
+      "difference": 0.0,
+      "latitude_difference_deg": -4.263256414560601e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 47,
+      "saved_reference": 0.42740000000000006,
+      "original_IMG_reference": 0.42740000000000006,
+      "difference": 0.0,
+      "latitude_difference_deg": -1.4210854715202004e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 48,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": 0.0,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 49,
+      "saved_reference": 0.45116000000000006,
+      "original_IMG_reference": 0.45116000000000006,
+      "difference": 0.0,
+      "latitude_difference_deg": -2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 50,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": -1.4210854715202004e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 51,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": 7.105427357601002e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 52,
+      "saved_reference": 0.23824,
+      "original_IMG_reference": 0.23824,
+      "difference": 0.0,
+      "latitude_difference_deg": 2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 53,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": 0.0,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 54,
+      "saved_reference": 0.47476,
+      "original_IMG_reference": 0.47476,
+      "difference": 0.0,
+      "latitude_difference_deg": 0.0,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 55,
+      "saved_reference": 0.1978,
+      "original_IMG_reference": 0.1978,
+      "difference": 0.0,
+      "latitude_difference_deg": -2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 56,
+      "saved_reference": 0.35316000000000003,
+      "original_IMG_reference": 0.35316000000000003,
+      "difference": 0.0,
+      "latitude_difference_deg": 1.4210854715202004e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 57,
+      "saved_reference": 0.10956,
+      "original_IMG_reference": 0.10956,
+      "difference": 0.0,
+      "latitude_difference_deg": 0.0,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 58,
+      "saved_reference": 0.23716,
+      "original_IMG_reference": 0.23716,
+      "difference": 0.0,
+      "latitude_difference_deg": 5.684341886080802e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 59,
+      "saved_reference": 0.0034400000000000003,
+      "original_IMG_reference": 0.0034400000000000003,
+      "difference": 0.0,
+      "latitude_difference_deg": -1.4210854715202004e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 60,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": 0.0,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 61,
+      "saved_reference": 0.45964000000000005,
+      "original_IMG_reference": 0.45964000000000005,
+      "difference": 0.0,
+      "latitude_difference_deg": 0.0,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 62,
+      "saved_reference": 0.48448,
+      "original_IMG_reference": 0.48448,
+      "difference": 0.0,
+      "latitude_difference_deg": 4.263256414560601e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 63,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": 2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 64,
+      "saved_reference": 0.27176,
+      "original_IMG_reference": 0.27176,
+      "difference": 0.0,
+      "latitude_difference_deg": 0.0,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 65,
+      "saved_reference": 0.61068,
+      "original_IMG_reference": 0.61068,
+      "difference": 0.0,
+      "latitude_difference_deg": -4.263256414560601e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 66,
+      "saved_reference": 0.11336,
+      "original_IMG_reference": 0.11336,
+      "difference": 0.0,
+      "latitude_difference_deg": -4.263256414560601e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 67,
+      "saved_reference": 0.45920000000000005,
+      "original_IMG_reference": 0.45920000000000005,
+      "difference": 0.0,
+      "latitude_difference_deg": 1.4210854715202004e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 68,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": -4.263256414560601e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 69,
+      "saved_reference": 0.22992,
+      "original_IMG_reference": 0.22992,
+      "difference": 0.0,
+      "latitude_difference_deg": -4.263256414560601e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 70,
+      "saved_reference": 0.40828000000000003,
+      "original_IMG_reference": 0.40828000000000003,
+      "difference": 0.0,
+      "latitude_difference_deg": 2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 71,
+      "saved_reference": 0.04372,
+      "original_IMG_reference": 0.04372,
+      "difference": 0.0,
+      "latitude_difference_deg": -2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 72,
+      "saved_reference": 0.31464000000000003,
+      "original_IMG_reference": 0.31464000000000003,
+      "difference": 0.0,
+      "latitude_difference_deg": -1.1368683772161603e-13,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 73,
+      "saved_reference": 0.039040000000000005,
+      "original_IMG_reference": 0.039040000000000005,
+      "difference": 0.0,
+      "latitude_difference_deg": -7.105427357601002e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 74,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": 4.263256414560601e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 75,
+      "saved_reference": 0.04476,
+      "original_IMG_reference": 0.04476,
+      "difference": 0.0,
+      "latitude_difference_deg": 4.263256414560601e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 76,
+      "saved_reference": 0.43332000000000004,
+      "original_IMG_reference": 0.43332000000000004,
+      "difference": 0.0,
+      "latitude_difference_deg": -1.4210854715202004e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 77,
+      "saved_reference": 0.04664,
+      "original_IMG_reference": 0.04664,
+      "difference": 0.0,
+      "latitude_difference_deg": 1.2789769243681803e-13,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 78,
+      "saved_reference": 0.40432,
+      "original_IMG_reference": 0.40432,
+      "difference": 0.0,
+      "latitude_difference_deg": -2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 79,
+      "saved_reference": 0.59772,
+      "original_IMG_reference": 0.59772,
+      "difference": 0.0,
+      "latitude_difference_deg": 0.0,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 80,
+      "saved_reference": 0.34088,
+      "original_IMG_reference": 0.34088,
+      "difference": 0.0,
+      "latitude_difference_deg": 2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 81,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": -8.526512829121202e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 82,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": 7.105427357601002e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 83,
+      "saved_reference": 0.49100000000000005,
+      "original_IMG_reference": 0.49100000000000005,
+      "difference": 0.0,
+      "latitude_difference_deg": 2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 84,
+      "saved_reference": 0.5028,
+      "original_IMG_reference": 0.5028,
+      "difference": 0.0,
+      "latitude_difference_deg": -5.684341886080802e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 85,
+      "saved_reference": 0.37032000000000004,
+      "original_IMG_reference": 0.37032000000000004,
+      "difference": 0.0,
+      "latitude_difference_deg": 2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 86,
+      "saved_reference": 0.5894400000000001,
+      "original_IMG_reference": 0.5894400000000001,
+      "difference": 0.0,
+      "latitude_difference_deg": 5.684341886080802e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 87,
+      "saved_reference": 0.34068000000000004,
+      "original_IMG_reference": 0.34068000000000004,
+      "difference": 0.0,
+      "latitude_difference_deg": 2.2737367544323206e-13,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 88,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": 0.0,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 89,
+      "saved_reference": 0.51948,
+      "original_IMG_reference": 0.51948,
+      "difference": 0.0,
+      "latitude_difference_deg": -1.2789769243681803e-13,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 90,
+      "saved_reference": 0.24768,
+      "original_IMG_reference": 0.24768,
+      "difference": 0.0,
+      "latitude_difference_deg": -2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 91,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": 2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 92,
+      "saved_reference": 0.31588000000000005,
+      "original_IMG_reference": 0.31588000000000005,
+      "difference": 0.0,
+      "latitude_difference_deg": -2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 93,
+      "saved_reference": 0.518,
+      "original_IMG_reference": 0.518,
+      "difference": 0.0,
+      "latitude_difference_deg": 1.4210854715202004e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 94,
+      "saved_reference": 0.41960000000000003,
+      "original_IMG_reference": 0.41960000000000003,
+      "difference": 0.0,
+      "latitude_difference_deg": -2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 95,
+      "saved_reference": 0.49592,
+      "original_IMG_reference": 0.49592,
+      "difference": 0.0,
+      "latitude_difference_deg": -4.263256414560601e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 96,
+      "saved_reference": 0.52064,
+      "original_IMG_reference": 0.52064,
+      "difference": 0.0,
+      "latitude_difference_deg": -1.4210854715202004e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 97,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": 1.4210854715202004e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 98,
+      "saved_reference": 0.3506,
+      "original_IMG_reference": 0.3506,
+      "difference": 0.0,
+      "latitude_difference_deg": -7.105427357601002e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 99,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": 4.263256414560601e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 100,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": 0.0,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 101,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": 2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 102,
+      "saved_reference": 0.41240000000000004,
+      "original_IMG_reference": 0.41240000000000004,
+      "difference": 0.0,
+      "latitude_difference_deg": -4.263256414560601e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 103,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": -2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 104,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": -2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 105,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": 2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 106,
+      "saved_reference": 0.34276,
+      "original_IMG_reference": 0.34276,
+      "difference": 0.0,
+      "latitude_difference_deg": -1.4210854715202004e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 107,
+      "saved_reference": 0.48436,
+      "original_IMG_reference": 0.48436,
+      "difference": 0.0,
+      "latitude_difference_deg": 0.0,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 108,
+      "saved_reference": 0.49492,
+      "original_IMG_reference": 0.49492,
+      "difference": 0.0,
+      "latitude_difference_deg": -4.263256414560601e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 109,
+      "saved_reference": 0.58228,
+      "original_IMG_reference": 0.58228,
+      "difference": 0.0,
+      "latitude_difference_deg": 4.263256414560601e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 110,
+      "saved_reference": 0.23076000000000002,
+      "original_IMG_reference": 0.23076000000000002,
+      "difference": 0.0,
+      "latitude_difference_deg": 4.263256414560601e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 111,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": -1.2789769243681803e-13,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 112,
+      "saved_reference": 0.13376000000000002,
+      "original_IMG_reference": 0.13376000000000002,
+      "difference": 0.0,
+      "latitude_difference_deg": 2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 113,
+      "saved_reference": 0.33772,
+      "original_IMG_reference": 0.33772,
+      "difference": 0.0,
+      "latitude_difference_deg": 5.684341886080802e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 114,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": 2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 115,
+      "saved_reference": 0.34780000000000005,
+      "original_IMG_reference": 0.34780000000000005,
+      "difference": 0.0,
+      "latitude_difference_deg": 0.0,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 116,
+      "saved_reference": 0.26776,
+      "original_IMG_reference": 0.26776,
+      "difference": 0.0,
+      "latitude_difference_deg": 0.0,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 117,
+      "saved_reference": 0.18068,
+      "original_IMG_reference": 0.18068,
+      "difference": 0.0,
+      "latitude_difference_deg": -5.684341886080802e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 118,
+      "saved_reference": 0.43808,
+      "original_IMG_reference": 0.43808,
+      "difference": 0.0,
+      "latitude_difference_deg": -4.263256414560601e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 119,
+      "saved_reference": 0.48864,
+      "original_IMG_reference": 0.48864,
+      "difference": 0.0,
+      "latitude_difference_deg": 1.4210854715202004e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 120,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": 0.0,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 121,
+      "saved_reference": 0.16640000000000002,
+      "original_IMG_reference": 0.16640000000000002,
+      "difference": 0.0,
+      "latitude_difference_deg": 4.263256414560601e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 122,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": 0.0,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 123,
+      "saved_reference": 0.16612000000000002,
+      "original_IMG_reference": 0.16612000000000002,
+      "difference": 0.0,
+      "latitude_difference_deg": -2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 124,
+      "saved_reference": 0.28668000000000005,
+      "original_IMG_reference": 0.28668000000000005,
+      "difference": 0.0,
+      "latitude_difference_deg": -1.1368683772161603e-13,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 125,
+      "saved_reference": 0.22016000000000002,
+      "original_IMG_reference": 0.22016000000000002,
+      "difference": 0.0,
+      "latitude_difference_deg": -7.105427357601002e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 126,
+      "saved_reference": 0.01136,
+      "original_IMG_reference": 0.01136,
+      "difference": 0.0,
+      "latitude_difference_deg": -1.4210854715202004e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 127,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": 7.105427357601002e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 128,
+      "saved_reference": 0.44144000000000005,
+      "original_IMG_reference": 0.44144000000000005,
+      "difference": 0.0,
+      "latitude_difference_deg": -1.2789769243681803e-13,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 129,
+      "saved_reference": 0.21860000000000002,
+      "original_IMG_reference": 0.21860000000000002,
+      "difference": 0.0,
+      "latitude_difference_deg": 7.105427357601002e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 130,
+      "saved_reference": 0.0994,
+      "original_IMG_reference": 0.0994,
+      "difference": 0.0,
+      "latitude_difference_deg": -4.263256414560601e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 131,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": -2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 132,
+      "saved_reference": 0.33148000000000005,
+      "original_IMG_reference": 0.33148000000000005,
+      "difference": 0.0,
+      "latitude_difference_deg": 0.0,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 133,
+      "saved_reference": 0.26816,
+      "original_IMG_reference": 0.26816,
+      "difference": 0.0,
+      "latitude_difference_deg": -1.4210854715202004e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 134,
+      "saved_reference": 0.30112,
+      "original_IMG_reference": 0.30112,
+      "difference": 0.0,
+      "latitude_difference_deg": -4.263256414560601e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 135,
+      "saved_reference": 0.14928000000000002,
+      "original_IMG_reference": 0.14928000000000002,
+      "difference": 0.0,
+      "latitude_difference_deg": -4.263256414560601e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 136,
+      "saved_reference": 0.36244000000000004,
+      "original_IMG_reference": 0.36244000000000004,
+      "difference": 0.0,
+      "latitude_difference_deg": 0.0,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 137,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": -5.684341886080802e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 138,
+      "saved_reference": 0.24872000000000002,
+      "original_IMG_reference": 0.24872000000000002,
+      "difference": 0.0,
+      "latitude_difference_deg": 2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 139,
+      "saved_reference": 0.27740000000000004,
+      "original_IMG_reference": 0.27740000000000004,
+      "difference": 0.0,
+      "latitude_difference_deg": 0.0,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 140,
+      "saved_reference": 0.004920000000000001,
+      "original_IMG_reference": 0.004920000000000001,
+      "difference": 0.0,
+      "latitude_difference_deg": -4.263256414560601e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 141,
+      "saved_reference": 0.19048,
+      "original_IMG_reference": 0.19048,
+      "difference": 0.0,
+      "latitude_difference_deg": -2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 142,
+      "saved_reference": 0.5709200000000001,
+      "original_IMG_reference": 0.5709200000000001,
+      "difference": 0.0,
+      "latitude_difference_deg": 2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 143,
+      "saved_reference": 0.46976,
+      "original_IMG_reference": 0.46976,
+      "difference": 0.0,
+      "latitude_difference_deg": -4.263256414560601e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 144,
+      "saved_reference": 0.46344,
+      "original_IMG_reference": 0.46344,
+      "difference": 0.0,
+      "latitude_difference_deg": -2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 145,
+      "saved_reference": 0.54996,
+      "original_IMG_reference": 0.54996,
+      "difference": 0.0,
+      "latitude_difference_deg": 5.684341886080802e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 146,
+      "saved_reference": 0.35324000000000005,
+      "original_IMG_reference": 0.35324000000000005,
+      "difference": 0.0,
+      "latitude_difference_deg": 5.684341886080802e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 147,
+      "saved_reference": 0.06004,
+      "original_IMG_reference": 0.06004,
+      "difference": 0.0,
+      "latitude_difference_deg": 1.2789769243681803e-13,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 148,
+      "saved_reference": 0.51892,
+      "original_IMG_reference": 0.51892,
+      "difference": 0.0,
+      "latitude_difference_deg": 0.0,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 149,
+      "saved_reference": 0.43728000000000006,
+      "original_IMG_reference": 0.43728000000000006,
+      "difference": 0.0,
+      "latitude_difference_deg": 7.105427357601002e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 150,
+      "saved_reference": 0.23564000000000002,
+      "original_IMG_reference": 0.23564000000000002,
+      "difference": 0.0,
+      "latitude_difference_deg": 2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 151,
+      "saved_reference": 0.4812,
+      "original_IMG_reference": 0.4812,
+      "difference": 0.0,
+      "latitude_difference_deg": 0.0,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 152,
+      "saved_reference": 0.0342,
+      "original_IMG_reference": 0.0342,
+      "difference": 0.0,
+      "latitude_difference_deg": -2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 153,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": 0.0,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 154,
+      "saved_reference": 0.58584,
+      "original_IMG_reference": 0.58584,
+      "difference": 0.0,
+      "latitude_difference_deg": 4.263256414560601e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 155,
+      "saved_reference": 0.28496000000000005,
+      "original_IMG_reference": 0.28496000000000005,
+      "difference": 0.0,
+      "latitude_difference_deg": -1.4210854715202004e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 156,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": -4.263256414560601e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 157,
+      "saved_reference": 0.21376,
+      "original_IMG_reference": 0.21376,
+      "difference": 0.0,
+      "latitude_difference_deg": 0.0,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 158,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": -4.263256414560601e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 159,
+      "saved_reference": 0.26940000000000003,
+      "original_IMG_reference": 0.26940000000000003,
+      "difference": 0.0,
+      "latitude_difference_deg": 4.263256414560601e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 160,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": 7.105427357601002e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 161,
+      "saved_reference": 0.25864000000000004,
+      "original_IMG_reference": 0.25864000000000004,
+      "difference": 0.0,
+      "latitude_difference_deg": 4.263256414560601e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 162,
+      "saved_reference": 0.23064,
+      "original_IMG_reference": 0.23064,
+      "difference": 0.0,
+      "latitude_difference_deg": -1.4210854715202004e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 163,
+      "saved_reference": 0.15996000000000002,
+      "original_IMG_reference": 0.15996000000000002,
+      "difference": 0.0,
+      "latitude_difference_deg": 5.684341886080802e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 164,
+      "saved_reference": 0.79044,
+      "original_IMG_reference": 0.79044,
+      "difference": 0.0,
+      "latitude_difference_deg": 1.4210854715202004e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 165,
+      "saved_reference": 0.0016,
+      "original_IMG_reference": 0.0016,
+      "difference": 0.0,
+      "latitude_difference_deg": -4.263256414560601e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 166,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": -1.4210854715202004e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 167,
+      "saved_reference": 0.45328,
+      "original_IMG_reference": 0.45328,
+      "difference": 0.0,
+      "latitude_difference_deg": 0.0,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 168,
+      "saved_reference": 0.31804000000000004,
+      "original_IMG_reference": 0.31804000000000004,
+      "difference": 0.0,
+      "latitude_difference_deg": -2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 169,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": 2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 170,
+      "saved_reference": 0.19404000000000002,
+      "original_IMG_reference": 0.19404000000000002,
+      "difference": 0.0,
+      "latitude_difference_deg": -1.4210854715202004e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 171,
+      "saved_reference": 0.38892000000000004,
+      "original_IMG_reference": 0.38892000000000004,
+      "difference": 0.0,
+      "latitude_difference_deg": -1.4210854715202004e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 172,
+      "saved_reference": 0.19184,
+      "original_IMG_reference": 0.19184,
+      "difference": 0.0,
+      "latitude_difference_deg": 2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 173,
+      "saved_reference": 0.19456,
+      "original_IMG_reference": 0.19456,
+      "difference": 0.0,
+      "latitude_difference_deg": -2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 174,
+      "saved_reference": 0.28568000000000005,
+      "original_IMG_reference": 0.28568000000000005,
+      "difference": 0.0,
+      "latitude_difference_deg": 1.4210854715202004e-13,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 175,
+      "saved_reference": 0.13948000000000002,
+      "original_IMG_reference": 0.13948000000000002,
+      "difference": 0.0,
+      "latitude_difference_deg": 2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 176,
+      "saved_reference": 0.29144000000000003,
+      "original_IMG_reference": 0.29144000000000003,
+      "difference": 0.0,
+      "latitude_difference_deg": 0.0,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 177,
+      "saved_reference": 0.05484000000000001,
+      "original_IMG_reference": 0.05484000000000001,
+      "difference": 0.0,
+      "latitude_difference_deg": 7.105427357601002e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 178,
+      "saved_reference": 0.30892000000000003,
+      "original_IMG_reference": 0.30892000000000003,
+      "difference": 0.0,
+      "latitude_difference_deg": 1.4210854715202004e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 179,
+      "saved_reference": 0.44016000000000005,
+      "original_IMG_reference": 0.44016000000000005,
+      "difference": 0.0,
+      "latitude_difference_deg": 9.947598300641403e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 180,
+      "saved_reference": 0.0,
+      "original_IMG_reference": 0.0,
+      "difference": 0.0,
+      "latitude_difference_deg": 5.684341886080802e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 181,
+      "saved_reference": 0.10552,
+      "original_IMG_reference": 0.10552,
+      "difference": 0.0,
+      "latitude_difference_deg": 8.526512829121202e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 182,
+      "saved_reference": 0.30768,
+      "original_IMG_reference": 0.30768,
+      "difference": 0.0,
+      "latitude_difference_deg": 9.947598300641403e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 183,
+      "saved_reference": 0.7390000000000001,
+      "original_IMG_reference": 0.7390000000000001,
+      "difference": 0.0,
+      "latitude_difference_deg": -2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    },
+    {
+      "index": 184,
+      "saved_reference": 0.44856,
+      "original_IMG_reference": 0.44856,
+      "difference": 0.0,
+      "latitude_difference_deg": 2.842170943040401e-14,
+      "longitude_difference_deg": 0.0
+    }
+  ],
+  "interpretation": "Checks archived raster values and pixel-centre registration only. Does not establish reference simulation epoch, height or frame equivalence."
+}

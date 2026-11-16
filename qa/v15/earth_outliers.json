@@ -1,0 +1,120 @@
+{
+  "kind": "Diagnostic only; no acceptance points removed",
+  "n": 185,
+  "prior_rms": 0.031343741684984903,
+  "prior_bias": 0.010338116523471098,
+  "largest_errors": [
+    {
+      "index": 10,
+      "lat": -88.27521915620785,
+      "lon": 19.744457377265828,
+      "reference": 0.05568000000000001,
+      "predicted": 0.2853392865904519,
+      "legacy_python": 0.28137726313723566,
+      "error": 0.22965928659045187,
+      "squared_error_share": 0.29019813391544824
+    },
+    {
+      "index": 147,
+      "lat": -88.96241754047779,
+      "lon": -7.836518135354495,
+      "reference": 0.06004,
+      "predicted": 0.28394705853491,
+      "legacy_python": 0.29378465237230755,
+      "error": 0.22390705853490997,
+      "squared_error_share": 0.27584312353875656
+    },
+    {
+      "index": 126,
+      "lat": -86.43227045094346,
+      "lon": 122.3639927604279,
+      "reference": 0.01136,
+      "predicted": 0.1300721259997056,
+      "legacy_python": 0.12647809234090573,
+      "error": 0.11871212599970561,
+      "squared_error_share": 0.07753838626145075
+    },
+    {
+      "index": 115,
+      "lat": -85.93895805389066,
+      "lon": 98.7260074893368,
+      "reference": 0.34780000000000005,
+      "predicted": 0.44521245277464305,
+      "legacy_python": 0.4452737844070458,
+      "error": 0.097412452774643,
+      "squared_error_share": 0.05221022322276401
+    },
+    {
+      "index": 57,
+      "lat": -85.86768401526324,
+      "lon": 152.6929599800266,
+      "reference": 0.10956,
+      "predicted": 0.20325916294588098,
+      "legacy_python": 0.2059822874245621,
+      "error": 0.09369916294588097,
+      "squared_error_share": 0.048305659411455246
+    },
+    {
+      "index": 169,
+      "lat": -86.71663244361552,
+      "lon": 110.32373627703754,
+      "reference": 0,
+      "predicted": 0.0859624159756636,
+      "legacy_python": 0.08536749914135715,
+      "error": 0.0859624159756636,
+      "squared_error_share": 0.04065779467493661
+    },
+    {
+      "index": 75,
+      "lat": -85.41814215235704,
+      "lon": 163.07454419800223,
+      "reference": 0.04476,
+      "predicted": 0.12319685000735979,
+      "legacy_python": 0.1261959668318532,
+      "error": 0.07843685000735978,
+      "squared_error_share": 0.03385063976618672
+    },
+    {
+      "index": 170,
+      "lat": -86.28119291067695,
+      "lon": 142.99906069555973,
+      "reference": 0.19404000000000002,
+      "predicted": 0.2621681958687012,
+      "legacy_python": 0.26212526372601935,
+      "error": 0.0681281958687012,
+      "squared_error_share": 0.025537616998777695
+    },
+    {
+      "index": 173,
+      "lat": -87.75320639525474,
+      "lon": -54.06350451091825,
+      "reference": 0.19456,
+      "predicted": 0.2580773759874393,
+      "legacy_python": 0.2602423826112556,
+      "error": 0.06351737598743928,
+      "squared_error_share": 0.02219788971056066
+    },
+    {
+      "index": 92,
+      "lat": -86.33102592492567,
+      "lon": -105.14133461983661,
+      "reference": 0.31588000000000005,
+      "predicted": 0.36987880869437223,
+      "legacy_python": 0.37092144644521857,
+      "error": 0.05399880869437218,
+      "squared_error_share": 0.016043346002967217
+    }
+  ],
+  "top_two_SSE_fraction": 0.5660412574542049,
+  "reference_label": {
+    "source": "https://imbrium.mit.edu/EXTRAS/ILLUMINATION/IMG/AVGVISIB_85S_060M_201608_EARTH.LBL",
+    "frame": "MEAN EARTH/POLAR AXIS OF DE421",
+    "terrain": "LDEM_85S_060M",
+    "scale_m": 60,
+    "scale_factor": 4e-05,
+    "projection": "polar stereographic",
+    "radius_km": 1737.4,
+    "height_and_calculation_epoch": "not specified by label; START/STOP describe source dataset times, not established simulation epoch"
+  },
+  "status": "FAIL unchanged; concentration does not establish cause or justify removing points"
+}

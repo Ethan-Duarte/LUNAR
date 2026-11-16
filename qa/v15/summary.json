@@ -1,0 +1,25 @@
+{
+  "results": [
+    {
+      "engine": "supplied-reference-browser",
+      "rms_pp": 3.1343741684984905,
+      "bias_pp": 1.033811652347109,
+      "correlation": 0.9893956917417833,
+      "status": "FAIL"
+    },
+    {
+      "engine": "LUNAR-V1-native-global",
+      "rms_pp": 3.1343741684984905,
+      "bias_pp": 1.033811652347109,
+      "correlation": 0.9893956917417833,
+      "status": "FAIL"
+    }
+  ],
+  "limits": {
+    "rms_pp": 3,
+    "absolute_bias_pp": 1,
+    "minimum_correlation": 0.98
+  },
+  "reference_pixels_verified": 185,
+  "height_sensitivity_is_diagnostic_only": true
+}

@@ -1,6 +1,6 @@
-# LUNAR V1.4 preview
+# LUNAR V1.5 preview
 
-Right-side mission information and shared terrain shadow rendering complete the historical pass. [Update and acceptance guide](UPDATE_V1_4.md). Next: [science and usability](VALIDATION_NEXT.md). Visual acceptance remains pending; existing scientific limitations still apply.
+Fixed Earth holdout reproduced, original NASA reference pixels verified, analytic Base and search checks extended. The Earth discrepancy remains unresolved. [Results](V1_5_VALIDATION.md) · [Update and user checks](UPDATE_V1_5.md). Visual acceptance remains pending; existing scientific limitations still apply.
 
 # LUNAR
 

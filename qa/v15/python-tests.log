@@ -1,0 +1,21 @@
+................................................................         [100%]
+=============================== warnings summary ===============================
+../../../../../opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/anyio/pytest_plugin.py:14
+  /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/anyio/pytest_plugin.py:14: PytestRemovedIn10Warning: _pytest.python.CallSpec2 has been renamed to CallSpec.
+  The CallSpec2 alias will be removed in pytest 10.
+  Update imports to use CallSpec instead.
+  See https://docs.pytest.org/en/stable/deprecations.html#callspec2-renamed
+    from _pytest.python import CallSpec2
+
+tests/test_auto_lola.py::test_visual_tiles_are_real_grids_from_same_geotiff
+tests/test_auto_lola.py::test_visual_tiles_are_real_grids_from_same_geotiff
+tests/test_auto_lola.py::test_cli_auto_refines_and_exports_3d_from_same_dem
+tests/test_auto_lola.py::test_cli_auto_refines_and_exports_3d_from_same_dem
+tests/test_regional_terrain.py::test_regional_levels_from_one_georeferenced_source
+tests/test_regional_terrain.py::test_regional_levels_from_one_georeferenced_source
+tests/test_regional_terrain.py::test_regional_levels_from_one_georeferenced_source
+  /workspace/scratch/7dfc364995d9/lunar-next/engine/scripts/export_lola_tiles.py:51: PendingDeprecationWarning: Use `@` matmul instead of `*` mul operator for matrix multiplication
+    cols,rows=inv*(px,py)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+64 passed, 8 warnings in 16.98s

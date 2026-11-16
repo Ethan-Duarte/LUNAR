@@ -883,3 +883,9 @@ a {
 @media(max-width:1100px){.mission-info{width:300px}.v1-scene[data-mission-info=open] .mission-scene{right:330px}.v1-scene[data-mission-info=open] .viewer-daylight{right:330px;max-width:160px}.mission-scene-top{flex-direction:column;align-items:flex-end;max-width:180px}.mission-scene-caption h2{font-size:20px}}
 @media(max-width:850px){.mission-info{left:12px;right:12px;top:auto;bottom:12px;width:auto;max-height:43%;}.mission-info.is-closed{left:auto;top:70px;bottom:auto;max-width:calc(100% - 24px)}.v1-scene[data-mission-info=open] .mission-scene{right:0;bottom:46%}.v1-scene[data-mission-info=open] .viewer-daylight{right:12px;top:70px;bottom:auto;max-width:180px}.mission-scene-top{top:110px;right:12px;max-width:170px}.mission-scene-caption{left:12px;bottom:12px}.mission-scene-caption p{max-width:85%;font-size:10px}.mission-info .mission-education img{max-height:170px}}
 .mission-info-scroll[hidden]{display:none}
+/* V1.5: mission information is an overlay; it never changes the canvas dimensions. */
+.v1-scene[data-mission-info=open] .mission-scene{right:0;bottom:0}
+.v1-scene[data-mission-info=open] .viewer-daylight{right:18px;top:auto;bottom:20px;max-width:260px}
+.v1-scene[data-mission-info=open] .mission-scene-top{left:18px;right:auto;top:78px;flex-direction:row;max-width:calc(100% - 410px)}
+.v1-scene[data-mission-info=open] .mission-scene-caption{right:390px}
+@media(max-width:850px){.v1-scene[data-mission-info=open] .mission-scene{right:0;bottom:0}.v1-scene[data-mission-info=open] .viewer-daylight{top:70px;bottom:auto;right:12px;max-width:180px}.v1-scene[data-mission-info=open] .mission-scene-top{top:110px;left:12px;right:auto;max-width:200px;flex-direction:column;align-items:flex-start}.v1-scene[data-mission-info=open] .mission-scene-caption{right:12px;bottom:46%}}

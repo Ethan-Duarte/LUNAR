@@ -52,3 +52,35 @@ Base connections are not traversable routes. Sampled terrain LOS is not an RF li
 ## Required next evidence
 
 Investigate the two largest Earth-holdout outliers against reference metadata, terrain profiles, datum/frame and raster registration. Validate individual Earthrise/Earthset events externally. Test footprint robustness and global terrain regimes separately. Maintain fixed thresholds and preserve unresolved failures.
+
+## V1.2 preview usability checkpoint (2026-11-15)
+
+- Added explicit Inspect/Add/Move map modes, a seven-step Base lesson with failure/repair, contextual help, and disconnected-facility diagnostics.
+- File cancellation/empty selection never starts import; failed imports show errors. Render error boundaries provide recovery controls. Exact reported browser crash remains un-reproduced.
+- Removed the separate observer terrain patch; refine the existing measured mesh around the observer. Hardware visual acceptance pending.
+- Added original Mission/Landscape/Try it/Sources education with three NASA-credited Apollo photographs and provenance hashes.
+- Scientific model thresholds unchanged; independent Earth holdout remains failed. See UPDATE_V1_2.md for acceptance checks.
+
+## V1.3 preview (2026-11-15)
+
+- Viewer-mounted, collapsible Base guide; mission selection scrolls to education.
+- Calendar-controlled scrub range and hourly geometric-daylight viewing shortcut; study dates remain independent.
+- Original educational crewed/robotic lander archetypes, illustrative Apollo rover, measured local ground and labeled studio/simulation lighting. No competitor showcase assets in the new scene.
+- Retained Base result comparison, assumptions mismatch warnings, ranking explanation and sampled blackout jumps.
+- Scientific acceptance thresholds unchanged; Earth holdout still failed. No hardware visual or competitor superiority claim. See UPDATE_V1_3.md.
+
+## V1.4 preview — final historical pass (2026-11-15)
+
+- Independent right-side mission file / narrow-screen drawer, persistent education tabs, original hardware explanations and terrain-spacing labels.
+- Simulation sunlight by default. Shared observatory terrain renderer in local coordinates, observer-horizon/eclipse gating for spacecraft, improved support placement and framing.
+- Double-precision localization before GPU upload; direct body-frame Sun and exposure conventions retained.
+- Numerical visibility, Base physics and acceptance thresholds unchanged. GPU visual acceptance remains pending; Earth holdout remains failed.
+- Historical additions frozen apart from blocking defects. See UPDATE_V1_4.md and VALIDATION_NEXT.md.
+
+## V1.5 science checkpoint (2026-11-15)
+
+- Reproduced all 185 fixed Earth points in both browser configurations: RMS 3.134374 pp, bias +1.033812 pp, correlation 0.989396; status still FAIL. No physical thresholds changed.
+- Verified every saved reference value and coordinate against the original NASA IMG/label. Two-point height diagnostics show sensitivity but do not explain or solve the mismatch.
+- Closed-form energy/storage cases and deterministic search bounds/fixed-anchor/re-evaluation checks pass. One-day optimizer case can legitimately remove solar area because initial battery energy covers demand; the UI now warns explicitly. No sustainable-base claim.
+- 64 Python regressions passed. Regular frontend/audit counts and commands are in qa/v15 and V1_5_VALIDATION.md. GPU and unassisted usability acceptance remain pending.
+- Mission information now overlays a fixed-size viewport. Integrated metre-scale landers deferred to avoid another camera overhaul.

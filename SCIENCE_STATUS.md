@@ -76,3 +76,11 @@ Investigate the two largest Earth-holdout outliers against reference metadata, t
 - Double-precision localization before GPU upload; direct body-frame Sun and exposure conventions retained.
 - Numerical visibility, Base physics and acceptance thresholds unchanged. GPU visual acceptance remains pending; Earth holdout remains failed.
 - Historical additions frozen apart from blocking defects. See UPDATE_V1_4.md and VALIDATION_NEXT.md.
+
+## V1.5 science checkpoint (2026-11-15)
+
+- Reproduced all 185 fixed Earth points in both browser configurations: RMS 3.134374 pp, bias +1.033812 pp, correlation 0.989396; status still FAIL. No physical thresholds changed.
+- Verified every saved reference value and coordinate against the original NASA IMG/label. Two-point height diagnostics show sensitivity but do not explain or solve the mismatch.
+- Closed-form energy/storage cases and deterministic search bounds/fixed-anchor/re-evaluation checks pass. One-day optimizer case can legitimately remove solar area because initial battery energy covers demand; the UI now warns explicitly. No sustainable-base claim.
+- 64 Python regressions passed. Regular frontend/audit counts and commands are in qa/v15 and V1_5_VALIDATION.md. GPU and unassisted usability acceptance remain pending.
+- Mission information now overlays a fixed-size viewport. Integrated metre-scale landers deferred to avoid another camera overhaul.

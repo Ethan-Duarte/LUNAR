@@ -217,6 +217,22 @@ it("runs every member of a nine-position candidate set and rechecks the shortlis
   expect(result.error).toBeUndefined();
   expect(result.tested).toBe(9);
   expect(result.alternatives).toHaveLength(3);
+  for(const row of result.alternatives){
+    expect(row.facilities.find((x:any)=>x.id==='h')).toEqual(f[0]);
+    for(const facility of row.facilities){const {distanceKm}=await import('./network');expect(distanceKm(f[0],facility)).toBeLessThanOrEqual(.10000001)}
+  }
+  const independentlyRechecked=await execute({kind:'evaluate',facilities:result.alternatives[0].facilities,source,ephem,start:Date.parse('2026-11-14T00:00:00Z'),settings:{...DEFAULT_ENGINEERING,days:1,requireEarth:false,maxSlopeDeg:90},radiusKm:.1,earthMaskDeg:0,maxTowerM:20});
+  expect(independentlyRechecked.error).toBeUndefined();
+  expect(independentlyRechecked.report.result.feasible).toBe(result.alternatives[0].feasible);
+  expect(independentlyRechecked.report.result.power.unmetKWh).toBeCloseTo(result.alternatives[0].unmetKWh,8);
+  const original=await execute({kind:'evaluate',facilities:f,source,ephem,start:Date.parse('2026-11-14T00:00:00Z'),settings:{...DEFAULT_ENGINEERING,days:1,requireEarth:false,maxSlopeDeg:90},radiusKm:.1,earthMaskDeg:0,maxTowerM:20});
+  const before=original.report.result,after=independentlyRechecked.report.result;
+  expect(after.power.unmetKWh).toBeLessThanOrEqual(before.power.unmetKWh+1e-6);
+  if(before.feasible)expect(after.feasible).toBe(true);
+  mkdirSync(new URL('../../../qa/v15/',import.meta.url),{recursive:true});
+  writeFileSync(new URL('../../../qa/v15/optimization.json',import.meta.url),JSON.stringify({kind:'One fixed synthetic-terrain search; actual shipped ephemeris',tested:result.tested,fixedAnchor:f[0],radiusKm:.1,start:original.report.start,settings:original.report.settings,before,after,limits:'Independent worker reevaluation, not independent physics implementation or global optimality proof.'},null,2));
+
+
   expect(
     result.alternatives.every((r: any) => Number.isFinite(r.unmetKWh)),
   ).toBe(true);

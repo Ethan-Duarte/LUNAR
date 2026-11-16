@@ -1,0 +1,49 @@
+{
+  "kind": "Diagnostic only; fixed holdout remains 2 m and all 185 points",
+  "rows": [
+    {
+      "index": 10,
+      "height_m": 0,
+      "reference": 0.05568000000000001,
+      "predicted": 0.23418870516657672,
+      "error": 0.17850870516657671,
+      "patches": [],
+      "horizonMin": -0.6290029287338257,
+      "horizonMax": 14.354141235351562
+    },
+    {
+      "index": 10,
+      "height_m": 2,
+      "reference": 0.05568000000000001,
+      "predicted": 0.2853392865904519,
+      "error": 0.22965928659045187,
+      "patches": [],
+      "horizonMin": -0.630994439125061,
+      "horizonMax": 13.984353065490723
+    },
+    {
+      "index": 147,
+      "height_m": 0,
+      "reference": 0.06004,
+      "predicted": 0.14677886266620874,
+      "error": 0.08673886266620873,
+      "patches": [],
+      "horizonMin": -0.8301003575325012,
+      "horizonMax": 8.919252395629883
+    },
+    {
+      "index": 147,
+      "height_m": 2,
+      "reference": 0.06004,
+      "predicted": 0.28394705853491,
+      "error": 0.22390705853490997,
+      "patches": [],
+      "horizonMin": -0.8354642987251282,
+      "horizonMax": 7.53249979019165
+    }
+  ],
+  "limits": [
+    "Surface-height sensitivity is not a validated reference observer height.",
+    "Do not choose a height to fit the reference; obtain original calculation metadata."
+  ]
+}
