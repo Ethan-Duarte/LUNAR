@@ -5,6 +5,7 @@ import * as T from 'three'
 import type { ThreeEvent } from '@react-three/fiber'
 import type { Cut, GlobeMap, GlobeRelief } from './shading'
 import { useStore } from '../store'
+import {overMarker} from './markers'
 
 const radius = 1737.4
 const capacity = 5
@@ -95,7 +96,7 @@ export function LunarGlobe(props:LunarGlobeProps){
   hits.push({point,distance,object:this})
  },[props.cuts])
  function select(e:ThreeEvent<MouseEvent>){
-  if(e.delta>4||e.intersections.some(h=>h.object.visible&&h.object.userData.marker&&(!h.uv||h.uv.distanceTo(new T.Vector2(.5,.5))<=.5)))return
+  if(e.delta>4||overMarker(e.intersections))return
   e.stopPropagation();const p=e.point
   props.onPick(Math.atan2(p.z,Math.hypot(p.x,p.y))*180/Math.PI,Math.atan2(p.y,p.x)*180/Math.PI)
  }

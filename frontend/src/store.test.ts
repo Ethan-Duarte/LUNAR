@@ -15,3 +15,13 @@ describe('clock', () => {
     expect(useStore.getState().tMs).toBe(ok)
   })
 })
+
+it('restores displaced observations through Undo without losing coordinates',()=>{
+ useStore.setState({pins:[],activePin:null,replaced:null})
+ for(let i=0;i<3;i++)useStore.getState().addPin({lat:-80-i,lon:i,hM:i,label:'Original '+i})
+ const original=useStore.getState().pins.map(p=>({...p}))
+ useStore.getState().addPin({lat:0,lon:100,hM:5,label:'New'})
+ expect(useStore.getState().pins).toHaveLength(3)
+ useStore.getState().undoReplace()
+ expect(useStore.getState().pins).toEqual(original)
+})

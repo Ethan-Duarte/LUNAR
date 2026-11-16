@@ -1,27 +1,48 @@
-// Sunlight and Earth-visibility time series for one site, and the events planners ask about.
-import { skyAt, type Ephem, type Sky } from "./ephem";
-import { discVisibleFraction, type Horizon } from "./horizon";
-
+/** LUNAR sampled visibility and event kernel. The analytic eclipse overlap
+ * function is the retained original LUNAR addition; sampling/statistics are replaced. */
+import {skyAt,type Ephem,type Sky} from './ephem'
+import {discVisibleFraction,horizonAt,type Horizon} from './horizon'
 export interface Series {
   t0Ms: number;
   stepMs: number;
   count: number;
   sunEl: Float32Array;
   sunAz: Float32Array;
-  /** fraction of the solar disc above the terrain horizon, 0..1 */
+
   sunFrac: Float32Array;
   earthEl: Float32Array;
   earthAz: Float32Array;
-  /** fraction of Earth's disc above the terrain horizon, 0..1 */
+
   earthFrac: Float32Array;
-  /** Earth-centre elevation above the terrain horizon at Earth's azimuth, degrees */
+
   earthClear: Float32Array;
-  /** Unocculted fraction; terrain and Earth masks are combined by a product approximation. */
+
   eclipseVisible?: Float32Array;
   terrainSunFrac?: Float32Array;
 }
+export interface Criteria {
 
-/** Analytic two-circle occultation in the small-angle sky plane. No atmospheric refraction. */
+  minSunFrac: number;
+
+  earthMaskDeg: number;
+}
+export interface Summary {
+
+  sunShare: number;
+  commShare: number;
+  bothShare: number;
+  longestSunH: number;
+  longestDarkH: number;
+  longestCommH: number;
+  longestNoCommH: number;
+  maxSunEl: number;
+}
+export interface NextChange {
+
+  now: boolean;
+
+  inHours: number | null;
+}
 export function uncoveredDisc(
   sunRadius: number,
   earthRadius: number,
@@ -63,172 +84,45 @@ export function eclipseFactor(sky: Sky): number {
   );
 }
 
-export function computeSeries(
-  e: Ephem,
-  h: Horizon,
-  hM: number,
-  t0Ms: number,
-  t1Ms: number,
-  stepMs: number,
-): Series {
-  if (!Number.isFinite(stepMs) || stepMs <= 0)
-    throw Error("Time step must be positive");
-  // An end before the start gives an empty series rather than an error.
-  const count = Math.max(Math.floor((t1Ms - t0Ms) / stepMs) + 1, 0);
-  const s: Series = {
-    t0Ms,
-    stepMs,
-    count,
-    sunEl: new Float32Array(count),
-    sunAz: new Float32Array(count),
-    sunFrac: new Float32Array(count),
-    eclipseVisible: new Float32Array(count),
-    terrainSunFrac: new Float32Array(count),
-    earthEl: new Float32Array(count),
-    earthAz: new Float32Array(count),
-    earthFrac: new Float32Array(count),
-    earthClear: new Float32Array(count),
-  };
-  const elevM = hM + h.observerHeightM;
-  for (let i = 0; i < count; i++) {
-    const sky = skyAt(e, t0Ms + i * stepMs, h.lat, h.lon, elevM);
-    s.sunEl[i] = sky.sun.el;
-    s.sunAz[i] = sky.sun.az;
-    s.terrainSunFrac![i] = discVisibleFraction(
-      h,
-      sky.sun.az,
-      sky.sun.el,
-      sky.sun.radius,
-    );
-    s.eclipseVisible![i] = eclipseFactor(sky);
-    s.sunFrac[i] = s.terrainSunFrac![i] * s.eclipseVisible![i];
-    s.earthEl[i] = sky.earth.el;
-    s.earthAz[i] = sky.earth.az;
-    s.earthFrac[i] = discVisibleFraction(
-      h,
-      sky.earth.az,
-      sky.earth.el,
-      sky.earth.radius,
-    );
-    s.earthClear[i] = sky.earth.el - interpHorizon(h, sky.earth.az);
+
+export const DEFAULT_CRITERIA:Criteria={minSunFrac:.5,earthMaskDeg:0}
+export function isSunlit(series:Series,index:number,criteria:Criteria){return series.sunFrac[index]>=criteria.minSunFrac}
+export function hasComm(series:Series,index:number,criteria:Criteria){return series.earthClear[index]>=criteria.earthMaskDeg}
+export function computeSeries(ephemeris:Ephem,horizon:Horizon,elevationM:number,start:number,end:number,step:number):Series{
+ if(!Number.isFinite(step)||step<=0)throw Error('Time step must be positive')
+ const count=Math.max(0,Math.floor((end-start)/step)+1)
+ const fields=['sunEl','sunAz','sunFrac','earthEl','earthAz','earthFrac','earthClear','terrainSunFrac','eclipseVisible'] as const
+ const series={t0Ms:start,stepMs:step,count,...Object.fromEntries(fields.map(field=>[field,new Float32Array(count)]))} as Series
+ for(let sample=0;sample<count;sample++){
+  const sky=skyAt(ephemeris,start+sample*step,horizon.lat,horizon.lon,elevationM+horizon.observerHeightM)
+  for(const body of ['sun','earth'] as const){
+   const position=sky[body],fraction=discVisibleFraction(horizon,position.az,position.el,position.radius)
+   series[body==='sun'?'sunEl':'earthEl'][sample]=position.el;series[body==='sun'?'sunAz':'earthAz'][sample]=position.az
+   if(body==='earth'){series.earthFrac[sample]=fraction;series.earthClear[sample]=position.el-horizonAt(horizon,position.az)}
+   else{series.terrainSunFrac![sample]=fraction;series.eclipseVisible![sample]=eclipseFactor(sky);series.sunFrac[sample]=series.terrainSunFrac![sample]*series.eclipseVisible![sample]}
   }
-  return s;
+ }return series
 }
-
-function interpHorizon(h: Horizon, az: number): number {
-  const f = (((az % 360) + 360) % 360) / h.azStepDeg;
-  const n = h.elevDeg.length;
-  const i = Math.floor(f) % n;
-  const w = f - Math.floor(f);
-  return h.elevDeg[i] * (1 - w) + h.elevDeg[(i + 1) % n] * w;
+export function summarise(series:Series,criteria:Criteria=DEFAULT_CRITERIA):Summary{
+ let sun=0,comm=0,both=0,highest=-90
+ const runs=[0,0,0,0],longest=[0,0,0,0]
+ for(let i=0;i<series.count;i++){
+  const lit=isSunlit(series,i,criteria),visible=hasComm(series,i,criteria)
+  sun+=Number(lit);comm+=Number(visible);both+=Number(lit&&visible);highest=Math.max(highest,series.sunEl[i])
+  const states=[lit,!lit,visible,!visible]
+  states.forEach((state,j)=>{runs[j]=state?runs[j]+1:0;longest[j]=Math.max(longest[j],runs[j])})
+ }
+ const hours=series.stepMs/3600000
+ return {sunShare:sun/series.count,commShare:comm/series.count,bothShare:both/series.count,longestSunH:longest[0]*hours,longestDarkH:longest[1]*hours,longestCommH:longest[2]*hours,longestNoCommH:longest[3]*hours,maxSunEl:highest}
 }
-
-export interface Criteria {
-  /** minimum fraction of the solar disc that counts as "in sunlight" */
-  minSunFrac: number;
-  /** minimum clearance of Earth's centre above the terrain, degrees, for a comm link */
-  earthMaskDeg: number;
+export function changeAfter(series:Series,utc:number,state:boolean,test:(index:number)=>boolean):NextChange{
+ const first=Math.max(0,Math.floor((utc-series.t0Ms)/series.stepMs)+1)
+ for(let i=first;i<series.count;i++)if(test(i)!==state)return {now:state,inHours:(series.t0Ms+i*series.stepMs-utc)/3600000}
+ return {now:state,inHours:null}
 }
+export function nextChange(series:Series,utc:number,test:(index:number)=>boolean):NextChange{
+ const index=Math.min(series.count-1,Math.max(0,Math.round((utc-series.t0Ms)/series.stepMs))),state=test(index)
+ for(let i=index+1;i<series.count;i++)if(test(i)!==state)return {now:state,inHours:(i-index)*series.stepMs/3600000}
+ return {now:state,inHours:null}
 
-export const DEFAULT_CRITERIA: Criteria = { minSunFrac: 0.5, earthMaskDeg: 0 };
-
-export const isSunlit = (s: Series, i: number, c: Criteria) =>
-  s.sunFrac[i] >= c.minSunFrac;
-export const hasComm = (s: Series, i: number, c: Criteria) =>
-  s.earthClear[i] >= c.earthMaskDeg;
-
-export interface Summary {
-  /** fraction of the period in sunlight / with Earth in view, 0..1 */
-  sunShare: number;
-  commShare: number;
-  bothShare: number;
-  longestSunH: number;
-  longestDarkH: number;
-  longestCommH: number;
-  longestNoCommH: number;
-  maxSunEl: number;
-}
-
-function longestRun(
-  count: number,
-  stepH: number,
-  test: (i: number) => boolean,
-): number {
-  let best = 0;
-  let run = 0;
-  for (let i = 0; i < count; i++) {
-    run = test(i) ? run + 1 : 0;
-    if (run > best) best = run;
-  }
-  return best * stepH;
-}
-
-export function summarise(s: Series, c: Criteria = DEFAULT_CRITERIA): Summary {
-  const stepH = s.stepMs / 3600000;
-  let sun = 0;
-  let comm = 0;
-  let both = 0;
-  let maxSunEl = -90;
-  for (let i = 0; i < s.count; i++) {
-    const a = isSunlit(s, i, c);
-    const b = hasComm(s, i, c);
-    if (a) sun++;
-    if (b) comm++;
-    if (a && b) both++;
-    if (s.sunEl[i] > maxSunEl) maxSunEl = s.sunEl[i];
-  }
-  return {
-    sunShare: sun / s.count,
-    commShare: comm / s.count,
-    bothShare: both / s.count,
-    longestSunH: longestRun(s.count, stepH, (i) => isSunlit(s, i, c)),
-    longestDarkH: longestRun(s.count, stepH, (i) => !isSunlit(s, i, c)),
-    longestCommH: longestRun(s.count, stepH, (i) => hasComm(s, i, c)),
-    longestNoCommH: longestRun(s.count, stepH, (i) => !hasComm(s, i, c)),
-    maxSunEl,
-  };
-}
-
-export interface NextChange {
-  /** state at the query time */
-  now: boolean;
-  /** hours until the state flips, or null if it does not flip within the series */
-  inHours: number | null;
-}
-
-/**
- * From time tMs, with the state at that moment known exactly (`now`), how long until a later
- * sample shows the other state. Used for the "now" rows, so the state named there always agrees
- * with the Sun and Earth figures printed beside it.
- */
-export function changeAfter(
-  s: Series,
-  tMs: number,
-  now: boolean,
-  test: (i: number) => boolean,
-): NextChange {
-  const first = Math.max(Math.floor((tMs - s.t0Ms) / s.stepMs) + 1, 0);
-  for (let i = first; i < s.count; i++) {
-    if (test(i) !== now)
-      return { now, inHours: (s.t0Ms + i * s.stepMs - tMs) / 3600000 };
-  }
-  return { now, inHours: null };
-}
-
-/** From time tMs, how long until `test` changes value. */
-export function nextChange(
-  s: Series,
-  tMs: number,
-  test: (i: number) => boolean,
-): NextChange {
-  const i0 = Math.min(
-    Math.max(Math.round((tMs - s.t0Ms) / s.stepMs), 0),
-    s.count - 1,
-  );
-  const now = test(i0);
-  for (let i = i0 + 1; i < s.count; i++) {
-    if (test(i) !== now)
-      return { now, inHours: ((i - i0) * s.stepMs) / 3600000 };
-  }
-  return { now, inHours: null };
 }

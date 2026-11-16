@@ -1,26 +1,24 @@
-# V1.8 rewrite experiment — NOT a provenance-cleared competition release
+# V1.9 rewrite checkpoint
 
-## Replacements in this checkpoint
+## Implemented replacements
 
-- Globe.tsx now delegates to new LunarGlobe.tsx: independent globe shader and component, spherical tangent stencil for relief normals, NASA photograph and elevation, surface cutouts and camera exposure. No shared rendering shader is imported by the new globe. Its asset loaders and parent scene remain retained components.
-- geo.ts: newly implemented spherical-coordinate, ENU and stereographic formula kernel.
-- ephem.ts: newly implemented binary-table evaluator, interpolation and observer projection. The precomputed table remains retained, NOT independently regenerated.
-- CSV filenames use LUNAR rather than the other project's product name.
+- New globe and surface GPU shaders, spherical relief mesh, skirts, conservative height-field picking, photo response, layer rendering and historical-scene transforms.
+- New graphics host, display asset hooks, sky objects and camera controller using standard Three.js OrbitControls.
+- New state mutation implementation with the compatible UI/project interface.
+- Reimplemented spherical coordinates, ephemeris interpolation/observer projection, terrain raster decoding and interpolation, skyline/disc sampling, visibility-series statistics, regional suitability finder, arrival-window ranking, observation hook and disk test adapters.
+- Fresh 105,193-record hourly sky table (2024–2036) computed directly from official NASA NAIF kernels. Maximum direction-channel difference from the previous table was 1.49e-8 at float32 precision; distances were identical at that precision. Generator and kernel SHA-256 records included.
+- Unused older showcase, spacecraft, camera, compass and export code retired. Unused external source snapshots removed. Current LUNAR education, Base, DSN and original Python science retained.
 
-These implementations were developed after exposure to the reference project and retain compatible interfaces. They are not a legally certified clean-room rewrite. Standard mathematical equations and interface compatibility do not establish independent provenance of the entire project.
+## Acceptance and limits
 
-## Explicit remaining dependencies
+126 release tests pass; two skipped. New reference tests retain 0.001 degree skyline and 0.02 degree sky tolerances. Regenerated ephemerides pass the retained Horizons direction checks. Both new terrain/globe shaders compile and link in a headless desktop OpenGL compatibility check; this is not a browser/device appearance test.
 
-MoonTerrain (surface mesh and shadow shader), shading asset loaders, Rig/camera, MoonCanvas, sky bodies, browser horizon/disc/window/finder/landing algorithms, terrain lookup/decode modules, store foundation, inherited tests and prepared datasets remain wholly or partly shared/adapted. Historical upstream docs and required provenance remain. Replacing a few modules does NOT clear this combined package for competition submission.
+The legacy compatibility suite reached 315 passed before the obsolete tests were retired/replaced. Release count is lower, not an increase in validation coverage. qa/v19 lists deleted source/test files and records checkpoints. Existing Earth-map holdout remains FAIL. DSN coverage and ideal shared-bus limitations remain unchanged.
 
-Earlier Apache assertions were not independently established: the inspected upstream root did not contain a LICENSE at pinned commit 707b035fccbc7829c5ee4cf539c17f0d2d9bb652. Historical notices are retained as records, not new legal verification. Permission/competition eligibility remains unresolved.
+Prepared terrain/layer rasters, mission facts and retained reference vectors still have external provenance. Retained reference agreement is not independent validation. Public types/interfaces remain compatible. Replacements were written after inspecting source, not by an isolated clean-room process. This checkpoint is not an eligibility or legal clearance.
 
-## Acceptance
+## Immediate hardware checks
 
-312 frontend tests passed, two skipped, after coordinate/sky replacements. CPU/DOM regression checks do not verify WebGL shader output. Static production build passed. No GPU appearance check was possible in this environment. Existing tests/fixtures include inherited reference checks, which are NOT original LUNAR validation work merely because they pass.
+Check title V1.9 Rewrite Test. Inspect globe terminator, crater relief, poles and detailed-terrain joins. Then inspect Surface, orbit/zoom/picking, each layer, historical local scenes, keyboard/playback and Base editing/calculation. Camera behavior now uses standard OrbitControls; the previous custom inertial surface-slide behavior is not reproduced exactly. Earth orientation is illustrative; body directions and phase are computed from the table. Keep V1.7/V1.8 for visual comparison.
 
-## Inspect immediately
-
-Preserve your .git directory and replace the source files. Push through GitHub Desktop for Pages, or run START_LUNAR_V1.bat locally. Check the browser title says V1.8 Rewrite Test. Compare globe light/dark boundary, crater relief, poles and terrain joins against V1.7. Check Surface remains as before, pick a location, then play/pause and switch globe/surface. Keep V1.7 as a recoverable visual baseline.
-
-Do not use this package's unchanged old README as a current eligibility declaration. It contains historical version claims. This document supersedes them for this experiment.
+Replace the COMPLETE old source tree while preserving .git; simply copying over files leaves retired code behind. Push using GitHub Desktop and wait for Pages deployment. No automatic publication was performed.

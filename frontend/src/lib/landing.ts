@@ -1,139 +1,72 @@
-// "When to land": compare landing dates at one site. A stay is a fixed number of days starting
-// at a landing time; each stay is summarised and scored from the site's sunlight / Earth series.
-import { DEFAULT_CRITERIA, hasComm, isSunlit, type Criteria, type Series } from './windows'
-
-const DAY_MS = 86400000
-
+/** LUNAR arrival-window comparison. Scores are stated preferences, not mission safety. */
+import {isSunlit,hasComm,DEFAULT_CRITERIA,type Criteria,type Series} from './windows'
 export interface WindowStats {
   startMs: number
   days: number
-  /** fraction of the stay in sunlight / with Earth in view, 0..1 */
+
   sunShare: number
   commShare: number
-  /** longest unbroken stretch without sunlight / without Earth, hours */
+
   longestDarkH: number
   longestNoCommH: number
-  /** Sun elevation while sunlit, degrees; NaN when the stay has no sunlight */
+
   meanSunElLit: number
   minSunElLit: number
 }
-
-/** What the mission wants; same meaning as in lib/verdict.ts. */
 export interface Wants {
   sunHigh: boolean
   earthHigh: boolean
 }
-
 export interface RankedWindow {
   stats: WindowStats
-  /** 0..1: 0.6 x sunlight fit + 0.4 x Earth fit */
+
   score: number
 }
-
-/** How well a stay fits the mission, 0..1: 0.6 x sunlight fit + 0.4 x Earth fit (the ranking rule). */
-export function fitScore(w: WindowStats, wants: Wants): number {
-  return 0.6 * (wants.sunHigh ? w.sunShare : 1 - w.sunShare) + 0.4 * (wants.earthHigh ? w.commShare : 1 - w.commShare)
-}
-
-/** First sample and sample count of a stay, or null when it is not wholly inside the series. */
-function span(s: Series, startMs: number, days: number): [number, number] | null {
-  const i0 = Math.round((startMs - s.t0Ms) / s.stepMs)
-  const n = Math.round((days * DAY_MS) / s.stepMs)
-  return n > 0 && i0 >= 0 && i0 + n <= s.count ? [i0, n] : null
-}
-
-/** Summary of the stay [startMs, startMs + days); null when the series does not cover all of it. */
-export function windowStats(s: Series, startMs: number, days: number, c: Criteria = DEFAULT_CRITERIA): WindowStats | null {
-  const at = span(s, startMs, days)
-  if (!at) return null
-  const [i0, n] = at
-  const stepH = s.stepMs / 3600000
-  let sun = 0
-  let comm = 0
-  let dark = 0
-  let longestDark = 0
-  let silent = 0
-  let longestSilent = 0
-  let elSum = 0
-  let elMin = Infinity
-  for (let i = i0; i < i0 + n; i++) {
-    if (isSunlit(s, i, c)) {
-      sun++
-      dark = 0
-      elSum += s.sunEl[i]
-      if (s.sunEl[i] < elMin) elMin = s.sunEl[i]
-    } else if (++dark > longestDark) longestDark = dark
-    if (hasComm(s, i, c)) {
-      comm++
-      silent = 0
-    } else if (++silent > longestSilent) longestSilent = silent
-  }
-  return {
-    startMs: s.t0Ms + i0 * s.stepMs,
-    days,
-    sunShare: sun / n,
-    commShare: comm / n,
-    longestDarkH: longestDark * stepH,
-    longestNoCommH: longestSilent * stepH,
-    meanSunElLit: sun ? elSum / sun : NaN,
-    minSunElLit: sun ? elMin : NaN,
-  }
-}
-
 export interface RankOptions {
-  /** how many stays to return (default 5) */
+
   top?: number
-  /** spacing of the landing times that are tried, hours (default 6) */
+
   everyH?: number
-  /** latest landing time that may be offered (the app's clock cannot be set later than this) */
+
   latestStartMs?: number
-  /** earliest landing time that may be offered; by default any time in the series */
+
   earliestStartMs?: number
   criteria?: Criteria
 }
-
-/**
- * The best landing times for a stay of `days`, best first. Every landing time `everyH` apart is
- * scored (prefix sums, so one pass over the series); equal scores go to the earlier date; the
- * stays returned start at least half a stay apart. Stays running past the series are not tried.
- */
-export function rankWindows(s: Series, days: number, wants: Wants, opts: RankOptions = {}): RankedWindow[] {
-  const { top = 5, everyH = 6, criteria = DEFAULT_CRITERIA, latestStartMs = Infinity, earliestStartMs = -Infinity } = opts
-  const n = Math.round((days * DAY_MS) / s.stepMs)
-  if (n <= 0 || n > s.count) return []
-  const sun = new Uint32Array(s.count + 1)
-  const comm = new Uint32Array(s.count + 1)
-  for (let i = 0; i < s.count; i++) {
-    sun[i + 1] = sun[i] + (isSunlit(s, i, criteria) ? 1 : 0)
-    comm[i + 1] = comm[i] + (hasComm(s, i, criteria) ? 1 : 0)
-  }
-  const stride = Math.max(1, Math.round((everyH * 3600000) / s.stepMs))
-  const scored: [score: number, i0: number][] = []
-  for (let i0 = 0; i0 + n <= s.count; i0 += stride) {
-    // Never offer a landing time the clock cannot be set to.
-    if (s.t0Ms + i0 * s.stepMs > latestStartMs) break
-    // Nor one before the earliest allowed (a slipped schedule cannot land in the past).
-    if (s.t0Ms + i0 * s.stepMs < earliestStartMs) continue
-    const sunShare = (sun[i0 + n] - sun[i0]) / n
-    const commShare = (comm[i0 + n] - comm[i0]) / n
-    scored.push([0.6 * (wants.sunHigh ? sunShare : 1 - sunShare) + 0.4 * (wants.earthHigh ? commShare : 1 - commShare), i0])
-  }
-  scored.sort((a, b) => b[0] - a[0] || a[1] - b[1])
-  const picked: [number, number][] = []
-  for (const k of scored) {
-    if (picked.length >= top) break
-    if (picked.every((p) => Math.abs(p[1] - k[1]) >= n / 2)) picked.push(k)
-  }
-  return picked.map(([score, i0]) => ({ score, stats: windowStats(s, s.t0Ms + i0 * s.stepMs, days, criteria)! }))
+export function fitScore(window:WindowStats,preference:Wants):number{
+ const sunlight=preference.sunHigh?window.sunShare:1-window.sunShare,communication=preference.earthHigh?window.commShare:1-window.commShare
+ return .6*sunlight+.4*communication
 }
-
-/**
- * Index of the best value, or -1 when a value is unknown or the lead over the runner-up is
- * smaller than `threshold` (the same rule as the site comparison).
- */
-export function leader(values: number[], higherIsBetter: boolean, threshold: number): number {
-  if (values.length < 2 || values.some((v) => !Number.isFinite(v))) return -1
-  const sign = higherIsBetter ? 1 : -1
-  const order = values.map((v, i) => [v * sign, i]).sort((a, b) => b[0] - a[0])
-  return order[0][0] - order[1][0] >= threshold ? order[0][1] : -1
+export function windowStats(series:Series,start:number,days:number,criteria:Criteria=DEFAULT_CRITERIA):WindowStats|null{
+ const offset=Math.round((start-series.t0Ms)/series.stepMs),length=Math.round(days*86400000/series.stepMs)
+ if(length<=0||offset<0||offset+length>series.count)return null
+ let litCount=0,visibleCount=0,totalElevation=0,minimum=Infinity
+ const run=[0,0],longest=[0,0]
+ for(let sample=offset;sample<offset+length;sample++){
+  const lit=isSunlit(series,sample,criteria),contact=hasComm(series,sample,criteria)
+  if(lit){litCount++;totalElevation+=series.sunEl[sample];minimum=Math.min(minimum,series.sunEl[sample])}
+  visibleCount+=Number(contact)
+  const states=[!lit,!contact];states.forEach((state,i)=>{run[i]=state?run[i]+1:0;longest[i]=Math.max(longest[i],run[i])})
+ }
+ return {startMs:series.t0Ms+offset*series.stepMs,days,sunShare:litCount/length,commShare:visibleCount/length,longestDarkH:longest[0]*series.stepMs/3600000,longestNoCommH:longest[1]*series.stepMs/3600000,meanSunElLit:litCount?totalElevation/litCount:NaN,minSunElLit:litCount?minimum:NaN}
+}
+export function rankWindows(series:Series,days:number,wants:Wants,options:RankOptions={}):RankedWindow[]{
+ const samples=Math.round(days*86400000/series.stepMs);if(samples<=0||samples>series.count)return []
+ const criteria=options.criteria??DEFAULT_CRITERIA,integrals=[new Uint32Array(series.count+1),new Uint32Array(series.count+1)]
+ for(let i=0;i<series.count;i++){integrals[0][i+1]=integrals[0][i]+Number(isSunlit(series,i,criteria));integrals[1][i+1]=integrals[1][i]+Number(hasComm(series,i,criteria))}
+ const stride=Math.max(1,Math.round((options.everyH??6)*3600000/series.stepMs)),choices:{sample:number;score:number}[]=[]
+ for(let i=0;i+samples<=series.count;i+=stride){
+  const date=series.t0Ms+i*series.stepMs;if(date<(options.earliestStartMs??-Infinity)||date>(options.latestStartMs??Infinity))continue
+  const shares=integrals.map(array=>(array[i+samples]-array[i])/samples)
+  choices.push({sample:i,score:.6*(wants.sunHigh?shares[0]:1-shares[0])+.4*(wants.earthHigh?shares[1]:1-shares[1])})
+ }
+ choices.sort((a,b)=>b.score-a.score||a.sample-b.sample)
+ const selected:typeof choices=[]
+ for(const choice of choices){if(selected.length>=(options.top??5))break;if(selected.every(other=>Math.abs(other.sample-choice.sample)>=samples*.5))selected.push(choice)}
+ return selected.map(({sample,score})=>({score,stats:windowStats(series,series.t0Ms+sample*series.stepMs,days,criteria)!}))
+}
+export function leader(values:number[],higher:boolean,threshold:number):number{
+ if(values.length<2||values.some(value=>!Number.isFinite(value)))return -1
+ const indices=values.map((_,index)=>index).sort((a,b)=>(higher?1:-1)*(values[b]-values[a]))
+ return Math.abs(values[indices[0]]-values[indices[1]])>=threshold?indices[0]:-1
 }

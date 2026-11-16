@@ -1,128 +1,65 @@
-// Terrain horizon seen from a point: for each azimuth, the highest elevation angle that any
-// terrain reaches. Rays follow great circles on the sphere and elevation angles are computed
-// in 3D, so the curvature of the Moon is included (no flat-map shortcut).
-import { D2R, localFrame, R2D, upVector } from './geo'
-import { sourceHeight, type HeightSource, type Terrain } from './terrain'
-
-export interface Horizon {
-  lat: number
-  lon: number
-  /** observer height above the local surface, metres */
-  observerHeightM: number
-  azStepDeg: number
-  /** elevation of the terrain horizon in degrees, index i is azimuth i * azStepDeg */
-  elevDeg: Float32Array
-  /** distance in km to the terrain that sets the horizon at each azimuth */
-  distKm: Float32Array
+/** LUNAR spherical skyline evaluator. Great-circle samples are precomputed once per
+ * calculation, then rotated into each bearing. This module preserves the public
+ * data interface and sampling contract used by saved studies and reference fixtures. */
+import {localFrame,type Vec3} from './geo'
+import {sourceHeight,type HeightSource,type Terrain} from './terrain'
+export interface Horizon {lat:number;lon:number;observerHeightM:number;azStepDeg:number;elevDeg:Float32Array;distKm:Float32Array}
+export interface HorizonOptions {observerHeightM?:number;azStepDeg?:number;maxRangeKm?:number}
+const degrees=180/Math.PI
+function distanceGrid(radius:number,maximum:number){
+ const distances:number[]=[],cosines:number[]=[],sines:number[]=[]
+ for(let metres=20;metres<=maximum;metres+=Math.max(20,metres*.002)){
+  distances.push(metres);cosines.push(Math.cos(metres/radius));sines.push(Math.sin(metres/radius))
+ }
+ return {distances,cosines,sines}
 }
-
-export interface HorizonOptions {
-  observerHeightM?: number
-  azStepDeg?: number
-  maxRangeKm?: number
-}
-
-const FIRST_STEP_M = 20
-const GROWTH = 0.002
-
-/**
- * `source` is either one terrain (rays then stop where its data ends) or the full lookup
- * chain, whose whole-Moon map carries every ray on to the maximum range.
- */
-export function computeHorizon(
-  source: Terrain | HeightSource,
-  latDeg: number,
-  lonDeg: number,
-  opts: HorizonOptions = {},
-): Horizon {
-  const observerHeightM = opts.observerHeightM ?? 2
-  const azStepDeg = opts.azStepDeg ?? 0.5
-  const maxRangeM = (opts.maxRangeKm ?? 300) * 1000
-  const src: HeightSource = 'levels' in source ? { terrains: [source], global: null } : source
-  const R = src.terrains.length ? src.terrains[0].radiusM : 1737400
-  const up = upVector(latDeg, lonDeg)
-  const f = localFrame(latDeg, lonDeg)
-  const ground = sourceHeight(src, up[0], up[1], up[2])
-  const rp = R + (Number.isNaN(ground) ? 0 : ground) + observerHeightM
-
-  const n = Math.round(360 / azStepDeg)
-  const elevDeg = new Float32Array(n)
-  const distKm = new Float32Array(n)
-  // Smooth-sphere horizon: the dip below horizontal for an observer at radius rp.
-  const dip = -Math.acos(Math.min(1, R / rp)) * R2D
-
-  for (let i = 0; i < n; i++) {
-    const az = i * azStepDeg * D2R
-    const ca = Math.cos(az)
-    const sa = Math.sin(az)
-    // Horizontal unit vector pointing along this azimuth.
-    const hx = f.n[0] * ca + f.e[0] * sa
-    const hy = f.n[1] * ca + f.e[1] * sa
-    const hz = f.n[2] * ca + f.e[2] * sa
-    let best = -Infinity
-    let bestD = 0
-    let seen = false
-    for (let d = FIRST_STEP_M; d <= maxRangeM; d += Math.max(FIRST_STEP_M, d * GROWTH)) {
-      const th = d / R
-      const c = Math.cos(th)
-      const s = Math.sin(th)
-      const dx = up[0] * c + hx * s
-      const dy = up[1] * c + hy * s
-      const dz = up[2] * c + hz * s
-      const h = sourceHeight(src, dx, dy, dz)
-      if (Number.isNaN(h)) {
-        if (seen) break // ran off the edge of the elevation data
-        continue
-      }
-      seen = true
-      const rq = R + h
-      // Elevation of the terrain point above the observer's horizontal plane.
-      const el = Math.atan2(rq * c - rp, rq * s)
-      if (el > best) {
-        best = el
-        bestD = d
-      }
-    }
-    elevDeg[i] = seen ? best * R2D : dip
-    distKm[i] = bestD / 1000
+export function computeHorizon(input:Terrain|HeightSource,latitude:number,longitude:number,options:HorizonOptions={}):Horizon{
+ const source:HeightSource='terrains' in input?input:{terrains:[input],global:null}
+ const height=options.observerHeightM??2,step=options.azStepDeg??.5
+ if(!(step>0)||!Number.isFinite(step))throw Error('Azimuth step must be positive')
+ const basis=localFrame(latitude,longitude),radius=source.terrains[0]?.radiusM??1737400
+ const terrainHeight=sourceHeight(source,...basis.u),eyeRadius=radius+(Number.isFinite(terrainHeight)?terrainHeight:0)+height
+ const profile:Horizon={lat:latitude,lon:longitude,observerHeightM:height,azStepDeg:step,elevDeg:new Float32Array(Math.round(360/step)),distKm:new Float32Array(Math.round(360/step))}
+ const path=distanceGrid(radius,(options.maxRangeKm??300)*1000)
+ for(let bearing=0;bearing<profile.elevDeg.length;bearing++){
+  const angle=bearing*step/degrees,across=Math.sin(angle),along=Math.cos(angle)
+  const tangent:Vec3=[0,1,2].map(axis=>basis.e[axis]*across+basis.n[axis]*along) as Vec3
+  let highest=-Infinity,atMetres=0,hasSamples=false
+  for(let index=0;index<path.distances.length;index++){
+   const c=path.cosines[index],s=path.sines[index]
+   const measurement=sourceHeight(source,basis.u[0]*c+tangent[0]*s,basis.u[1]*c+tangent[1]*s,basis.u[2]*c+tangent[2]*s)
+   if(!Number.isFinite(measurement)){if(hasSamples)break;continue}
+   hasSamples=true
+   const radial=radius+measurement,vertical=radial*c-eyeRadius,horizontal=radial*s
+   const candidate=Math.atan2(vertical,horizontal)
+   if(candidate>highest){highest=candidate;atMetres=path.distances[index]}
   }
-  return { lat: latDeg, lon: lonDeg, observerHeightM, azStepDeg, elevDeg, distKm }
+  profile.elevDeg[bearing]=degrees*(hasSamples?highest:-Math.acos(Math.min(1,radius/eyeRadius)))
+  profile.distKm[bearing]=atMetres*.001
+ }
+ return profile
 }
-
-/** Horizon elevation in degrees at any azimuth, linearly interpolated. */
-export function horizonAt(h: Horizon, azDeg: number): number {
-  const n = h.elevDeg.length
-  const f = (((azDeg % 360) + 360) % 360) / h.azStepDeg
-  const i = Math.floor(f) % n
-  const w = f - Math.floor(f)
-  return h.elevDeg[i] * (1 - w) + h.elevDeg[(i + 1) % n] * w
+export function horizonAt(profile:Horizon,azimuth:number):number{
+ const wrapped=(azimuth-360*Math.floor(azimuth/360))/profile.azStepDeg
+ const index=Math.floor(wrapped),fraction=wrapped-index,n=profile.elevDeg.length
+ return profile.elevDeg[index%n]*(1-fraction)+profile.elevDeg[(index+1)%n]*fraction
 }
-
-/**
- * Fraction (0..1) of a disc of angular radius `radiusDeg` centred at (az, el) that is above
- * the terrain horizon. The disc is cut into vertical strips and each strip is compared with
- * the horizon at its own azimuth, so a notch or a peak in front of the disc is handled.
- */
-export function discVisibleFraction(
-  h: Horizon,
-  azDeg: number,
-  elDeg: number,
-  radiusDeg: number,
-  strips = 15,
-): number {
-  // Quick exits when the disc is far from the horizon.
-  const centre = horizonAt(h, azDeg)
-  if (elDeg - centre > radiusDeg * 4) return 1
-  if (centre - elDeg > radiusDeg * 4 + 2) return 0
-  const cosEl = Math.max(Math.cos(elDeg * D2R), 1e-6)
-  let visible = 0
-  let total = 0
-  for (let k = 0; k < strips; k++) {
-    const x = (-1 + (2 * (k + 0.5)) / strips) * radiusDeg
-    const half = Math.sqrt(radiusDeg * radiusDeg - x * x)
-    const hz = horizonAt(h, azDeg + x / cosEl)
-    visible += Math.min(Math.max(elDeg + half - hz, 0), 2 * half)
-    total += 2 * half
-  }
-  return visible / total
+export function discVisibleFraction(profile:Horizon,azimuth:number,elevation:number,radius:number,strips=15):number{
+ if(radius<=0)return Number(elevation>=horizonAt(profile,azimuth))
+ let illuminated=0,area=0
+ const horizontalScale=1/Math.max(1e-6,Math.cos(elevation/degrees))
+ // Bound every linear skyline segment intersecting the disc before integrating.
+ // This is conservative even when a peak lies away from the disc centre.
+ const spread=radius*horizontalScale,n=profile.elevDeg.length
+ const begin=Math.floor((azimuth-spread)/profile.azStepDeg),end=Math.ceil((azimuth+spread)/profile.azStepDeg)
+ let low=Infinity,high=-Infinity
+ for(let j=begin;j<=Math.min(end,begin+n);j++){const value=profile.elevDeg[(j%n+n)%n];low=Math.min(low,value);high=Math.max(high,value)}
+ if(elevation-radius>high)return 1
+ if(elevation+radius<low)return 0
+ for(let strip=0;strip<strips;strip++){
+  const offset=radius*((strip+.5)*2/strips-1),chord=2*Math.sqrt(Math.max(0,radius*radius-offset*offset))
+  const threshold=horizonAt(profile,azimuth+offset*horizontalScale)
+  illuminated+=Math.max(0,Math.min(chord,elevation+chord*.5-threshold));area+=chord
+ }
+ return illuminated/area
 }

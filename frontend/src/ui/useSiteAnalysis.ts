@@ -1,45 +1,28 @@
-// Everything the app works out for one pinned point. Site cards and the comparison view both
-// use this, so they always show the same numbers; horizons are cached because they are the
-// slow part.
-import { useMemo } from 'react'
-import { ephemEndMs, skyAt, type Ephem, type Sky } from '../lib/ephem'
-import { upVector } from '../lib/geo'
-import type { GlobalDem } from '../lib/globalDem'
-import { computeHorizon, discVisibleFraction, horizonAt, type Horizon } from '../lib/horizon'
-import { slopeAt, sourceHeight, terrainTier, type HeightSource, type Terrain } from '../lib/terrain'
-import { horizonKey } from '../lib/assumptions'
-import {
-  changeAfter,
-  computeSeries,
-  eclipseFactor,
-  hasComm,
-  isSunlit,
-  summarise,
-  type NextChange,
-  type Series,
-  type Summary,
-} from '../lib/windows'
-import { useStore, type Pin } from '../store'
-
-export const DAY = 86400000
-export const WINDOW_DAYS = 60
-const STEP_MS = 20 * 60000
-
-export type Tier = 'crest' | 'patch' | 'fine' | 'coarse' | 'global' | 'none'
-
+/** LUNAR observation controller: measured geometry, date-window results and
+ * instantaneous sky are memoized independently. No display setting changes science. */
+import {useMemo} from 'react'
+import {useStore,type Pin} from '../store'
+import {upVector} from '../lib/geo'
+import {skyAt,ephemEndMs,type Ephem,type Sky} from '../lib/ephem'
+import {computeHorizon,discVisibleFraction,horizonAt,type Horizon} from '../lib/horizon'
+import {sourceHeight,slopeAt,terrainTier,type HeightSource,type Terrain} from '../lib/terrain'
+import type {GlobalDem} from '../lib/globalDem'
+import {computeSeries,summarise,eclipseFactor,isSunlit,hasComm,type Series,type Summary,type NextChange} from '../lib/windows'
+export const DAY=86400000,WINDOW_DAYS=60
+export type Tier='crest'|'patch'|'fine'|'coarse'|'global'|'none'
 export interface SiteAnalysis {
   pin: Pin
-  /** the Sun and Earth table the figures come from (for longer look-aheads) */
+
   ephem: Ephem
-  /** metres above the reference sphere */
+
   hM: number
-  /** degrees, NaN where no detailed terrain covers the point */
+
   slope: number
   tier: Tier
   horizon: Horizon
   series: Series
   summary: Summary
-  /** at the selected time */
+
   sky: Sky
   sunFrac: number
   eclipse: number
@@ -47,106 +30,38 @@ export interface SiteAnalysis {
   sunNext: NextChange
   commNext: NextChange
 }
-
-const horizons = new Map<string, Horizon>()
-
-/**
- * The next change of state after tMs: looked for in the chart's own period first, then in the
- * period after it. Without the second search a countdown read near the end of the chart said
- * "more than 60 days" when the change was only just past the chart's end.
- */
-export function changeAhead<S extends Pick<Series, 't0Ms' | 'stepMs' | 'count'>>(series: S, ahead: S | null, tMs: number, now: boolean, test: (s: S, i: number) => boolean): NextChange {
-  const a = changeAfter(series as unknown as Series, tMs, now, (i) => test(series, i))
-  return a.inHours !== null || !ahead ? a : changeAfter(ahead as unknown as Series, tMs, now, (i) => test(ahead, i))
+export function changeAhead<S extends Pick<Series,'t0Ms'|'stepMs'|'count'>>(series:S,ahead:S|null,time:number,now:boolean,test:(s:S,i:number)=>boolean):NextChange{
+ for(const window of [series,ahead]){
+  if(!window)continue
+  const first=Math.max(0,Math.floor((time-window.t0Ms)/window.stepMs)+1)
+  for(let i=first;i<window.count;i++)if(test(window,i)!==now)return {now,inHours:(window.t0Ms+window.stepMs*i-time)/3600000}
+ }return {now,inHours:null}
 }
-
-export function useSiteAnalysis(
-  pin: Pin | null,
-  ephem: Ephem | null,
-  terrain: Terrain | null,
-  /** the site's detailed patches, finest first (none for most free points) */
-  patches: Terrain[],
-  global: GlobalDem | null,
-): SiteAnalysis | null {
-  const tMs = useStore((s) => s.tMs)
-  const windowStart = useStore((s) => s.windowStart)
-  // The planner's assumptions: the sunlit and Earth-link rules, and the panel and antenna height.
-  const criteria = useStore((s) => s.criteria)
-  const observerM = useStore((s) => s.observerM)
-  const lat = pin?.lat ?? 0
-  const lon = pin?.lon ?? 0
-  const has = pin !== null && ephem !== null && terrain !== null
-
-  // Height lookup order: site patches (finest first), south-pole tiles, whole-Moon map.
-  // The list is rebuilt by the caller on every render, so it is compared by the patches' ids.
-  const patchKey = patches.map((p) => p.id ?? '?').join('+')
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const source: HeightSource = useMemo(() => ({ terrains: [...patches, ...(terrain ? [terrain] : [])], global }), [patchKey, terrain, global])
-  const fixed = useMemo(() => {
-    if (!has || !terrain) return null
-    const u = upVector(lat, lon)
-    const h = sourceHeight(source, u[0], u[1], u[2])
-    const patch = source.terrains.length > 1 ? source.terrains[0] : null
-    const key = horizonKey(lat, lon, patchKey, !!global, observerM)
-    let horizon = horizons.get(key)
-    if (!horizon) {
-      horizon = computeHorizon(source, lat, lon, { observerHeightM: observerM })
-      if (horizons.size > 24) horizons.clear()
-      horizons.set(key, horizon)
-    }
-    const s = patch ? slopeAt(patch, lat, lon) : NaN
-    const polarTier = terrainTier(terrain, lat, lon)
-    const tier: Tier = patch?.kind === 'crest20' ? 'crest' : patch ? 'patch' : polarTier !== 'none' ? polarTier : global ? 'global' : 'none'
-    return { hM: Number.isNaN(h) ? 0 : h, horizon, slope: Number.isNaN(s) ? slopeAt(terrain, lat, lon) : s, tier }
-  }, [has, lat, lon, source, patchKey, terrain, global, observerM])
-
-  const series = useMemo(
-    () => (fixed && ephem ? computeSeries(ephem, fixed.horizon, fixed.hM, windowStart, windowStart + WINDOW_DAYS * DAY, STEP_MS) : null),
-    [ephem, fixed, windowStart],
-  )
-  // Sixty more days past the chart, searched only for the next rise or set, so a countdown read
-  // near the end of the chart still looks a full period ahead. It stops where the Sun and Earth table ends.
-  const ahead = useMemo(
-    () =>
-      fixed && ephem
-        ? computeSeries(ephem, fixed.horizon, fixed.hM, windowStart + WINDOW_DAYS * DAY + STEP_MS, Math.min(windowStart + 2 * WINDOW_DAYS * DAY, ephemEndMs(ephem)), STEP_MS)
-        : null,
-    [ephem, fixed, windowStart],
-  )
-  const summary = useMemo(() => (series ? summarise(series, criteria) : null), [series, criteria])
-
-  if (!pin || !ephem || !fixed || !series || !summary) return null
-  const sky = skyAt(ephem, tMs, lat, lon, fixed.hM + fixed.horizon.observerHeightM)
-  const eclipse = eclipseFactor(sky)
-  const sunFrac = discVisibleFraction(fixed.horizon, sky.sun.az, sky.sun.el, sky.sun.radius) * eclipse
-  const earthClear = sky.earth.el - horizonAt(fixed.horizon, sky.earth.az)
-  return {
-    pin,
-    ephem,
-    ...fixed,
-    series,
-    summary,
-    sky,
-    eclipse,
-    sunFrac,
-    earthClear,
-    // The state now is judged from the same two figures the card prints, by the same rules as the period.
-    sunNext: changeAhead(series, ahead, tMs, sunFrac >= criteria.minSunFrac, (s, i) => isSunlit(s, i, criteria)),
-    commNext: changeAhead(series, ahead, tMs, earthClear >= criteria.earthMaskDeg, (s, i) => hasComm(s, i, criteria)),
-  }
+export function useSiteAnalysis(pin:Pin|null,ephemeris:Ephem|null,terrain:Terrain|null,patches:Terrain[],global:GlobalDem|null):SiteAnalysis|null{
+ const time=useStore(s=>s.tMs),start=useStore(s=>s.windowStart),criteria=useStore(s=>s.criteria),observer=useStore(s=>s.observerM)
+ const signature=patches.map(p=>p.id??'?').join('|')
+ const source:HeightSource=useMemo(()=>({terrains:[...patches,...(terrain?[terrain]:[])],global}),[terrain,global,signature])
+ const fixed=useMemo(()=>{
+  if(!pin||!ephemeris||!terrain)return null
+  const measured=sourceHeight(source,...upVector(pin.lat,pin.lon)),patch=patches[0],polar=terrainTier(terrain,pin.lat,pin.lon)
+  const slope=patch?slopeAt(patch,pin.lat,pin.lon):NaN
+  const tier:Tier=patch?.kind==='crest20'?'crest':patch?'patch':polar!=='none'?polar:global?'global':'none'
+  return {hM:Number.isFinite(measured)?measured:0,horizon:computeHorizon(source,pin.lat,pin.lon,{observerHeightM:observer}),slope:Number.isFinite(slope)?slope:slopeAt(terrain,pin.lat,pin.lon),tier}
+ },[pin?.lat,pin?.lon,ephemeris,terrain,source,observer])
+ const windows=useMemo(()=>{
+  if(!fixed||!ephemeris)return null
+  const end=start+WINDOW_DAYS*DAY,step=1200000
+  return {series:computeSeries(ephemeris,fixed.horizon,fixed.hM,start,end,step),ahead:computeSeries(ephemeris,fixed.horizon,fixed.hM,end+step,Math.min(start+2*WINDOW_DAYS*DAY,ephemEndMs(ephemeris)),step)}
+ },[fixed,ephemeris,start])
+ const summary=useMemo(()=>windows?summarise(windows.series,criteria):null,[windows,criteria])
+ if(!pin||!ephemeris||!fixed||!windows||!summary)return null
+ const sky=skyAt(ephemeris,time,pin.lat,pin.lon,fixed.hM+observer),eclipse=eclipseFactor(sky),sunFrac=discVisibleFraction(fixed.horizon,sky.sun.az,sky.sun.el,sky.sun.radius)*eclipse,earthClear=sky.earth.el-horizonAt(fixed.horizon,sky.earth.az)
+ return {pin,ephem:ephemeris,...fixed,series:windows.series,summary,sky,eclipse,sunFrac,earthClear,
+  sunNext:changeAhead(windows.series,windows.ahead,time,sunFrac>=criteria.minSunFrac,(s,i)=>isSunlit(s,i,criteria)),
+  commNext:changeAhead(windows.series,windows.ahead,time,earthClear>=criteria.earthMaskDeg,(s,i)=>hasComm(s,i,criteria))}
 }
-
-/** Consecutive runs where `test` is true, as [startIndex, endIndex) pairs. */
-export function runs(count: number, test: (i: number) => boolean): [number, number][] {
-  const out: [number, number][] = []
-  let start = -1
-  for (let i = 0; i <= count; i++) {
-    const on = i < count && test(i)
-    if (on && start < 0) start = i
-    if (!on && start >= 0) {
-      out.push([start, i])
-      start = -1
-    }
-  }
-  return out
+export function runs(count:number,test:(index:number)=>boolean):[number,number][]{
+ const result:[number,number][]=[];let cursor=0
+ while(cursor<count){if(!test(cursor)){cursor++;continue}const begin=cursor++;while(cursor<count&&test(cursor))cursor++;result.push([begin,cursor])}
+ return result
 }

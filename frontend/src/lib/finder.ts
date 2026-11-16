@@ -1,111 +1,65 @@
-// Site finder: turn "what I need from a landing site" into a suitability map and a ranked
-// shortlist. Everything is computed on the 2048 x 2048 south-pole grid (about 300 m cells) from
-// the published layers: slope (LOLA), long-term sunlight and Earth visibility and permanent
-// shadow (NASA GSFC, Mazarico et al. 2011).
-//
-// Two steps, as in multi-criteria site selection generally:
-//   1. eliminate - every hard limit must hold, or the cell is out;
-//   2. rank - among the cells left, score how well each meets the stated preferences.
-import { spUnproject } from './geo'
-import { decodePng } from './terrain'
-
+/** LUNAR regional suitability search. Screen hard limits, rank eligible
+ * neighbourhoods, then suppress nearby repeats. NASA long-term maps are not date-specific forecasts. */
+import {spUnproject} from './geo'
+import {decodePng} from './terrain'
+export type Prefer='high'|'low'|'none'
+export const SEARCH_RADIUS_KM=160
 export interface FinderGrid {
   size: number
   pixelM: number
   xMin: number
   yMax: number
   radiusM: number
-  /** degrees: the steepest 80 m slope in the cell; NaN outside the search area */
+
   slope: Float32Array
-  /** long-term share of time the Sun is visible, 0..1; NaN where NASA's map has no value */
+
   sun: Float32Array
-  /** long-term share of time Earth is visible, 0..1; NaN where there is no value */
+
   earth: Float32Array
-  /** 1 where permanently shadowed */
+
   psr: Uint8Array
-  /** km to the nearest permanently shadowed cell (0 inside one) */
+
   psrKm: Float32Array
 }
-
-/**
- * The finder searches within this distance of the south pole (about 84.7 S and poleward): the
- * area covered by the 80 m terrain tile, where slopes are measured at 80 m everywhere and every
- * suggested spot can be analysed and drawn in full detail.
- */
-export const SEARCH_RADIUS_KM = 160
-
-export type Prefer = 'high' | 'low' | 'none'
-
 export interface FinderCriteria {
-  /** hard limit, degrees */
+
   maxSlopeDeg: number
-  /** hard limits on the long-term share of time in sunlight, 0..1 */
+
   sunMin: number
   sunMax: number
-  /** among eligible cells: more sunlight is better, less is better, or it does not matter */
+
   sunPrefer: Prefer
-  /** hard limits on the long-term share of time with Earth in view, 0..1 */
+
   earthMin: number
   earthMax: number
   earthPrefer: Prefer
-  /** permanent shadow: no requirement, must be inside, or must be outside */
+
   psr: 'any' | 'inside' | 'outside'
-  /** hard limit: at most this far from permanent shadow (ice access); null = no requirement */
+
   maxPsrKm: number | null
-  /**
-   * How much each thing counts when the ground that passes is ranked. Left out, everything
-   * counts the same (1), which is how the named presets rank. A lander that copes with slopes
-   * can count flatness for less without having to let steeper ground in.
-   */
+
   weights?: FinderWeights
 }
-
 export interface FinderWeights {
   slope?: number
   sun?: number
   earth?: number
-  /** closeness to permanent shadow, when that limit is on */
+
   psr?: number
 }
-
 export interface Preset {
   id: string
   label: string
-  /** used to name pinned candidates, e.g. "Solar #1" */
+
   short: string
   blurb: string
   criteria: FinderCriteria
 }
-
-export const PRESETS: Preset[] = [
-  {
-    id: 'solar',
-    label: 'Solar-powered lander',
-    short: 'Solar',
-    blurb: 'Flat ground with as much sunlight as possible and a radio link to Earth.',
-    criteria: { maxSlopeDeg: 10, sunMin: 0.35, sunMax: 1, sunPrefer: 'high', earthMin: 0.5, earthMax: 1, earthPrefer: 'high', psr: 'outside', maxPsrKm: null },
-  },
-  {
-    id: 'ice',
-    label: 'Ice prospecting',
-    short: 'Ice',
-    blurb: 'Ground that almost never sees the Sun, cold enough to keep ice, but still in touch with Earth.',
-    criteria: { maxSlopeDeg: 10, sunMin: 0, sunMax: 0.05, sunPrefer: 'low', earthMin: 0.5, earthMax: 1, earthPrefer: 'high', psr: 'any', maxPsrKm: null },
-  },
-  {
-    id: 'base',
-    label: 'Base next to ice',
-    short: 'Base',
-    blurb: 'Sunlit, flat ground within a short drive of permanent shadow.',
-    criteria: { maxSlopeDeg: 8, sunMin: 0.35, sunMax: 1, sunPrefer: 'high', earthMin: 0.5, earthMax: 1, earthPrefer: 'high', psr: 'outside', maxPsrKm: 5 },
-  },
-]
-
 export interface Candidate {
   rank: number
   lat: number
   lon: number
-  /** 0..1, how well the spot meets the preferences (its 900 m neighbourhood, not one cell) */
+
   score: number
   slopeDeg: number
   sun: number
@@ -113,302 +67,102 @@ export interface Candidate {
   psrKm: number
   inPsr: boolean
 }
-
 export interface FinderResult {
-  /** per cell: 0 = eliminated, 1..255 = eligible, brighter is better */
+
   score: Uint8Array
   eligibleKm2: number
-  /** lowest and highest preference value among eligible cells, 0..1 (used to stretch the map colours) */
+
   minPref: number
   maxPref: number
-  /** share of the mapped area that passes each limit on its own, 0..1: shows which limit bites */
+
   passAlone: { slope: number; sun: number; earth: number; psr: number }
   candidates: Candidate[]
 }
-
-const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v)
-
-/** Distance in cells to the nearest set cell (two-pass 3-4 chamfer, within a few percent of true distance). */
-export function distanceToMask(mask: Uint8Array, size: number): Float32Array {
-  const BIG = 1e9
-  const d = new Float32Array(size * size)
-  for (let i = 0; i < d.length; i++) d[i] = mask[i] ? 0 : BIG
-  const A = 1
-  const B = Math.SQRT2
-  for (let r = 0; r < size; r++) {
-    for (let c = 0; c < size; c++) {
-      const i = r * size + c
-      let v = d[i]
-      if (c > 0) v = Math.min(v, d[i - 1] + A)
-      if (r > 0) {
-        v = Math.min(v, d[i - size] + A)
-        if (c > 0) v = Math.min(v, d[i - size - 1] + B)
-        if (c < size - 1) v = Math.min(v, d[i - size + 1] + B)
-      }
-      d[i] = v
-    }
-  }
-  for (let r = size - 1; r >= 0; r--) {
-    for (let c = size - 1; c >= 0; c--) {
-      const i = r * size + c
-      let v = d[i]
-      if (c < size - 1) v = Math.min(v, d[i + 1] + A)
-      if (r < size - 1) {
-        v = Math.min(v, d[i + size] + A)
-        if (c < size - 1) v = Math.min(v, d[i + size + 1] + B)
-        if (c > 0) v = Math.min(v, d[i + size - 1] + B)
-      }
-      d[i] = v
-    }
-  }
-  return d
-}
-
-function limits(g: FinderGrid, c: FinderCriteria, i: number) {
-  const sun = g.sun[i]
-  const earth = g.earth[i]
-  const known = !Number.isNaN(sun) && !Number.isNaN(earth) && !Number.isNaN(g.slope[i])
-  return {
-    known,
-    slope: g.slope[i] <= c.maxSlopeDeg,
-    sun: sun >= c.sunMin && sun <= c.sunMax,
-    earth: earth >= c.earthMin && earth <= c.earthMax,
-    psr:
-      (c.psr === 'any' || (c.psr === 'inside') === (g.psr[i] === 1)) &&
-      (c.maxPsrKm === null || g.psrKm[i] <= c.maxPsrKm),
-  }
-}
-
-/** A weight as it is used: 1 when left out or not a usable number, never negative. */
-const weightOf = (w: number | undefined) => (w === undefined || !Number.isFinite(w) || w < 0 ? 1 : w)
-
-/**
- * 0..1 for an eligible cell: the average of the preference terms that are switched on, each
- * counted by its weight. With no weights given this is the plain average.
- */
-function preference(g: FinderGrid, c: FinderCriteria, i: number): number {
-  let sum = 0
-  let n = 0
-  const add = (value: number, weight: number | undefined) => {
-    const w = weightOf(weight)
-    sum += value * w
-    n += w
-  }
-  // Flatter is always better.
-  add(1 - clamp01(g.slope[i] / Math.max(c.maxSlopeDeg, 1e-6)), c.weights?.slope)
-  const span = (v: number, lo: number, hi: number, p: Prefer, weight: number | undefined) => {
-    if (p === 'none') return
-    const t = hi > lo ? clamp01((v - lo) / (hi - lo)) : 1
-    add(p === 'high' ? t : 1 - t, weight)
-  }
-  span(g.sun[i], c.sunMin, c.sunMax, c.sunPrefer, c.weights?.sun)
-  span(g.earth[i], c.earthMin, c.earthMax, c.earthPrefer, c.weights?.earth)
-  if (c.maxPsrKm !== null && c.psr !== 'inside') add(1 - clamp01(g.psrKm[i] / Math.max(c.maxPsrKm, 1e-6)), c.weights?.psr)
-  // Every weight set to nothing leaves nothing to rank by: all passing ground is then equal.
-  return n > 0 ? sum / n : 1
-}
-
-export function runFinder(
-  g: FinderGrid,
-  c: FinderCriteria,
-  opts: { maxCandidates?: number; minSeparationKm?: number } = {},
-): FinderResult {
-  const n = g.size * g.size
-  const score = new Uint8Array(n)
-  const pref = new Float32Array(n)
-  const pass = { slope: 0, sun: 0, earth: 0, psr: 0 }
-  let known = 0
-  let eligibleM2 = 0
-  let maxPref = 0
-  let minPref = 1
-  const R4 = 4 * g.radiusM * g.radiusM
-  for (let i = 0; i < n; i++) {
-    const l = limits(g, c, i)
-    if (!l.known) continue
-    known++
-    if (l.slope) pass.slope++
-    if (l.sun) pass.sun++
-    if (l.earth) pass.earth++
-    if (l.psr) pass.psr++
-    if (!(l.slope && l.sun && l.earth && l.psr)) continue
-    const p = preference(g, c, i)
-    pref[i] = p
-    if (p > maxPref) maxPref = p
-    if (p < minPref) minPref = p
-    score[i] = 1 + Math.round(254 * p)
-    // Ground area of a map cell: the stereographic map is stretched by (1 + rho^2).
-    const x = g.xMin + ((i % g.size) + 0.5) * g.pixelM
-    const y = g.yMax - (Math.floor(i / g.size) + 0.5) * g.pixelM
-    const k = 1 + (x * x + y * y) / R4
-    eligibleM2 += (g.pixelM * g.pixelM) / (k * k)
-  }
-
-  // Shortlist: best 3 x 3 neighbourhoods (about 900 m across, eliminated cells count as zero),
-  // kept apart so the list is a set of distinct places rather than one hill eight times.
-  const size = g.size
-  const area = new Float32Array(n)
-  for (let r = 1; r < size - 1; r++) {
-    for (let col = 1; col < size - 1; col++) {
-      const i = r * size + col
-      if (!score[i]) continue
-      let s = 0
-      for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) s += pref[i + dr * size + dc] * (score[i + dr * size + dc] ? 1 : 0)
-      // Small bonus so a fully eligible neighbourhood beats a lone good cell.
-      area[i] = s / 9 + 1e-3
-    }
-  }
-  const sep = Math.max(1, Math.round(((opts.minSeparationKm ?? 8) * 1000) / g.pixelM))
-  const candidates: Candidate[] = []
-  const max = opts.maxCandidates ?? 8
-  while (candidates.length < max) {
-    let best = -1
-    let bestV = 0
-    for (let i = 0; i < n; i++) {
-      if (area[i] > bestV) {
-        bestV = area[i]
-        best = i
-      }
-    }
-    if (best < 0) break
-    const r0 = Math.floor(best / size)
-    const c0 = best % size
-    const x = g.xMin + (c0 + 0.5) * g.pixelM
-    const y = g.yMax - (r0 + 0.5) * g.pixelM
-    const ll = spUnproject(x, y, g.radiusM)
-    candidates.push({
-      rank: candidates.length + 1,
-      lat: ll.lat,
-      lon: ll.lon,
-      score: Math.min(bestV, 1),
-      slopeDeg: g.slope[best],
-      sun: g.sun[best],
-      earth: g.earth[best],
-      psrKm: g.psrKm[best],
-      inPsr: g.psr[best] === 1,
-    })
-    for (let r = Math.max(0, r0 - sep); r <= Math.min(size - 1, r0 + sep); r++) {
-      for (let col = Math.max(0, c0 - sep); col <= Math.min(size - 1, c0 + sep); col++) {
-        if ((r - r0) * (r - r0) + (col - c0) * (col - c0) <= sep * sep) area[r * size + col] = 0
-      }
-    }
-  }
-
-  const share = (v: number) => (known ? v / known : 0)
-  return {
-    score,
-    eligibleKm2: eligibleM2 / 1e6,
-    minPref: Math.min(minPref, maxPref),
-    maxPref,
-    passAlone: { slope: share(pass.slope), sun: share(pass.sun), earth: share(pass.earth), psr: share(pass.psr) },
-    candidates,
-  }
-}
-
-/**
- * Slope per coarse cell: the coarse tile's value, replaced inside the fine tile by the steepest
- * fine-tile slope that falls in the cell (a landing has to survive the worst of it).
- */
-export function mergeSlope(
-  coarse: Float32Array,
-  size0: number,
-  x0Min: number,
-  y0Max: number,
-  pixel0: number,
-  fine: Float32Array,
-  size1: number,
-  x1Min: number,
-  y1Max: number,
-  pixel1: number,
-): Float32Array {
-  const out = coarse.slice()
-  const seen = new Uint8Array(coarse.length)
-  for (let r = 0; r < size1; r++) {
-    const y = y1Max - (r + 0.5) * pixel1
-    const r0 = Math.floor((y0Max - y) / pixel0)
-    if (r0 < 0 || r0 >= size0) continue
-    for (let c = 0; c < size1; c++) {
-      const v = fine[r * size1 + c]
-      if (Number.isNaN(v)) continue
-      const c0 = Math.floor((x1Min + (c + 0.5) * pixel1 - x0Min) / pixel0)
-      if (c0 < 0 || c0 >= size0) continue
-      const i = r0 * size0 + c0
-      if (!seen[i] || v > out[i]) out[i] = v
-      seen[i] = 1
-    }
-  }
-  return out
-}
-
 interface LevelMeta {
   size: number
   x_min_m: number
   y_max_m: number
   pixel_m: number
 }
-
-/** Assemble the grid from decoded 8-bit layers (first channel of each RGBA image). */
-export function buildGrid(
-  radiusM: number,
-  l0: LevelMeta,
-  l1: LevelMeta,
-  slope0: Uint8ClampedArray,
-  slope1: Uint8ClampedArray,
-  sun: Uint8ClampedArray,
-  earth: Uint8ClampedArray,
-  psr: Uint8ClampedArray,
-  searchRadiusKm = SEARCH_RADIUS_KM,
-): FinderGrid {
-  const n = l0.size * l0.size
-  const first = (rgba: Uint8ClampedArray, count: number, f: (v: number) => number) => {
-    const out = new Float32Array(count)
-    for (let i = 0; i < count; i++) out[i] = f(rgba[i * 4])
-    return out
+const bound=(x:number)=>Math.max(0,Math.min(1,x))
+const defaults:FinderCriteria={maxSlopeDeg:10,sunMin:.35,sunMax:1,sunPrefer:'high',earthMin:.5,earthMax:1,earthPrefer:'high',psr:'outside',maxPsrKm:null}
+export const PRESETS:Preset[]=[
+ {id:'solar',label:'Power survey',short:'Power',blurb:'Screen gentle terrain for useful sunlight and Earth access.',criteria:{...defaults}},
+ {id:'ice',label:'Cold-trap investigation',short:'Cold trap',blurb:'Find low-illumination terrain while retaining Earth access. Shadow alone does not establish ice.',criteria:{...defaults,sunMin:0,sunMax:.05,sunPrefer:'low',psr:'any'}},
+ {id:'base',label:'Outpost near shadow',short:'Outpost',blurb:'Search illuminated ground near a permanently shadowed region, then study the connected layout in Base.',criteria:{...defaults,maxSlopeDeg:8,maxPsrKm:5}}
+]
+export function distanceToMask(mask:Uint8Array,size:number):Float32Array{
+ const distance=Float32Array.from(mask,value=>value?0:1e9)
+ for(const direction of [1,-1]){
+  const offsets=direction===1?[[-1,0],[0,-1],[-1,-1],[1,-1]]:[[1,0],[0,1],[1,1],[-1,1]]
+  for(let scan=0;scan<distance.length;scan++){
+   const index=direction===1?scan:distance.length-1-scan,row=Math.floor(index/size),col=index%size
+   for(const [dx,dy] of offsets){const x=col+dx,y=row+dy;if(x>=0&&x<size&&y>=0&&y<size)distance[index]=Math.min(distance[index],distance[y*size+x]+Math.hypot(dx,dy))}
   }
-  const frac = (v: number) => (v > 250 ? NaN : v / 250)
-  const psrMask = new Uint8Array(n)
-  for (let i = 0; i < n; i++) psrMask[i] = psr[i * 4] > 127 ? 1 : 0
-  const cells = distanceToMask(psrMask, l0.size)
-  const psrKm = new Float32Array(n)
-  for (let i = 0; i < n; i++) psrKm[i] = (cells[i] * l0.pixel_m) / 1000
-  const slope = mergeSlope(
-    first(slope0, n, (v) => v * 0.25),
-    l0.size,
-    l0.x_min_m,
-    l0.y_max_m,
-    l0.pixel_m,
-    first(slope1, l1.size * l1.size, (v) => v * 0.25),
-    l1.size,
-    l1.x_min_m,
-    l1.y_max_m,
-    l1.pixel_m,
-  )
-  // Cells outside the search area are left out altogether (not eliminated: not considered).
-  const limit = searchRadiusKm * 1000
-  for (let i = 0; i < n; i++) {
-    const x = l0.x_min_m + ((i % l0.size) + 0.5) * l0.pixel_m
-    const y = l0.y_max_m - (Math.floor(i / l0.size) + 0.5) * l0.pixel_m
-    if (x * x + y * y > limit * limit) slope[i] = NaN
-  }
-  return {
-    size: l0.size,
-    pixelM: l0.pixel_m,
-    xMin: l0.x_min_m,
-    yMax: l0.y_max_m,
-    radiusM,
-    slope,
-    sun: first(sun, n, frac),
-    earth: first(earth, n, frac),
-    psr: psrMask,
-    psrKm,
-  }
+ }return distance
 }
-
-export async function loadFinderGrid(base: string): Promise<FinderGrid> {
-  const meta = await (await fetch(`${base}terrain/sp_meta.json`)).json()
-  const [s0, s1, sun, earth, psr] = await Promise.all(
-    ['terrain/sp_slope_L0.png', 'terrain/sp_slope_L1.png', 'layers/sun_avg.png', 'layers/earth_avg.png', 'layers/psr.png'].map((f) =>
-      decodePng(`${base}${f}`),
-    ),
-  )
-  return buildGrid(meta.radius_m, meta.levels[0], meta.levels[1], s0.data, s1.data, sun.data, earth.data, psr.data)
+function preference(grid:FinderGrid,criteria:FinderCriteria,index:number){
+ const terms:[number,number|undefined][]=[[1-bound(grid.slope[index]/Math.max(1e-6,criteria.maxSlopeDeg)),criteria.weights?.slope]]
+ for(const field of ['sun','earth'] as const){
+  const preference=criteria[field+'Prefer' as 'sunPrefer'|'earthPrefer'],minimum=criteria[field+'Min' as 'sunMin'|'earthMin'],maximum=criteria[field+'Max' as 'sunMax'|'earthMax']
+  if(preference==='none')continue
+  const value=maximum>minimum?bound((grid[field][index]-minimum)/(maximum-minimum)):1
+  terms.push([preference==='high'?value:1-value,criteria.weights?.[field]])
+ }
+ if(criteria.maxPsrKm!==null&&criteria.psr!=='inside')terms.push([1-bound(grid.psrKm[index]/Math.max(1e-6,criteria.maxPsrKm)),criteria.weights?.psr])
+ let value=0,total=0
+ for(const [term,supplied] of terms){const weight=supplied===undefined||!Number.isFinite(supplied)||supplied<0?1:supplied;total+=weight;value+=term*weight}
+ return total?value/total:1
+}
+export function runFinder(grid:FinderGrid,criteria:FinderCriteria,options:{maxCandidates?:number;minSeparationKm?:number}={}):FinderResult{
+ const count=grid.size**2,score=new Uint8Array(count),preferenceMap=new Float32Array(count),pass={slope:0,sun:0,earth:0,psr:0},candidates:Candidate[]=[]
+ let known=0,area=0,minimum=1,maximum=0
+ for(let i=0;i<count;i++){
+  if(![grid.sun[i],grid.earth[i],grid.slope[i]].every(Number.isFinite))continue
+  known++
+  const checks={slope:grid.slope[i]<=criteria.maxSlopeDeg,sun:grid.sun[i]>=criteria.sunMin&&grid.sun[i]<=criteria.sunMax,earth:grid.earth[i]>=criteria.earthMin&&grid.earth[i]<=criteria.earthMax,psr:(criteria.psr==='any'||Number(criteria.psr==='inside')===grid.psr[i])&&(criteria.maxPsrKm===null||grid.psrKm[i]<=criteria.maxPsrKm)}
+  for(const field of ['slope','sun','earth','psr'] as const)pass[field]+=Number(checks[field])
+  if(!Object.values(checks).every(Boolean))continue
+  const fit=preference(grid,criteria,i);preferenceMap[i]=fit;score[i]=1+Math.round(254*fit);minimum=Math.min(minimum,fit);maximum=Math.max(maximum,fit)
+  const x=grid.xMin+(i%grid.size+.5)*grid.pixelM,y=grid.yMax-(Math.floor(i/grid.size)+.5)*grid.pixelM
+  area+=grid.pixelM**2/(1+(x*x+y*y)/(4*grid.radiusM**2))**2
+ }
+ const neighbourhood=new Float32Array(count)
+ for(let row=1;row<grid.size-1;row++)for(let col=1;col<grid.size-1;col++){
+  const i=row*grid.size+col;if(!score[i])continue
+  let sum=0;for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++)sum+=preferenceMap[i+dy*grid.size+dx]
+  neighbourhood[i]=sum/9+.001
+ }
+ const separation=Math.max(1,Math.round((options.minSeparationKm??8)*1000/grid.pixelM))
+ for(let rank=1;rank<=(options.maxCandidates??8);rank++){
+  let best=-1,value=0;for(let i=0;i<count;i++)if(neighbourhood[i]>value){best=i;value=neighbourhood[i]}
+  if(best<0)break
+  const row=Math.floor(best/grid.size),col=best%grid.size,coordinate=spUnproject(grid.xMin+(col+.5)*grid.pixelM,grid.yMax-(row+.5)*grid.pixelM,grid.radiusM)
+  candidates.push({rank,...coordinate,score:Math.min(1,value),slopeDeg:grid.slope[best],sun:grid.sun[best],earth:grid.earth[best],psrKm:grid.psrKm[best],inPsr:!!grid.psr[best]})
+  for(let dy=-separation;dy<=separation;dy++)for(let dx=-separation;dx<=separation;dx++)if(dx*dx+dy*dy<=separation*separation&&row+dy>=0&&row+dy<grid.size&&col+dx>=0&&col+dx<grid.size)neighbourhood[(row+dy)*grid.size+col+dx]=0
+ }
+ for(const field of ['slope','sun','earth','psr'] as const)pass[field]=known?pass[field]/known:0
+ return {score,eligibleKm2:area/1e6,minPref:Math.min(minimum,maximum),maxPref:maximum,passAlone:pass,candidates}
+}
+export function mergeSlope(coarse:Float32Array,size0:number,x0:number,y0:number,pixel0:number,fine:Float32Array,size1:number,x1:number,y1:number,pixel1:number):Float32Array{
+ const result=coarse.slice(),visited=new Uint8Array(result.length)
+ for(let i=0;i<fine.length;i++){
+  if(!Number.isFinite(fine[i]))continue
+  const col=Math.floor((x1+(i%size1+.5)*pixel1-x0)/pixel0),row=Math.floor((y0-y1+(Math.floor(i/size1)+.5)*pixel1)/pixel0)
+  if(row<0||col<0||row>=size0||col>=size0)continue
+  const target=row*size0+col;result[target]=visited[target]?Math.max(result[target],fine[i]):fine[i];visited[target]=1
+ }return result
+}
+export function buildGrid(radiusM:number,outer:LevelMeta,inner:LevelMeta,coarseSlope:Uint8ClampedArray,fineSlope:Uint8ClampedArray,sunBytes:Uint8ClampedArray,earthBytes:Uint8ClampedArray,shadowBytes:Uint8ClampedArray,searchRadiusKm=SEARCH_RADIUS_KM):FinderGrid{
+ const channel=(bytes:Uint8ClampedArray,length:number,convert:(value:number)=>number)=>Float32Array.from({length},(_,i)=>convert(bytes[i*4]))
+ const count=outer.size**2,psr=Uint8Array.from({length:count},(_,i)=>Number(shadowBytes[i*4]>127)),distance=distanceToMask(psr,outer.size)
+ const slope=mergeSlope(channel(coarseSlope,count,x=>x*.25),outer.size,outer.x_min_m,outer.y_max_m,outer.pixel_m,channel(fineSlope,inner.size**2,x=>x*.25),inner.size,inner.x_min_m,inner.y_max_m,inner.pixel_m)
+ for(let i=0;i<count;i++){const x=outer.x_min_m+(i%outer.size+.5)*outer.pixel_m,y=outer.y_max_m-(Math.floor(i/outer.size)+.5)*outer.pixel_m;if(Math.hypot(x,y)>searchRadiusKm*1000)slope[i]=NaN;distance[i]*=outer.pixel_m*.001}
+ const fraction=(code:number)=>code>250?NaN:code/250
+ return {size:outer.size,pixelM:outer.pixel_m,xMin:outer.x_min_m,yMax:outer.y_max_m,radiusM,slope,sun:channel(sunBytes,count,fraction),earth:channel(earthBytes,count,fraction),psr,psrKm:distance}
+}
+export async function loadFinderGrid(root:string):Promise<FinderGrid>{
+ const manifest=await (await fetch(root+'terrain/sp_meta.json')).json(),files=['terrain/sp_slope_L0.png','terrain/sp_slope_L1.png','layers/sun_avg.png','layers/earth_avg.png','layers/psr.png']
+ const images=await Promise.all(files.map(file=>decodePng(root+file)))
+ return buildGrid(manifest.radius_m,manifest.levels[0],manifest.levels[1],images[0].data,images[1].data,images[2].data,images[3].data,images[4].data)
 }

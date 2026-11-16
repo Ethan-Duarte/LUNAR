@@ -64,3 +64,7 @@
 
 ## V1.7 preview checkpoint
 Keyboard navigation, explicit analysis time, per-facility removal, stale-result clearing, boundary-censored outage labels, bounded station-specific DSN geometry and a selected spatial before/after case. See UPDATE_V1_7.md and V1_7_SCIENCE.md. Global progressive tiles deferred; Earth holdout remains FAIL.
+
+
+## V1.9 rewrite experiment
+Active renderer and browser-calculation paths replaced; ephemerides regenerated from NASA kernels. See REWRITE_STATUS.md. Earth holdout remains FAIL; no eligibility clearance or GPU visual acceptance is claimed.

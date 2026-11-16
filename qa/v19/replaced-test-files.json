@@ -1,0 +1,13 @@
+[
+  "frontend/src/lib/assumptions.test.ts",
+  "frontend/src/lib/ephem.test.ts",
+  "frontend/src/lib/horizon.real.test.ts",
+  "frontend/src/lib/crest.real.test.ts",
+  "frontend/src/lib/globalDem.test.ts",
+  "frontend/src/lib/geo.test.ts",
+  "frontend/src/lib/horizon.test.ts",
+  "frontend/src/lib/patch.test.ts",
+  "frontend/src/lib/landing.test.ts",
+  "frontend/src/lib/finder.test.ts",
+  "frontend/src/ui/useSiteAnalysis.test.ts"
+]

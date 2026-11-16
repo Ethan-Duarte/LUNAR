@@ -29,7 +29,7 @@ import { loadFinderGrid, runFinder, type FinderGrid } from "./lib/finder";
 import { Globe } from "./scene/Globe";
 import { MoonTerrain } from "./scene/MoonTerrain";
 import { MoonCanvas } from "./scene/MoonCanvas";
-import { Rig } from "./scene/Rig";
+import { LunarCamera as Rig } from "./scene/LunarCamera";
 import { MovingDetail } from "./scene/MovingDetail";
 import { SkyBodies } from "./scene/SkyBodies";
 import { useGlobeMap, useGlobeRelief, type Cut } from "./scene/shading";
@@ -324,7 +324,7 @@ export default function App() {
       JSON.stringify(
         {
           schema: "lunar-project-1",
-          version: "1.8.0-experiment",
+          version: "1.9.0-experiment",
           pins,
           time: t,
           observer,
@@ -374,7 +374,7 @@ export default function App() {
       <header className="v1-header">
         <a className="v1-brand" href="#" onClick={(e) => e.preventDefault()}>
           <span className="brand-orbit" />
-          LUNAR <small>FIELD ATLAS / 1.8 REWRITE TEST</small>
+          LUNAR <small>FIELD ATLAS / 1.9 REWRITE TEST</small>
         </a>
         <div className="v1-header-right">
           <span className="v1-live">

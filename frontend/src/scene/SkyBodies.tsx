@@ -1,73 +1,26 @@
-// The Sun and the Earth in the main view, in the directions they really are from the Moon at
-// the selected time. Directions are real; distances and sizes are not: the Earth is 220 Moon
-// radii away and the Sun 86,000, far outside what the view can hold, so both are drawn much
-// nearer and enlarged so they can be seen.
-import { useEffect, useMemo } from 'react'
-import * as THREE from 'three'
-import { unit, type Vec3 } from '../lib/geo'
-import { invalidate } from '@react-three/fiber'
-import { earthMaterial, earthOrientation, subLunarLonDeg } from './landers/earth'
-
-/** Where the two are drawn, km from the Moon's centre (the camera's far limit is 30,000 km). */
-export const EARTH_AT_KM = 13000
-export const SUN_AT_KM = 19000
-/** Earth's real radius seen from the Moon is about 0.95 degrees; drawn at twice that. */
-const EARTH_RADIUS_KM = EARTH_AT_KM * Math.tan((0.95 * 2 * Math.PI) / 180)
-/** The Sun's real radius is 0.27 degrees; its disc is drawn at three times that, plus a glow. */
-const SUN_DISC_KM = SUN_AT_KM * Math.tan((0.27 * 3 * Math.PI) / 180)
-
-export function glowTexture(): THREE.Texture {
-  const c = document.createElement('canvas')
-  c.width = c.height = 256
-  const g = c.getContext('2d')!
-  const grad = g.createRadialGradient(128, 128, 0, 128, 128, 128)
-  grad.addColorStop(0, 'rgba(255,252,238,1)')
-  grad.addColorStop(0.09, 'rgba(255,250,228,1)')
-  grad.addColorStop(0.13, 'rgba(255,242,214,0.28)')
-  grad.addColorStop(0.4, 'rgba(255,232,186,0.035)')
-  grad.addColorStop(1, 'rgba(255,210,130,0)')
-  g.fillStyle = grad
-  g.fillRect(0, 0, 256, 256)
-  const t = new THREE.CanvasTexture(c)
-  t.colorSpace = THREE.SRGBColorSpace
-  return t
+/** LUNAR sky objects. Earth photograph: NASA Blue Marble (credited in data metadata).
+ * Earth orientation is illustrative; direction and illumination use the supplied ephemeris. */
+import {useEffect,useMemo} from 'react'
+import * as T from 'three'
+import {invalidate} from '@react-three/fiber'
+import type {Vec3} from '../lib/geo'
+export const EARTH_AT_KM=13000,SUN_AT_KM=19000
+export function glowTexture():T.Texture{
+ const size=128,data=new Uint8Array(size*size*4)
+ for(let row=0;row<size;row++)for(let col=0;col<size;col++){
+  const r=Math.hypot((col+.5)*2/size-1,(row+.5)*2/size-1),disc=1-T.MathUtils.smoothstep(r,.095,.13),halo=.18*Math.exp(-r*r*28),i=(row*size+col)*4
+  data[i]=255;data[i+1]=250;data[i+2]=230;data[i+3]=Math.round(Math.min(1,disc+halo)*255)
+ }
+ const texture=new T.DataTexture(data,size,size);texture.magFilter=texture.minFilter=T.LinearFilter;texture.needsUpdate=true;return texture
 }
-
-interface Props {
-  /** Moon-centred vectors to the Sun and the Earth, body-fixed (any length) */
-  sun: Vec3
-  earth: Vec3
-  tMs: number
-}
-
-export function SkyBodies({ sun, earth, tMs }: Props) {
-  const sunDir = unit(sun)
-  const earthDir = unit(earth)
-  const material = useMemo(() => earthMaterial(`${import.meta.env.BASE_URL}data/`, () => invalidate()), [])
-  const glow = useMemo(glowTexture, [])
-  useEffect(
-    () => () => {
-      material.uniforms.uMap.value.dispose()
-      material.dispose()
-      glow.dispose()
-    },
-    [material, glow],
-  )
-  // Sunlight reaches the Earth from the same direction as it reaches the Moon, so the Earth's
-  // phase follows from the Sun direction used everywhere else in the app.
-  material.uniforms.uSun.value.set(sunDir[0], sunDir[1], sunDir[2])
-  const earthPos = new THREE.Vector3(earthDir[0], earthDir[1], earthDir[2]).multiplyScalar(EARTH_AT_KM)
-  // The Earth's north is taken along the Moon's (they differ by up to about 25 degrees), and
-  // the side of the Earth that really faces the Moon at this time is turned towards it.
-  const earthTurn = earthOrientation(new THREE.Vector3(0, 0, 1), earthPos, subLunarLonDeg(tMs))
-  return (
-    <>
-      <mesh position={earthPos} quaternion={earthTurn} material={material} frustumCulled={false}>
-        <sphereGeometry args={[EARTH_RADIUS_KM, 48, 32]} />
-      </mesh>
-      <sprite position={[sunDir[0] * SUN_AT_KM, sunDir[1] * SUN_AT_KM, sunDir[2] * SUN_AT_KM]} scale={[SUN_DISC_KM * 15, SUN_DISC_KM * 15, 1]}>
-        <spriteMaterial map={glow} transparent depthWrite={false} blending={THREE.AdditiveBlending} toneMapped={false} />
-      </sprite>
-    </>
-  )
+export function SkyBodies({sun,earth,tMs:_time}:{sun:Vec3;earth:Vec3;tMs:number}){
+ const assets=useMemo(()=>{
+  const texture=new T.TextureLoader().load(import.meta.env.BASE_URL+'data/globe/earth_2k.jpg',()=>invalidate());texture.colorSpace=T.NoColorSpace
+  const material=new T.ShaderMaterial({uniforms:{image:{value:texture},sunlight:{value:new T.Vector3()}},vertexShader:'varying vec2 st;varying vec3 worldNormal;void main(){st=uv;worldNormal=normalize(mat3(modelMatrix)*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:'uniform sampler2D image;uniform vec3 sunlight;varying vec2 st;varying vec3 worldNormal;void main(){vec3 linear=pow(texture2D(image,st).rgb,vec3(2.2));float light=max(0.,dot(normalize(worldNormal),sunlight));gl_FragColor=vec4(pow(linear*(light+.015),vec3(1./2.2)),1.);}'})
+  return {texture,material,glow:glowTexture()}
+ },[])
+ useEffect(()=>()=>{assets.texture.dispose();assets.material.dispose();assets.glow.dispose()},[assets])
+ const direction=new T.Vector3(...sun).normalize(),earthPosition=new T.Vector3(...earth).normalize().multiplyScalar(EARTH_AT_KM),sunPosition=direction.clone().multiplyScalar(SUN_AT_KM)
+ assets.material.uniforms.sunlight.value.copy(direction)
+ return <><mesh position={earthPosition} rotation={[Math.PI/2,0,0]} material={assets.material} frustumCulled={false}><sphereGeometry args={[EARTH_AT_KM*Math.tan(1.9*Math.PI/180),48,32]}/></mesh><sprite position={sunPosition} scale={[SUN_AT_KM*Math.tan(.81*Math.PI/180)*15,SUN_AT_KM*Math.tan(.81*Math.PI/180)*15,1]}><spriteMaterial map={assets.glow} transparent depthWrite={false} toneMapped={false}/></sprite></>
 }

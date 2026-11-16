@@ -1,6 +1,6 @@
 {
   "product": "LUNAR",
-  "version": "1.8.0-experiment.1",
+  "version": "1.9.0-experiment.1",
   "start": "START_LUNAR_V1.bat",
-  "source": "original LUNAR interface over attributed technical foundation"
+  "source": "LUNAR rewrite experiment; retained raster/reference provenance in NOTICE"
 }

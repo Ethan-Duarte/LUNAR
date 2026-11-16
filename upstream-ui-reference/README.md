@@ -1,1 +1,0 @@
-Historical upstream presentation source, retained for attribution/reference only. Not imported, bundled or presented as LUNAR V1 UI. The application uses frontend/src/App.tsx and lunar/v1.css. Original relative imports here are archival and are not runnable in this folder.

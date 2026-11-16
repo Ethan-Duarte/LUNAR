@@ -1,1 +1,1 @@
-Partial rewrite experiment. Read REWRITE_STATUS.md. Preserve .git when replacing source. This build still contains derived code and is NOT cleared for competitive submission. GPU appearance needs review.
+V1.9 rewrite experiment. Read REWRITE_STATUS.md. Replace the COMPLETE old source tree while preserving .git. Copying on top leaves retired files behind. Visual acceptance remains pending. No automatic publication or eligibility clearance is claimed.

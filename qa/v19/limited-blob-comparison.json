@@ -1,0 +1,293 @@
+{
+  "scope": "Known corresponding lib and scene files only; differing hashes do not establish independent authorship.",
+  "files": [
+    {
+      "upstream": "web/src/lib/assumptions.test.ts",
+      "local": "frontend/src/lib/assumptions.test.ts",
+      "sha": "4368f0458c0bab64f298eebee1e3e09a1a124317",
+      "status": "removed"
+    },
+    {
+      "upstream": "web/src/lib/assumptions.ts",
+      "local": "frontend/src/lib/assumptions.ts",
+      "sha": "15b122d54dd2cf72e2acde167d869852bb020785",
+      "status": "different bytes"
+    },
+    {
+      "upstream": "web/src/lib/crest.real.test.ts",
+      "local": "frontend/src/lib/crest.real.test.ts",
+      "sha": "ab299748cbc371797263594a1a54587fb492721a",
+      "status": "removed"
+    },
+    {
+      "upstream": "web/src/lib/dateEntry.test.ts",
+      "local": "frontend/src/lib/dateEntry.test.ts",
+      "sha": "33a035a1b9de5ce4c7cc9f47c0e9f87b3d0b46bc",
+      "status": "removed"
+    },
+    {
+      "upstream": "web/src/lib/dateEntry.ts",
+      "local": "frontend/src/lib/dateEntry.ts",
+      "sha": "ec178b90fbb7042f717d11808e19bfd56c735fb6",
+      "status": "removed"
+    },
+    {
+      "upstream": "web/src/lib/ephem.test.ts",
+      "local": "frontend/src/lib/ephem.test.ts",
+      "sha": "b40b9d1f45913e1a7aeda5f4993e24476788449f",
+      "status": "removed"
+    },
+    {
+      "upstream": "web/src/lib/ephem.ts",
+      "local": "frontend/src/lib/ephem.ts",
+      "sha": "6cec96e561010ef25497ba81a1c38570eedfe47b",
+      "status": "different bytes"
+    },
+    {
+      "upstream": "web/src/lib/exportScenario.test.ts",
+      "local": "frontend/src/lib/exportScenario.test.ts",
+      "sha": "dfce8d8d79b199df302767507ec3524415e68da7",
+      "status": "removed"
+    },
+    {
+      "upstream": "web/src/lib/exportScenario.ts",
+      "local": "frontend/src/lib/exportScenario.ts",
+      "sha": "e373f4de5cfb43a7d4d6851d966fa6ad3746dcb0",
+      "status": "removed"
+    },
+    {
+      "upstream": "web/src/lib/finder.test.ts",
+      "local": "frontend/src/lib/finder.test.ts",
+      "sha": "f131220ee7ab0c409aaa03f647cd2437531e6c65",
+      "status": "removed"
+    },
+    {
+      "upstream": "web/src/lib/finder.ts",
+      "local": "frontend/src/lib/finder.ts",
+      "sha": "d91e26cb1c5b8e332804197a5f2317342b55fb8d",
+      "status": "different bytes"
+    },
+    {
+      "upstream": "web/src/lib/format.test.ts",
+      "local": "frontend/src/lib/format.test.ts",
+      "sha": "559677aa584a5543ea1daf684dd490955f51d4c0",
+      "status": "removed"
+    },
+    {
+      "upstream": "web/src/lib/format.ts",
+      "local": "frontend/src/lib/format.ts",
+      "sha": "8debba5c41d7ff90dbb92395bd690b726b264e5b",
+      "status": "removed"
+    },
+    {
+      "upstream": "web/src/lib/geo.test.ts",
+      "local": "frontend/src/lib/geo.test.ts",
+      "sha": "bafc345b524640689b93fea0f7e1b399787eade0",
+      "status": "removed"
+    },
+    {
+      "upstream": "web/src/lib/geo.ts",
+      "local": "frontend/src/lib/geo.ts",
+      "sha": "469593ebf1db55a6e17e62dd1c414de11a643c94",
+      "status": "different bytes"
+    },
+    {
+      "upstream": "web/src/lib/globalDem.test.ts",
+      "local": "frontend/src/lib/globalDem.test.ts",
+      "sha": "16a507aceb5c38de29a9c86313439ab989305bb9",
+      "status": "removed"
+    },
+    {
+      "upstream": "web/src/lib/globalDem.ts",
+      "local": "frontend/src/lib/globalDem.ts",
+      "sha": "f843bf079b726143e9203bac2cd662d626122845",
+      "status": "different bytes"
+    },
+    {
+      "upstream": "web/src/lib/horizon.real.test.ts",
+      "local": "frontend/src/lib/horizon.real.test.ts",
+      "sha": "1a0ec2e5327cee6483ad84a5c1865bc0a80cf192",
+      "status": "removed"
+    },
+    {
+      "upstream": "web/src/lib/horizon.test.ts",
+      "local": "frontend/src/lib/horizon.test.ts",
+      "sha": "baa0e8f68ed4e7ef356e955d8d4137631ebbb326",
+      "status": "removed"
+    },
+    {
+      "upstream": "web/src/lib/horizon.ts",
+      "local": "frontend/src/lib/horizon.ts",
+      "sha": "2aa2272a92c9aee00e2703fc5a4fee66cf01ac83",
+      "status": "different bytes"
+    },
+    {
+      "upstream": "web/src/lib/landing.test.ts",
+      "local": "frontend/src/lib/landing.test.ts",
+      "sha": "2c60580c4bc5659741828e4328a024dd4337a1be",
+      "status": "removed"
+    },
+    {
+      "upstream": "web/src/lib/landing.ts",
+      "local": "frontend/src/lib/landing.ts",
+      "sha": "aded518da5abcfcd0a50dc7bde4d7781d1b4cc75",
+      "status": "different bytes"
+    },
+    {
+      "upstream": "web/src/lib/patch.test.ts",
+      "local": "frontend/src/lib/patch.test.ts",
+      "sha": "a95bbd9ab4c6aa538ad64dfe5d690fed2e7df575",
+      "status": "removed"
+    },
+    {
+      "upstream": "web/src/lib/shareLink.test.ts",
+      "local": "frontend/src/lib/shareLink.test.ts",
+      "sha": "75dfae01c5b76c38231935a55bad2cadb9eaa61c",
+      "status": "removed"
+    },
+    {
+      "upstream": "web/src/lib/shareLink.ts",
+      "local": "frontend/src/lib/shareLink.ts",
+      "sha": "968412d341b4d156cc2b5801c578c3392d7af5f9",
+      "status": "removed"
+    },
+    {
+      "upstream": "web/src/lib/terrain.ts",
+      "local": "frontend/src/lib/terrain.ts",
+      "sha": "1019ca1af296e53addb4c73f6de73381558661a7",
+      "status": "different bytes"
+    },
+    {
+      "upstream": "web/src/lib/testData.ts",
+      "local": "frontend/src/lib/testData.ts",
+      "sha": "2fb40344a6218de0b705750d22328f095a559ded",
+      "status": "different bytes"
+    },
+    {
+      "upstream": "web/src/lib/tour.test.ts",
+      "local": "frontend/src/lib/tour.test.ts",
+      "sha": "f98d78d22373fce82104405582e6c952ecf69990",
+      "status": "removed"
+    },
+    {
+      "upstream": "web/src/lib/tour.ts",
+      "local": "frontend/src/lib/tour.ts",
+      "sha": "ea3a306b4028597e609394677f8d848ae13ef83a",
+      "status": "removed"
+    },
+    {
+      "upstream": "web/src/lib/verdict.test.ts",
+      "local": "frontend/src/lib/verdict.test.ts",
+      "sha": "edf87c92658c9389483ef76050a54007a82e6847",
+      "status": "removed"
+    },
+    {
+      "upstream": "web/src/lib/verdict.ts",
+      "local": "frontend/src/lib/verdict.ts",
+      "sha": "4032ea5003fc34c1f5929f127faa2b5d7a692352",
+      "status": "removed"
+    },
+    {
+      "upstream": "web/src/lib/windows.ts",
+      "local": "frontend/src/lib/windows.ts",
+      "sha": "2f09e63c0aa63990856043ed21615d1a42569078",
+      "status": "different bytes"
+    },
+    {
+      "upstream": "web/src/scene/Globe.tsx",
+      "local": "frontend/src/scene/Globe.tsx",
+      "sha": "6c440a9436b72eba922a7fde21b783e7d0578ea0",
+      "status": "different bytes"
+    },
+    {
+      "upstream": "web/src/scene/LanderModel.test.ts",
+      "local": "frontend/src/scene/LanderModel.test.ts",
+      "sha": "4015e59758d19c1be93f2074c44085e1dd97cb2e",
+      "status": "removed"
+    },
+    {
+      "upstream": "web/src/scene/LanderModel.tsx",
+      "local": "frontend/src/scene/LanderModel.tsx",
+      "sha": "876df3a87e3c80bd0993c10c8cc0b9329a67f838",
+      "status": "removed"
+    },
+    {
+      "upstream": "web/src/scene/Missions.tsx",
+      "local": "frontend/src/scene/Missions.tsx",
+      "sha": "418e92ba4df15c9421b43fbc131055de78fcfd7b",
+      "status": "different bytes"
+    },
+    {
+      "upstream": "web/src/scene/MoonTerrain.tsx",
+      "local": "frontend/src/scene/MoonTerrain.tsx",
+      "sha": "606b448b75e94e80bba4ad8fe26c945c41482790",
+      "status": "different bytes"
+    },
+    {
+      "upstream": "web/src/scene/Rig.test.ts",
+      "local": "frontend/src/scene/Rig.test.ts",
+      "sha": "52a996067bedfe5f1b7a2a9f7c3dd9e1e93b1b26",
+      "status": "removed"
+    },
+    {
+      "upstream": "web/src/scene/Rig.tsx",
+      "local": "frontend/src/scene/Rig.tsx",
+      "sha": "5b55375f76add006288e349c1163902c6abdc01e",
+      "status": "removed"
+    },
+    {
+      "upstream": "web/src/scene/SkyBodies.tsx",
+      "local": "frontend/src/scene/SkyBodies.tsx",
+      "sha": "3d981ac8288788241c5092e6e96554003bdd5eea",
+      "status": "different bytes"
+    },
+    {
+      "upstream": "web/src/scene/SkyCompass.css",
+      "local": "frontend/src/scene/SkyCompass.css",
+      "sha": "a0837b7918ad70c54d0905f6d96976bf1ae4bcd2",
+      "status": "removed"
+    },
+    {
+      "upstream": "web/src/scene/SkyCompass.tsx",
+      "local": "frontend/src/scene/SkyCompass.tsx",
+      "sha": "12975d8acdbf3c6fc582a2a1dc6e1039592f3356",
+      "status": "removed"
+    },
+    {
+      "upstream": "web/src/scene/landers",
+      "local": "frontend/src/scene/landers",
+      "sha": "1b16f5b2d19f905d4ee195bd0e3f10b7864be8af",
+      "status": "removed"
+    },
+    {
+      "upstream": "web/src/scene/markers.test.ts",
+      "local": "frontend/src/scene/markers.test.ts",
+      "sha": "650d8fe34ff10d82a532bea5fc5ac315dc8653c8",
+      "status": "different bytes"
+    },
+    {
+      "upstream": "web/src/scene/markers.ts",
+      "local": "frontend/src/scene/markers.ts",
+      "sha": "5f4b0b7d4ceb99e056868fce7f3a326032763645",
+      "status": "different bytes"
+    },
+    {
+      "upstream": "web/src/scene/shading.ts",
+      "local": "frontend/src/scene/shading.ts",
+      "sha": "124546779644a356d6528eaa3ad65c4cea4c8477",
+      "status": "different bytes"
+    },
+    {
+      "upstream": "web/src/scene/skyCompassMath.test.ts",
+      "local": "frontend/src/scene/skyCompassMath.test.ts",
+      "sha": "d6c0bf009eaba90c90b577b9ea04ec47e7efd7aa",
+      "status": "removed"
+    },
+    {
+      "upstream": "web/src/scene/skyCompassMath.ts",
+      "local": "frontend/src/scene/skyCompassMath.ts",
+      "sha": "b2f6152d8378d3355f696e9c49fccbdaefd54b9f",
+      "status": "removed"
+    }
+  ]
+}

@@ -1,89 +1,32 @@
-// LUNAR V1 modification; upstream Apache-2.0 attribution in NOTICE.
-// Loads the published data files from disk for tests (the browser fetches the same files).
-import { existsSync, readFileSync } from 'node:fs'
-import { PNG } from 'pngjs'
-import type { Ephem } from './ephem'
-import type { GlobalDem } from './globalDem'
-import { decodeHeights, decodePatch, decodePatchOuter, patchTerrain, POLAR_FRAME, type PatchIndex, type Terrain } from './terrain'
-
-const data = new URL('../../public/data/', import.meta.url)
-
-function heights(file: URL): { h: Float32Array; width: number; height: number } {
-  const png = PNG.sync.read(readFileSync(file))
-  const rgba = new Uint8ClampedArray(png.data.buffer, png.data.byteOffset, png.data.length)
-  return { h: decodeHeights(rgba, png.width * png.height), width: png.width, height: png.height }
+/** Disk adapters for LUNAR tests. Prepared raster and reference-vector provenance
+ * is retained in the data manifests and NOTICE; fixtures are not new observations. */
+import {readFileSync,existsSync} from 'node:fs'
+import {PNG} from 'pngjs'
+import {decodeHeights,decodePatch,decodePatchOuter,patchTerrain,POLAR_FRAME,type Terrain,type PatchIndex} from './terrain'
+import type {Ephem} from './ephem'
+import type {GlobalDem} from './globalDem'
+const root=new URL('../../public/data/',import.meta.url)
+export function readJson<T>(path:string):T|null{const url=new URL(path,root);return existsSync(url)?JSON.parse(readFileSync(url,'utf8')) as T:null}
+function raster(path:string){const image=PNG.sync.read(readFileSync(new URL(path,root)));return {...image,rgba:new Uint8ClampedArray(image.data)}}
+function dem(path:string):GlobalDem{const image=raster(path);return {width:image.width,height:image.height,h:decodeHeights(image.rgba,image.width*image.height)}}
+export function readGlobalDem():GlobalDem{return dem('globe/moon_dem_4k.png')}
+export function readCurrentGlobalDem():GlobalDem{const meta=readJson<{dem:{file:string}}>('globe/globe.json')!;return dem('globe/'+meta.dem.file)}
+export function readEphem():Ephem{
+ const meta=readJson<{t0_utc:string;step_s:number;count:number;kernels:string[]}>('ephem/ephem.json')!,bytes=readFileSync(new URL('ephem/ephem.bin',root))
+ const copy=new Uint8Array(bytes.byteLength);copy.set(bytes)
+ return {t0Ms:Date.parse(meta.t0_utc),stepS:meta.step_s,count:meta.count,kernels:meta.kernels,data:new Float32Array(copy.buffer)}
 }
-
-export function readPolarTerrain(): Terrain {
-  const meta = JSON.parse(readFileSync(new URL('terrain/sp_meta.json', data), 'utf8'))
-  return {
-    radiusM: meta.radius_m,
-    frame: POLAR_FRAME,
-    levels: meta.levels.map((l: Record<string, number | string>) => ({
-      size: l.size,
-      xMin: l.x_min_m,
-      xMax: l.x_max_m,
-      yMin: l.y_min_m,
-      yMax: l.y_max_m,
-      pixel: l.pixel_m,
-      h: heights(new URL(`terrain/${l.file}`, data)).h,
-    })),
-  }
+export function readPolarTerrain():Terrain{
+ const metadata=readJson<{radius_m:number;levels:{file:string;size:number;x_min_m:number;x_max_m:number;y_min_m:number;y_max_m:number;pixel_m:number}[]}>('terrain/sp_meta.json')!
+ return {radiusM:metadata.radius_m,frame:POLAR_FRAME,levels:metadata.levels.map(level=>({size:level.size,xMin:level.x_min_m,xMax:level.x_max_m,yMin:level.y_min_m,yMax:level.y_max_m,pixel:level.pixel_m,h:dem('terrain/'+level.file).h}))}
 }
-
-// Historical fixtures intentionally retain their original 4k input; V1 production uses globe.json.
-export function readGlobalDem(): GlobalDem {
-  return heights(new URL('globe/moon_dem_4k.png', data))
+export function readPatchIndex():PatchIndex|null{
+ const meta=readJson<{radius_m:number;size:number;pixel_m:number;patches:PatchIndex['patches']}>('patches/patches.json')
+ return meta?{radiusM:meta.radius_m,size:meta.size,pixelM:meta.pixel_m,patches:meta.patches}:null
 }
-
-export function readPatchIndex(): PatchIndex | null {
-  const file = new URL('patches/patches.json', data)
-  if (!existsSync(file)) return null
-  const j = JSON.parse(readFileSync(file, 'utf8'))
-  return { radiusM: j.radius_m, size: j.size, pixelM: j.pixel_m, patches: j.patches }
+export function readPatch(index:PatchIndex,id:string):Terrain{
+ const patch=index.patches.find(entry=>entry.id===id);if(!patch)throw Error('Unknown terrain patch '+id)
+ return patchTerrain(index,patch,decodePatch(index,patch,raster('patches/'+patch.file).rgba),patch.outer?decodePatchOuter(patch,raster('patches/'+patch.outer.file).rgba):undefined)
 }
-
-export function readPatch(index: PatchIndex, id: string): Terrain {
-  const entry = index.patches.find((p) => p.id === id)
-  if (!entry) throw new Error(`no patch ${id}`)
-  const rgba = (file: string) => {
-    const png = PNG.sync.read(readFileSync(new URL(`patches/${file}`, data)))
-    return new Uint8ClampedArray(png.data.buffer, png.data.byteOffset, png.data.length)
-  }
-  const outer = entry.outer ? decodePatchOuter(entry, rgba(entry.outer.file)) : undefined
-  return patchTerrain(index, entry, decodePatch(index, entry, rgba(entry.file)), outer)
-}
-
-export interface HorizonVector {
-  name: string
-  lat: number
-  lon: number
-  observer_height_m: number
-  az_step_deg: number
-  elev_deg: number[]
-  patch?: string | null
-}
-
-export function readVectors(path: string): HorizonVector[] | null {
-  const file = new URL(path, data)
-  return existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : null
-}
-
-export function readEphem(): Ephem {
-  const meta = JSON.parse(readFileSync(new URL('ephem/ephem.json', data), 'utf8'))
-  const bin = readFileSync(new URL('ephem/ephem.bin', data))
-  return {
-    t0Ms: Date.parse(meta.t0_utc),
-    stepS: meta.step_s,
-    count: meta.count,
-    data: new Float32Array(bin.buffer, bin.byteOffset, bin.byteLength / 4),
-    kernels: meta.kernels,
-  }
-}
-
-export function readJson<T>(path: string): T | null {
-  const file = new URL(path, data)
-  return existsSync(file) ? (JSON.parse(readFileSync(file, 'utf8')) as T) : null
-}
-
-export function readCurrentGlobalDem(): GlobalDem { const meta=JSON.parse(readFileSync(new URL('globe/globe.json',data),'utf8'));return heights(new URL('globe/'+meta.dem.file,data)) }
+export interface HorizonVector {name:string;lat:number;lon:number;observer_height_m:number;az_step_deg:number;elev_deg:number[];patch?:string|null}
+export function readVectors(path:string):HorizonVector[]|null{return readJson<HorizonVector[]>(path)}
