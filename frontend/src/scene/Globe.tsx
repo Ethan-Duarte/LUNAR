@@ -1,3 +1,2 @@
-// LUNAR V1.8 experiment: globe rendering is implemented in LunarGlobe.
-// Other scene components remain derived; see NOTICE and REWRITE_STATUS.md.
+// LUNAR replacement renderer entry point. Data/development sources: NOTICE.
 export { LunarGlobe as Globe } from './LunarGlobe'

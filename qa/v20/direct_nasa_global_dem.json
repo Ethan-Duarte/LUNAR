@@ -1,0 +1,13 @@
+{
+  "source_url": "https://svs.gsfc.nasa.gov/vis/a000000/a004700/a004720/ldem_16_uint.tif",
+  "source_sha256": "45a2b32d56e81ed30db07fead8abc842b249b6511219d9ca2c53f81bc2dc5d62",
+  "output_sha256": "52070e4ec4d2a6221d6fed34c7f49a974879d70e8c002d880f61f1ff428a0d77",
+  "output_unchanged_from_v19": true,
+  "generator": "tools/prepare_global_lola.py",
+  "dimensions": [
+    5760,
+    2880
+  ],
+  "encoding": "half metres relative to 1737.4 km sphere; no spatial downsampling",
+  "credit": "NASA SVS / LOLA Science Team"
+}

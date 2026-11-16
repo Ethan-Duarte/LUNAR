@@ -85,7 +85,8 @@ float altitude(vec2 p){vec2 fine=uv(p,fineExtent);if(contained(fine))return bili
 vec3 radial(vec2 p){vec2 a=p/(2.*radius);float q=dot(a,a);return (2.*a.x*east+2.*a.y*north+(1.-q)*vertical)/(1.+q);}
 vec2 project(vec3 d){return 2.*radius*vec2(dot(d,east),dot(d,north))/(1.+dot(d,vertical));}
 vec3 positionAt(vec2 p){return radial(p)*(radius+altitude(p));}
-vec3 response(vec3 albedo,float light){return vec3(1.)-exp(-albedo*(light+shadowFill)*exposure);}
+// Display fill is independent of automatic exposure, so dark terrain stays dark.
+vec3 response(vec3 albedo,float light){float ambient=shadowFill>0.01?shadowFill*exposure:shadowFill;return vec3(1.)-exp(-albedo*(light*exposure+ambient));}
 vec3 palette(float value,vec3 low,vec3 high){return mix(low,high,clamp(value,0.,1.));}
 void main(){
  vec2 chart=uv(location,coarseExtent);if(!contained(chart))discard;

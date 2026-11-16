@@ -59,7 +59,9 @@ void main(){
  float incidence=max(0.0,dot(normal,sunlight));
  vec3 reflectance=mix(vec3(0.4),pow(texture2D(photograph,chart(d,photoOrigin)).rgb,vec3(2.2)),hasPhoto);
  // Bounded exponential film response, followed by display gamma.
- vec3 energy=reflectance*(incidence+fill)*gain;
+ // Exposure applies to sunlight; the display-only dark fill remains bounded.
+ float ambient=fill>0.01?fill*gain:fill;
+ vec3 energy=reflectance*(incidence*gain+ambient);
  vec3 display=vec3(1.)-exp(-energy);
  gl_FragColor=vec4(pow(max(display,vec3(0.)),vec3(1./2.2)),1.);
 }`

@@ -1,0 +1,38 @@
+[
+  {
+    "file": "LunarSurface.tsx",
+    "stage": "vertex",
+    "pass": true,
+    "log": ""
+  },
+  {
+    "file": "LunarSurface.tsx",
+    "stage": "fragment",
+    "pass": true,
+    "log": ""
+  },
+  {
+    "file": "LunarSurface.tsx",
+    "stage": "link",
+    "pass": true,
+    "log": ""
+  },
+  {
+    "file": "LunarGlobe.tsx",
+    "stage": "vertex",
+    "pass": true,
+    "log": ""
+  },
+  {
+    "file": "LunarGlobe.tsx",
+    "stage": "fragment",
+    "pass": true,
+    "log": ""
+  },
+  {
+    "file": "LunarGlobe.tsx",
+    "stage": "link",
+    "pass": true,
+    "log": ""
+  }
+]

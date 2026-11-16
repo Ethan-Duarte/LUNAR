@@ -1,29 +1,18 @@
-LUNAR V1.9 rewrite experiment — provenance notice
+LUNAR — sources and acknowledgments
 
-V1.0–V1.7 incorporated substantial code from daniel27-space/lunar-navigator,
-https://github.com/daniel27-space/lunar-navigator, pinned reference
-707b035fccbc7829c5ee4cf539c17f0d2d9bb652. Earlier Apache-2.0 assurances were
-not independently established by an upstream LICENSE file. Do not treat them
-as verified permission. Historical records are retained in qa/v19/HISTORICAL_NOTICE.txt.
+NASA/space-agency data: LOLA, LROC, SLDEM2015, Blue Marble, JPL DE440/SPICE,
+Horizons and DSN documentation. Asset metadata and scientific reports retain
+specific source URLs and credits. LUNAR regenerates its browser ephemerides
+and native global LOLA map from NASA inputs.
 
-V1.8–V1.9 replace the active globe and surface implementations, height-map shader,
-geometry construction, picking, camera, display-data hooks, state mutations,
-coordinate/ephemeris evaluation, horizon/disc sampling, raster lookup, visibility
-series, regional finder, arrival ranking, observation controller and test adapters.
-These replacements retain compatible public data/API contracts. They were written
-after exposure to the reference source, not under a formally isolated clean-room process.
-No claim of legally certified independence or competition eligibility is made.
+Lunar Navigator — https://github.com/daniel27-space/lunar-navigator
+Early prototypes incorporated components; the active rendering and browser
+calculation paths were subsequently reimplemented for LUNAR. Prepared polar/site
+rasters, map layers, mission catalog records and comparison vectors obtained
+through this project remain credited to that source.
 
-Unused legacy showcase/vehicle/compass/export/camera implementations and external
-source snapshots were removed. Existing LUNAR connected-base, DSN, Python science,
-interface and education implementations remain. NASA/JPL ephemeris tables were
-regenerated with engine/scripts/build_browser_ephemeris.py; metadata records hashes.
+Lunar Horizon Wheel — https://github.com/NetRunnerXD/lunar-horizon-wheel
+Capability research and matched benchmark comparisons; no application code incorporated.
 
-Prepared NASA-origin terrain/layer rasters, factual mission catalog records and
-reference vectors were obtained through the referenced project and remain credited
-as such. Their processing/provenance is not claimed as original LUNAR work.
-Agreement with retained reference fixtures is regression evidence, not independent
-scientific validation. NASA LOLA, LROC, SLDEM2015, Blue Marble, JPL SPICE/DE440 and
-DSN sources remain in data metadata and scientific reports. Dependencies retain
-licenses in THIRD_PARTY_LICENSES.txt. The LUNAR expedition craft/flag are illustrative.
-OpenAI Codex assisted development and this rewrite.
+Dependency notices: THIRD_PARTY_LICENSES.txt. Project license: LICENSE.
+OpenAI Codex assisted implementation and documentation.

@@ -1,30 +1,25 @@
-# Run LUNAR V1.0
+# Run LUNAR
 
-1. Extract the entire release into a **new folder**.
-2. Double-click **START_LUNAR_V1.bat**. Keep its console open. Open its printed URL, normally http://127.0.0.1:5195/?build=lunar-v1.0 .
-3. Confirm the browser title is **LUNAR V1.0 · Field Atlas** and **Basic** is selected. No welcome carousel should cover the workspace.
-4. Click **Begin at Connecting Ridge**. Use Globe / South pole / Surface and the bottom UTC timeline. Graphics acceleration / WebGL 2 is required for 3D.
-5. For new Python studies, run **SETUP_SCIENCE.bat** once, restart, switch to **Advanced**, then open **LUNAR science**. Five SPICE kernels are bundled; regional native DEMs may download roughly 400 MB once.
+## Existing GitHub repository
 
-## First checks
+1. Back up your current checkout. Preserve its .git directory.
+2. Replace the complete project source with this package. Copying over files alone leaves retired files behind. This ZIP does not contain a .git directory.
+3. Review additions, changes and deletions in GitHub Desktop; commit and push to main.
+4. In GitHub Settings → Pages, use GitHub Actions. Wait for the build and deployment to succeed, then open the Pages URL.
+5. Confirm the title reads V1.9.1. Check globe/surface switching and Deep shadows.
 
-- Observe: select a point; inspect Sun/Earth readings and horizon explanation.
-- Compare: pin two points; compare matched 60-day results, arrival dates and schedule slips.
-- Base: assign a habitat, return to Observe for another point, then assign a power facility. Confirm the layout survives tab and mode changes. Inspect distances, terrain LOS, exclusion conflicts and joint availability. Save alternatives / export JSON before closing.
-- Sites: optional factual catalog, not the default screen.
-- Save/open an observation project to retain scientific assumptions and time.
+## Local Windows
 
-## If startup fails
+Run START_LUNAR_V1.bat, keep its console open and use the exact HTTP URL it prints. Do not double-click an HTML file. For new Python calculations, run SETUP_SCIENCE.bat and restart. GitHub Pages supports browser calculations and bundled studies; it does not run the Python service.
 
-Open PowerShell in the folder containing run_atlas.py:
+## Development
 
-```powershell
-py -3 run_atlas.py --self-test
-py -3 run_atlas.py --port 5195 --open-browser
+Use Node/npm to install and build the frontend:
+
+```sh
+npm ci --prefix frontend
+npm test --prefix frontend
+npm run build --prefix frontend
 ```
 
-Use the exact URL printed, including the build query. The launcher prints the folder it serves and rejects an older app HTML. If Python has no `py` launcher, use `python` instead. Never open app/index.html directly or reuse an old Atlas bookmark.
-
-## Scientific limits
-
-The fixed Earth-map holdout remains FAIL for both the supplied reference browser code and V1; the shared discrepancy is under investigation. New Python single-site studies include Earth occultation with a documented combined-mask approximation; archived studies and sampled sensitivity remain terrain-only. Base links and separation constraints are screening results, not reliable RF/debris safety predictions. See SCIENCE_STATUS.md.
+For a static hosted build, set VITE_LUNAR_STATIC=true before the build. Python checks run from engine with `python -m pytest -q`. See TESTING.md for the rest of the checks.

@@ -7,7 +7,7 @@ import {upVector} from '../lib/geo'
 import {computeHorizon} from '../lib/horizon'
 import {computeSeries,summarise} from '../lib/windows'
 import type {Study} from './science'
-it('records the supplied Singapore engine against preserved LUNAR scenarios without hiding differences',()=>{
+it('compares rewritten browser calculations with preserved Python scenarios on credited raster inputs',()=>{
  const ephem=readEphem(),polar=readPolarTerrain(),global=readCurrentGlobalDem(),index=readPatchIndex()!;
  const cases=[];
  for(const id of ['ridge-2m','ridge-10m','earth-control']){
@@ -21,6 +21,6 @@ it('records the supplied Singapore engine against preserved LUNAR scenarios with
   cases.push({id,lat:s.lat,lon:s.lon,height_m:s.height_m,start:s.study.start_utc,end:s.study.end_utc,patches:patches.map(p=>p.id),browser,python_hourly:original,delta_pp:{sun:(browser.sunShare-original.sun)*100,earth:(browser.commShare-original.earth)*100},python_refined:s.metrics});
   expect(series.count).toBe(s.samples.length-1);expect(Number.isFinite(browser.sunShare)).toBe(true);
  }
- const path=new URL('../../../qa/',import.meta.url);mkdirSync(path,{recursive:true});writeFileSync(new URL('singapore_baseline.json',path),JSON.stringify({kind:'Cross-engine audit, not independent validation',criteria:'Matched site, height, 180-day dates, half solar disc, zero Earth-centre clearance, hourly left-hand samples, 300km range. Terrain chains and eclipse treatment differ.',caveats:['Browser terrain is derived from supplied upstream PNGs; Python examples use their original native DEM chain.','Browser includes approximate Earth eclipses; retained Python studies are terrain-only.','Refined Python blackout duration is not directly equivalent to an hourly sampled browser duration.'],cases},null,2));
+ const path=new URL('../../../qa/v20/',import.meta.url);mkdirSync(path,{recursive:true});writeFileSync(new URL('browser_python_comparison.json',path),JSON.stringify({kind:'Browser/Python regression comparison, not independent validation',criteria:'Matched site, height, 180-day dates, half solar disc, zero Earth-centre clearance, hourly left-hand samples, 300km range. Terrain chains and eclipse treatment differ.',caveats:['Browser terrain is derived from supplied upstream PNGs; Python examples use their original native DEM chain.','Browser includes approximate Earth eclipses; retained Python studies are terrain-only.','Refined Python blackout duration is not directly equivalent to an hourly sampled browser duration.'],cases},null,2));
  console.log('Matched hourly differences (percentage points):',cases.map(c=>({id:c.id,...c.delta_pp})));
 },30000)

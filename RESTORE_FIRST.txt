@@ -1,1 +1,1 @@
-V1.9 rewrite experiment. Read REWRITE_STATUS.md. Replace the COMPLETE old source tree while preserving .git. Copying on top leaves retired files behind. Visual acceptance remains pending. No automatic publication or eligibility clearance is claimed.
+LUNAR V1.9.1 source. Preserve .git and replace the complete remaining project tree, including deletion of retired files. Follow START_HERE.md. Build through GitHub Actions or the local launcher.

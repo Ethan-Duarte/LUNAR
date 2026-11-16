@@ -1,0 +1,4 @@
+Downloading native global NASA LOLA: https://svs.gsfc.nasa.gov/vis/a000000/a004700/a004720/ldem_16_uint.tif
+/home/agent/.local/lib/python3.12/site-packages/rasterio/__init__.py:367: NotGeoreferencedWarning: Dataset has no geotransform, gcps, or rpcs. The identity matrix will be returned.
+  dataset = DatasetReader(path, driver=driver, sharing=sharing, thread_safe=thread_safe, **kwargs)
+Native 5760×2880 global LOLA encoded without downsampling; 0.5m vertical quantization.

@@ -1,3 +1,2 @@
-// Compatibility entry point for LUNAR's replacement surface implementation.
-// Remaining inherited modules and data are documented in REWRITE_STATUS.md.
+// LUNAR replacement renderer entry point. Data/development sources: NOTICE.
 export {LunarSurface as MoonTerrain,buildGeometry,globeMeshHeight,preloadOverlays} from './LunarSurface'

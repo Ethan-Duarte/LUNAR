@@ -1,4 +1,5 @@
-// LUNAR V1.0: original product interface. Adapted rendering/geometry remain Apache-2.0 attributed in NOTICE.
+// LUNAR interface. Rendering and browser-calculation replacements: V1.8–V1.9.
+// Current data and development provenance: NOTICE.
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { invalidate } from "@react-three/fiber";
@@ -324,7 +325,7 @@ export default function App() {
       JSON.stringify(
         {
           schema: "lunar-project-1",
-          version: "1.9.0-experiment",
+          version: "1.9.1-experiment",
           pins,
           time: t,
           observer,
@@ -374,7 +375,7 @@ export default function App() {
       <header className="v1-header">
         <a className="v1-brand" href="#" onClick={(e) => e.preventDefault()}>
           <span className="brand-orbit" />
-          LUNAR <small>FIELD ATLAS / 1.9 REWRITE TEST</small>
+          LUNAR <small>FIELD ATLAS / 1.9.1</small>
         </a>
         <div className="v1-header-right">
           <span className="v1-live">
@@ -1154,7 +1155,7 @@ export default function App() {
             remains FAIL. Archived Python studies omit eclipses; new V1 Python
             calculations include a documented approximate combined model. Code
             attribution and data sources:{" "}
-            <a href="lunar/evidence/ATTRIBUTION.md" target="_blank">
+            <a href="lunar/evidence/NOTICE" target="_blank">
               credits
             </a>
             .
