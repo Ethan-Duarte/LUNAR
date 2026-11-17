@@ -16,7 +16,7 @@ Explore measured lunar terrain and study how a connected outpost could share pow
 
 Read [START_HERE.md](START_HERE.md). GitHub Pages builds from source through GitHub Actions. Local Windows users run START_LUNAR_V1.bat and use its printed HTTP address. Never open an HTML file directly.
 
-Current release: **1.9.1**. Deep shadows have a bounded display fill; Inspect retains its brighter response. Those controls change appearance, not scientific results.
+Current development checkpoint: **1.10.0**. Primary-data cleanup is in progress; see [PROVENANCE_PROGRESS.md](PROVENANCE_PROGRESS.md). Deep shadows have a bounded display fill; Inspect retains its brighter response. Those controls change appearance, not scientific results.
 
 ## How it was built
 

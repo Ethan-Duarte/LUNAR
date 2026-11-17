@@ -7,9 +7,10 @@ and native global LOLA map from NASA inputs.
 
 Lunar Navigator — https://github.com/daniel27-space/lunar-navigator
 Early prototypes incorporated components; the active rendering and browser
-calculation paths were subsequently reimplemented for LUNAR. Prepared polar/site
-rasters, map layers, mission catalog records and comparison vectors obtained
-through this project remain credited to that source.
+calculation paths were subsequently reimplemented for LUNAR. Site rasters (except independently rebuilt patches listed in qa/v110), mission
+catalog records and remaining comparison vectors obtained through this project
+remain credited to that source. Polar elevation/slope and map overlays were
+regenerated directly from NASA products; fresh sky checks come from JPL Horizons.
 
 Lunar Horizon Wheel — https://github.com/NetRunnerXD/lunar-horizon-wheel
 Capability research and matched benchmark comparisons; no application code incorporated.

@@ -1,0 +1,94 @@
+{
+  "reference_commit": "707b035fccbc7829c5ee4cf539c17f0d2d9bb652",
+  "files": [
+    {
+      "path": "lib/geo.ts",
+      "longest_exact_line_block": 1,
+      "exact_line_count": 9,
+      "scope": "Text comparison only. Interfaces, boilerplate and shared scientific formulae are not themselves evidence of copied implementation."
+    },
+    {
+      "path": "lib/ephem.ts",
+      "longest_exact_line_block": 1,
+      "exact_line_count": 3,
+      "scope": "Text comparison only. Interfaces, boilerplate and shared scientific formulae are not themselves evidence of copied implementation."
+    },
+    {
+      "path": "lib/terrain.ts",
+      "longest_exact_line_block": 8,
+      "exact_line_count": 54,
+      "scope": "Text comparison only. Interfaces, boilerplate and shared scientific formulae are not themselves evidence of copied implementation."
+    },
+    {
+      "path": "lib/horizon.ts",
+      "longest_exact_line_block": 1,
+      "exact_line_count": 4,
+      "scope": "Text comparison only. Interfaces, boilerplate and shared scientific formulae are not themselves evidence of copied implementation."
+    },
+    {
+      "path": "lib/windows.ts",
+      "longest_exact_line_block": 2,
+      "exact_line_count": 6,
+      "scope": "Text comparison only. Interfaces, boilerplate and shared scientific formulae are not themselves evidence of copied implementation."
+    },
+    {
+      "path": "lib/assumptions.ts",
+      "longest_exact_line_block": 1,
+      "exact_line_count": 1,
+      "scope": "Text comparison only. Interfaces, boilerplate and shared scientific formulae are not themselves evidence of copied implementation."
+    },
+    {
+      "path": "lib/globalDem.ts",
+      "longest_exact_line_block": 1,
+      "exact_line_count": 2,
+      "scope": "Text comparison only. Interfaces, boilerplate and shared scientific formulae are not themselves evidence of copied implementation."
+    },
+    {
+      "path": "lib/finder.ts",
+      "longest_exact_line_block": 7,
+      "exact_line_count": 59,
+      "scope": "Text comparison only. Interfaces, boilerplate and shared scientific formulae are not themselves evidence of copied implementation."
+    },
+    {
+      "path": "lib/landing.ts",
+      "longest_exact_line_block": 4,
+      "exact_line_count": 26,
+      "scope": "Text comparison only. Interfaces, boilerplate and shared scientific formulae are not themselves evidence of copied implementation."
+    },
+    {
+      "path": "scene/SkyBodies.tsx",
+      "longest_exact_line_block": 1,
+      "exact_line_count": 2,
+      "scope": "Text comparison only. Interfaces, boilerplate and shared scientific formulae are not themselves evidence of copied implementation."
+    },
+    {
+      "path": "scene/MoonTerrain.tsx",
+      "longest_exact_line_block": 0,
+      "exact_line_count": 0,
+      "scope": "Text comparison only. Interfaces, boilerplate and shared scientific formulae are not themselves evidence of copied implementation."
+    },
+    {
+      "path": "scene/Globe.tsx",
+      "longest_exact_line_block": 0,
+      "exact_line_count": 0,
+      "scope": "Text comparison only. Interfaces, boilerplate and shared scientific formulae are not themselves evidence of copied implementation."
+    },
+    {
+      "path": "store.ts",
+      "longest_exact_line_block": 9,
+      "exact_line_count": 104,
+      "scope": "Text comparison only. Interfaces, boilerplate and shared scientific formulae are not themselves evidence of copied implementation."
+    },
+    {
+      "path": "main.tsx",
+      "longest_exact_line_block": 4,
+      "exact_line_count": 9,
+      "scope": "Text comparison only. Interfaces, boilerplate and shared scientific formulae are not themselves evidence of copied implementation."
+    }
+  ],
+  "limitations": [
+    "Not a legal originality certification",
+    "Limited to selected corresponding implementation modules",
+    "Changed bytes do not establish independence"
+  ]
+}

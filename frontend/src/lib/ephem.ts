@@ -1,5 +1,5 @@
 /** LUNAR sky-table evaluator. Newly implemented interpolation and ENU projection.
- * The existing binary ephemeris dataset is retained and is NOT claimed as regenerated.
+ * The binary ephemeris is generated directly from NAIF kernels by build_browser_ephemeris.py.
  * NASA SPICE: https://naif.jpl.nasa.gov/naif/documentation.html */
 import {localFrame,sitePosKm,azEl,norm,R2D,SUN_RADIUS_KM,EARTH_RADIUS_KM,type Vec3} from './geo'
 export interface Ephem {t0Ms:number;stepS:number;count:number;data:Float32Array;kernels:string[]}

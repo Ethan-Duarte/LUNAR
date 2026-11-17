@@ -325,7 +325,7 @@ export default function App() {
       JSON.stringify(
         {
           schema: "lunar-project-1",
-          version: "1.9.1-experiment",
+          version: "1.10.0-experiment",
           pins,
           time: t,
           observer,
@@ -375,7 +375,7 @@ export default function App() {
       <header className="v1-header">
         <a className="v1-brand" href="#" onClick={(e) => e.preventDefault()}>
           <span className="brand-orbit" />
-          LUNAR <small>FIELD ATLAS / 1.9.1</small>
+          LUNAR <small>FIELD ATLAS / 1.10.0</small>
         </a>
         <div className="v1-header-right">
           <span className="v1-live">

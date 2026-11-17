@@ -1,0 +1,5 @@
+numpy>=1.24,<3
+rasterio>=1.4,<2
+Pillow>=10
+scipy>=1.11
+pyproj>=3.5,<4

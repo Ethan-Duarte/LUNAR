@@ -1,0 +1,58 @@
+{
+  "generator": "tools/prepare_polar_products.py",
+  "sources": [
+    {
+      "url": "https://pgda.gsfc.nasa.gov/data/LOLA_20mpp/LDEM_80S_80MPP_ADJ.TIF",
+      "sha256": "82030dcbdd7c4bb0c7d858e9b4b293b9f2cda5a543ba31ec0f42784bd6beee5a",
+      "bytes": 189158392
+    },
+    {
+      "url": "https://pgda.gsfc.nasa.gov/data/MoonIllumination/AVGVISIB_75S_120M_201608.TIF",
+      "sha256": "d539467f16ccc5f51b6a904af6be5d16c9b2f194afe619b9f1f81841d9fec0bb",
+      "bytes": 83052039
+    },
+    {
+      "url": "https://pgda.gsfc.nasa.gov/data/MoonIllumination/AVGVISIB_75S_120M_201608_EARTH.TIF",
+      "sha256": "5355a015b3cd71602ac6a130bfd1d596465f14ebbaedb6e5919c5dc34984d4f8",
+      "bytes": 43148153
+    },
+    {
+      "url": "https://pgda.gsfc.nasa.gov/data/MoonIllumination/LPSR_75S_120M_201608.TIF",
+      "sha256": "8af40cd8c1ca0c4b469803586581e5fc9baa0b001bd2cf8d28ccad29640e2b8e",
+      "bytes": 1046706
+    }
+  ],
+  "products": [
+    {
+      "file": "terrain/sp_dem_L0.png",
+      "sha256": "d6d460ba908586d8309800c088daaf2d3d1e06ed319680a7856076639a84596b",
+      "max_quantization_error_m": 0.2509765625
+    },
+    {
+      "file": "terrain/sp_slope_L0.png",
+      "sha256": "74563e3b8c3ddad59477de0c635cc906ea355f67fd656dcc97aca6d94cea0e36"
+    },
+    {
+      "file": "terrain/sp_dem_L1.png",
+      "sha256": "56f8b94109e08fda8772cf8501a52c0eac375f8666b0fe37ac368bad58cb101f",
+      "max_quantization_error_m": 0.2509765625
+    },
+    {
+      "file": "terrain/sp_slope_L1.png",
+      "sha256": "e45682be43100901a83fd764eeb061963c7b75947dfc3a19bd86463b4b002a35"
+    },
+    {
+      "file": "layers/sun_avg.png",
+      "sha256": "fcf1817ce8bd96251a60d66bc6f679aa3888f290540230e4b28b8b99ad0dcde1"
+    },
+    {
+      "file": "layers/earth_avg.png",
+      "sha256": "80b3106055d450a6e8e401e754a53daa6a466c03430c4bffabd98befffd6baaf"
+    },
+    {
+      "file": "layers/psr.png",
+      "sha256": "093cff5ceefcd07fadccb1ee7b00160fa5d88a70f6fb257fbbf8cc874eb6a2bb"
+    }
+  ],
+  "caveat": "Regenerated products require scientific regression checks; no new accuracy claim."
+}

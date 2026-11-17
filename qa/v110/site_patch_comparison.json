@@ -1,0 +1,17 @@
+[
+  {
+    "file": "apollo-11.png",
+    "max_absolute_height_difference_m": 0.5,
+    "rms_height_difference_m": 0.014572284691145437
+  },
+  {
+    "file": "apollo-11.outer.png",
+    "max_absolute_height_difference_m": 20.0,
+    "rms_height_difference_m": 1.0690714748600185
+  },
+  {
+    "file": "connecting-ridge.png",
+    "max_absolute_height_difference_m": 0.10000000000013642,
+    "rms_height_difference_m": 0.0018217537213068233
+  }
+]

@@ -1,0 +1,403 @@
+{
+  "patches": {
+    "apollo-11": [
+      {
+        "file": "apollo-11.png",
+        "sha256": "9bb0b6a0f58d64eedbe3986953d06bae550274531ccd0c013dec09a594f98e03",
+        "pixel_m": 80,
+        "valid_fraction": 1.0,
+        "source": "NASA/PDS SLDEM2015; source labels and byte windows in qa/v110/site_patch_build.json"
+      },
+      {
+        "file": "apollo-11.outer.png",
+        "sha256": "48a9ec523ea53c34b4ee2db2a0c07167ea01530c06fab77f21e33b5330fae331",
+        "pixel_m": 160,
+        "valid_fraction": 1.0,
+        "source": "NASA/PDS SLDEM2015; source labels and byte windows in qa/v110/site_patch_build.json"
+      }
+    ],
+    "connecting-ridge": [
+      {
+        "file": "connecting-ridge.png",
+        "sha256": "56d3051c32bb106f5e4eb8665ec13f26860b06dd643ab8d5402181110a517782",
+        "pixel_m": 20,
+        "valid_fraction": 1.0,
+        "source": "https://pgda.gsfc.nasa.gov/data/LOLA_20mpp/LDEM_80S_20MPP_ADJ.TIF"
+      }
+    ]
+  },
+  "generator": "tools/prepare_site_patches.py",
+  "source_labels": [
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_30S_00S_000_045_FLOAT.LBL",
+      "sha256": "e45ee8710b15cdcb2f9dad1c48b2bea2b377ea0a1cc2e6e24823d3e64b6998b6"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_00N_30N_000_045_FLOAT.LBL",
+      "sha256": "575e055a07344769d74546d3fdbc8c10c2704dd684eed17babc890429ee6412b"
+    }
+  ],
+  "source_windows": [
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_30S_00S_000_045_FLOAT.IMG",
+      "first_byte": 11796480,
+      "last_byte": 16127999,
+      "source_bytes": 1415577600,
+      "sha256": "05f2c494c900cb87b9a717d7bd1ff2a2c9279e4d2cdbae0f75e583e8cea43f41"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_30S_00S_000_045_FLOAT.IMG",
+      "first_byte": 0,
+      "last_byte": 5898239,
+      "source_bytes": 1415577600,
+      "sha256": "666f8fb4484f30bf75639390b2e880ebaa01d2cf03ac316558122e0085e29682"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_30S_00S_000_045_FLOAT.IMG",
+      "first_byte": 5898240,
+      "last_byte": 11796479,
+      "source_bytes": 1415577600,
+      "sha256": "17dd0cb62ea97a92d1442f0c320796e6eac5429bbae2fe2e982d40220895675b"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_00N_30N_000_045_FLOAT.IMG",
+      "first_byte": 1341757440,
+      "last_byte": 1347655679,
+      "source_bytes": 1415577600,
+      "sha256": "a91c1b5182c3c40b1cb5b1f73fccf9e4052f79a2bd50d0850b610659b910b746"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_00N_30N_000_045_FLOAT.IMG",
+      "first_byte": 1353553920,
+      "last_byte": 1359452159,
+      "source_bytes": 1415577600,
+      "sha256": "286bbbc28630690912a901a516ab6e31fbba4ee4c3c99b9acd7c676991ba8080"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_00N_30N_000_045_FLOAT.IMG",
+      "first_byte": 1335859200,
+      "last_byte": 1341757439,
+      "source_bytes": 1415577600,
+      "sha256": "32c13554555b909586d5871905d13a7b2530cc59755c0d1333fb279a603dec83"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_00N_30N_000_045_FLOAT.IMG",
+      "first_byte": 1347655680,
+      "last_byte": 1353553919,
+      "source_bytes": 1415577600,
+      "sha256": "eabcbf1a4f20c08cf9b228d10c9972469e4f4548fde9236419deb105f74aa97b"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_00N_30N_000_045_FLOAT.IMG",
+      "first_byte": 1365350400,
+      "last_byte": 1371248639,
+      "source_bytes": 1415577600,
+      "sha256": "e7a30a58283a07e935a5ccb15ada78c8279f16803c56218c766958996c1f8599"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_00N_30N_000_045_FLOAT.IMG",
+      "first_byte": 1359452160,
+      "last_byte": 1365350399,
+      "source_bytes": 1415577600,
+      "sha256": "b8665d3707058be739013b7de9a05da712a49401e660473f3b1bd2bd15714ce8"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_00N_30N_000_045_FLOAT.IMG",
+      "first_byte": 1371248640,
+      "last_byte": 1377146879,
+      "source_bytes": 1415577600,
+      "sha256": "1d91f07fd1a914dadb146108766df3fea979412207c3dc93a3e31fed53fae8ec"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_00N_30N_000_045_FLOAT.IMG",
+      "first_byte": 1377146880,
+      "last_byte": 1383045119,
+      "source_bytes": 1415577600,
+      "sha256": "c7fc263f490fd02d6b88877c6ac8c58d06265e4bb74aa8e8b0a445b3e7957ece"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_00N_30N_000_045_FLOAT.IMG",
+      "first_byte": 1383045120,
+      "last_byte": 1388943359,
+      "source_bytes": 1415577600,
+      "sha256": "48da08c647a3b121bf27a07ea552a91fd687d57b646f8ead2a223c65aeac8fe3"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_00N_30N_000_045_FLOAT.IMG",
+      "first_byte": 1388943360,
+      "last_byte": 1394841599,
+      "source_bytes": 1415577600,
+      "sha256": "9da41bc9a32786dcb5f7451ab1d533a0d5a4a8e09e0a9b8181e8c41b515142ad"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_00N_30N_000_045_FLOAT.IMG",
+      "first_byte": 1400739840,
+      "last_byte": 1406638079,
+      "source_bytes": 1415577600,
+      "sha256": "31202529ffb95c52c5b9e698f4770ea1ecdeddb786446bf43d75ed0e4d18a992"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_00N_30N_000_045_FLOAT.IMG",
+      "first_byte": 1394841600,
+      "last_byte": 1400739839,
+      "source_bytes": 1415577600,
+      "sha256": "f440d53ef33e103ea31474698f885f715d23d701754443d7b7813cdd73a52283"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_00N_30N_000_045_FLOAT.IMG",
+      "first_byte": 1412536320,
+      "last_byte": 1415577599,
+      "source_bytes": 1415577600,
+      "sha256": "ff14bcef2110a89bd1cab419069ea36838ddc3a4bcc5f89322467c94b06b442b"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_00N_30N_000_045_FLOAT.IMG",
+      "first_byte": 1406638080,
+      "last_byte": 1412536319,
+      "source_bytes": 1415577600,
+      "sha256": "8f12fd1332f923d96b5eb8b8f49ce14365831ee7662d19c4a600c84427bc1279"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_30S_00S_000_045_FLOAT.IMG",
+      "first_byte": 29491200,
+      "last_byte": 35389439,
+      "source_bytes": 1415577600,
+      "sha256": "ec6934afbd8fedccc9af7e9eeceb94fc40283c48ea4f8895050becc722ea6483"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_30S_00S_000_045_FLOAT.IMG",
+      "first_byte": 23592960,
+      "last_byte": 29491199,
+      "source_bytes": 1415577600,
+      "sha256": "8b256476ec667e24977ae90cc9a21253913deaa6216b6bb00a5a48e721214a95"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_30S_00S_000_045_FLOAT.IMG",
+      "first_byte": 17694720,
+      "last_byte": 23592959,
+      "source_bytes": 1415577600,
+      "sha256": "87c7c377fd05382bbf19d32fc9f65d76d7ac6e53a78afe3d53291bdda69253d1"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_30S_00S_000_045_FLOAT.IMG",
+      "first_byte": 11796480,
+      "last_byte": 17694719,
+      "source_bytes": 1415577600,
+      "sha256": "737db735db14d8092e50a453392d283700f473e8ac377d3ffb4e842a1d7c661e"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_30S_00S_000_045_FLOAT.IMG",
+      "first_byte": 35389440,
+      "last_byte": 41287679,
+      "source_bytes": 1415577600,
+      "sha256": "83c76d4aa02b004d11f3cfa4e97279183b2b6b380dacc4749e4536f0d5e0ee9b"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_30S_00S_000_045_FLOAT.IMG",
+      "first_byte": 41287680,
+      "last_byte": 47185919,
+      "source_bytes": 1415577600,
+      "sha256": "993ba90ddab69ed9c4506bd305b86524fee119b1cab92703f5bc4955b4c145c2"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_30S_00S_000_045_FLOAT.IMG",
+      "first_byte": 58982400,
+      "last_byte": 63866879,
+      "source_bytes": 1415577600,
+      "sha256": "fd75bb1aa0b6c573b5d0bcf07493eb63c6b61f3ecd53890c5ef1b16abf512874"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_30S_00S_000_045_FLOAT.IMG",
+      "first_byte": 53084160,
+      "last_byte": 58982399,
+      "source_bytes": 1415577600,
+      "sha256": "05c3a567d29028884a6d30ed4aa96e873343be1f32c450e87634fa4c600e9459"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_30S_00S_000_045_FLOAT.IMG",
+      "first_byte": 47185920,
+      "last_byte": 53084159,
+      "source_bytes": 1415577600,
+      "sha256": "9104b95d33f003648dca9fb79b87d5191771a6029199f12984da476b8aa207e3"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_00N_30N_000_045_FLOAT.IMG",
+      "first_byte": 1299916800,
+      "last_byte": 1305815039,
+      "source_bytes": 1415577600,
+      "sha256": "f78bac62957760160ba9df848ce78adab131813bb5195294674d5568d06bec9e"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_00N_30N_000_045_FLOAT.IMG",
+      "first_byte": 1294018560,
+      "last_byte": 1299916799,
+      "source_bytes": 1415577600,
+      "sha256": "17b989597ab86bf4e9f88b6e8a21b0604e232ad499c4bc703654fd357ec16fa9"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_00N_30N_000_045_FLOAT.IMG",
+      "first_byte": 1311713280,
+      "last_byte": 1317611519,
+      "source_bytes": 1415577600,
+      "sha256": "6db9d47b284c6b264dea72a96575f7d4e31815aa0d552d57e54f69d78e060de0"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_00N_30N_000_045_FLOAT.IMG",
+      "first_byte": 1305815040,
+      "last_byte": 1311713279,
+      "source_bytes": 1415577600,
+      "sha256": "00cbb63d21ddd8eb6c1bd24b33c1cb58a4e5f6863beb8b22e22e1277ce13f07e"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_00N_30N_000_045_FLOAT.IMG",
+      "first_byte": 1288120320,
+      "last_byte": 1294018559,
+      "source_bytes": 1415577600,
+      "sha256": "b52afca75ab83deb8fc4f168f4810e670e67d7a2806f9c7af02095d61dffe5e4"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_00N_30N_000_045_FLOAT.IMG",
+      "first_byte": 1317611520,
+      "last_byte": 1323509759,
+      "source_bytes": 1415577600,
+      "sha256": "13693d6af165bde8a6821289f8cf168163032c7488589f99be3dd9e86dcda3e8"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_00N_30N_000_045_FLOAT.IMG",
+      "first_byte": 1341204480,
+      "last_byte": 1347102719,
+      "source_bytes": 1415577600,
+      "sha256": "153aa4321147cb58cb8f09ac6cdb26f6405fc6840a7713519bfa3b5598c7f690"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_00N_30N_000_045_FLOAT.IMG",
+      "first_byte": 1329408000,
+      "last_byte": 1335306239,
+      "source_bytes": 1415577600,
+      "sha256": "a28353029ac6fd6f4e9f0df46090e80b09ff065162c4d7fefa3cd062b0af2460"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_00N_30N_000_045_FLOAT.IMG",
+      "first_byte": 1323509760,
+      "last_byte": 1329407999,
+      "source_bytes": 1415577600,
+      "sha256": "221ade44bfa51d16a384ff48c5625f946a1d0c5bdf41e6292b9e8ee68bbbafc3"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_00N_30N_000_045_FLOAT.IMG",
+      "first_byte": 1335306240,
+      "last_byte": 1341204479,
+      "source_bytes": 1415577600,
+      "sha256": "1591e4a63238c03187054c002d53e02b8a00c5713c7341c724c9ba0089dfcb5d"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_00N_30N_000_045_FLOAT.IMG",
+      "first_byte": 1347102720,
+      "last_byte": 1353000959,
+      "source_bytes": 1415577600,
+      "sha256": "d42620944a142728f35662d2452ded2fc8465677b87a1af5087764960f3a5a92"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_00N_30N_000_045_FLOAT.IMG",
+      "first_byte": 1358899200,
+      "last_byte": 1364797439,
+      "source_bytes": 1415577600,
+      "sha256": "5d928ce2acb8274858f0839c61a76465625c6bc2a26836f47aa52a522b2e5d3b"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_00N_30N_000_045_FLOAT.IMG",
+      "first_byte": 1353000960,
+      "last_byte": 1358899199,
+      "source_bytes": 1415577600,
+      "sha256": "65d4920b06d7d49cf156c8b5557fb51c791d4478774b2521ab61b116f9c0da59"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_00N_30N_000_045_FLOAT.IMG",
+      "first_byte": 1376593920,
+      "last_byte": 1382492159,
+      "source_bytes": 1415577600,
+      "sha256": "09d910969581ab05f86397a5dd6f89fe414d5646e30a38dd1950f59c2df643a1"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_00N_30N_000_045_FLOAT.IMG",
+      "first_byte": 1364797440,
+      "last_byte": 1370695679,
+      "source_bytes": 1415577600,
+      "sha256": "b1e3e2517c3356bcaf1b0c1f6f9afdd6f63b5b71dab882754e14fd087ee10e4d"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_00N_30N_000_045_FLOAT.IMG",
+      "first_byte": 1382492160,
+      "last_byte": 1388390399,
+      "source_bytes": 1415577600,
+      "sha256": "813d2e2a8e255f3c2b4b7d65badc731820ec80fd96e9bc6a45079d68bbf1d0b0"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_00N_30N_000_045_FLOAT.IMG",
+      "first_byte": 1370695680,
+      "last_byte": 1376593919,
+      "source_bytes": 1415577600,
+      "sha256": "698c2d43149906fe98ab7eb16dd12dad9acfbebcab49158f5e74d652d88409f6"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_00N_30N_000_045_FLOAT.IMG",
+      "first_byte": 1388390400,
+      "last_byte": 1394288639,
+      "source_bytes": 1415577600,
+      "sha256": "07134da0cda15dd9c3a6b4393b8214e0c37f8476e5267cf79f9818513de6cf60"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_00N_30N_000_045_FLOAT.IMG",
+      "first_byte": 1400186880,
+      "last_byte": 1406085119,
+      "source_bytes": 1415577600,
+      "sha256": "8da62a33676bd2866d1cc1982cf26a0572580783fac58c156ee87d7c3b382d0c"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_00N_30N_000_045_FLOAT.IMG",
+      "first_byte": 1411983360,
+      "last_byte": 1415577599,
+      "source_bytes": 1415577600,
+      "sha256": "a53bfad096f05ccc2c3fb2932759448ef0749264b987d8b1c154d7310734d02b"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_00N_30N_000_045_FLOAT.IMG",
+      "first_byte": 1394288640,
+      "last_byte": 1400186879,
+      "source_bytes": 1415577600,
+      "sha256": "ff3d72486a51db13bf84f620e44c795b9f2ed789e2da46ca6c4d0772f9524d23"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_00N_30N_000_045_FLOAT.IMG",
+      "first_byte": 1406085120,
+      "last_byte": 1411983359,
+      "source_bytes": 1415577600,
+      "sha256": "ddcd5639a8cd5c8e91717912bf68253d8da99f13ebc80db2108b35a61798cb71"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_00N_30N_000_045_FLOAT.IMG",
+      "first_byte": 1415393280,
+      "last_byte": 1415577599,
+      "source_bytes": 1415577600,
+      "sha256": "1372a0c7558fd0b9cc9f406e650da1db4b72ba0d8bb603c4fb57b6d83195db79"
+    },
+    {
+      "url": "https://imbrium.mit.edu/DATA/SLDEM2015/TILES/FLOAT_IMG/SLDEM2015_512_30S_00S_000_045_FLOAT.IMG",
+      "first_byte": 0,
+      "last_byte": 184319,
+      "source_bytes": 1415577600,
+      "sha256": "d2326877472cd72e34283abc0d9af21f45b821472e3f963e22dc57ae2b942e24"
+    }
+  ],
+  "fine_tiff": {
+    "url": "https://pgda.gsfc.nasa.gov/data/LOLA_20mpp/LDEM_80S_20MPP_ADJ.TIF",
+    "size_bytes": 2696082051,
+    "fetched_blocks": [
+      {
+        "block": 0,
+        "sha256": "4ec12cd6030e0cedd7745c47f0382d40b547033e1dabc6cd9a55a6d689967543"
+      }
+    ],
+    "note": "Only selected byte ranges fetched; full-source checksum not established"
+  }
+}

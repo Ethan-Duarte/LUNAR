@@ -1,0 +1,44 @@
+[
+  {
+    "file": "frontend/public/data/terrain/sp_dem_L0.png",
+    "changed_pixels": 3785,
+    "max_absolute_code_or_height_difference": 0.5,
+    "mean_absolute_difference": 0.00045120716094970703
+  },
+  {
+    "file": "frontend/public/data/terrain/sp_slope_L0.png",
+    "changed_pixels": 9,
+    "max_absolute_code_or_height_difference": 1.0,
+    "mean_absolute_difference": 2.1457672119140625e-06
+  },
+  {
+    "file": "frontend/public/data/terrain/sp_dem_L1.png",
+    "changed_pixels": 0,
+    "max_absolute_code_or_height_difference": 0.0,
+    "mean_absolute_difference": 0.0
+  },
+  {
+    "file": "frontend/public/data/terrain/sp_slope_L1.png",
+    "changed_pixels": 41,
+    "max_absolute_code_or_height_difference": 1.0,
+    "mean_absolute_difference": 2.4437904357910156e-06
+  },
+  {
+    "file": "frontend/public/data/layers/sun_avg.png",
+    "changed_pixels": 0,
+    "max_absolute_code_or_height_difference": 0.0,
+    "mean_absolute_difference": 0.0
+  },
+  {
+    "file": "frontend/public/data/layers/earth_avg.png",
+    "changed_pixels": 0,
+    "max_absolute_code_or_height_difference": 0.0,
+    "mean_absolute_difference": 0.0
+  },
+  {
+    "file": "frontend/public/data/layers/psr.png",
+    "changed_pixels": 0,
+    "max_absolute_code_or_height_difference": 0.0,
+    "mean_absolute_difference": 0.0
+  }
+]

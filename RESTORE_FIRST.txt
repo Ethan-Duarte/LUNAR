@@ -1,1 +1,4 @@
-LUNAR V1.9.1 source. Preserve .git and replace the complete remaining project tree, including deletion of retired files. Follow START_HERE.md. Build through GitHub Actions or the local launcher.
+LUNAR v1.10.0 primary-data cleanup checkpoint.
+Extract into a fresh folder; do not overlay an older release with retired files.
+For an existing GitHub checkout preserve its .git directory.
+Read PROVENANCE_PROGRESS.md for completed work and remaining dependencies.

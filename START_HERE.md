@@ -6,7 +6,7 @@
 2. Replace the complete project source with this package. Copying over files alone leaves retired files behind. This ZIP does not contain a .git directory.
 3. Review additions, changes and deletions in GitHub Desktop; commit and push to main.
 4. In GitHub Settings → Pages, use GitHub Actions. Wait for the build and deployment to succeed, then open the Pages URL.
-5. Confirm the title reads V1.9.1. Check globe/surface switching and Deep shadows.
+5. Confirm the title reads V1.10.0. Check globe/surface switching and Deep shadows.
 
 ## Local Windows
 

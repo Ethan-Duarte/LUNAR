@@ -1,109 +1,82 @@
 {
-  "radius_m": 1737400.0,
-  "projection": "south polar stereographic (true scale at pole)",
-  "extent_source": "web/public/data/terrain/sp_meta.json levels[0]",
+  "radius_m": 1737400,
+  "projection": "south polar stereographic",
   "layers": [
     {
       "id": "sun_avg",
       "file": "sun_avg.png",
       "size": 2048,
-      "extent": {
-        "x_min_m": -304000.0,
-        "x_max_m": 304000.0,
-        "y_min_m": -304000.0,
-        "y_max_m": 304000.0
-      },
       "pixel_m": 296.875,
-      "grid": "row 0 = max y, col 0 = min x; identical to terrain sp_dem_L0",
+      "extent": {
+        "x_min_m": -304000,
+        "x_max_m": 304000,
+        "y_min_m": -304000,
+        "y_max_m": 304000
+      },
+      "source": {
+        "url": "https://pgda.gsfc.nasa.gov/data/MoonIllumination/AVGVISIB_75S_120M_201608.TIF",
+        "sha256": "d539467f16ccc5f51b6a904af6be5d16c9b2f194afe619b9f1f81841d9fec0bb",
+        "raw_scale": 4e-05,
+        "raw_offset": 0
+      },
       "encoding": {
-        "type": "uint8 greyscale",
         "formula": "fraction = value / 250",
-        "valid_range": [
-          0,
-          250
-        ],
         "nodata": 255
       },
-      "resampling": "area average (rasterio.warp Resampling.average) from 120 m",
-      "source": {
-        "file": "AVGVISIB_75S_120M_201608.TIF",
-        "url": "https://pgda.gsfc.nasa.gov/data/MoonIllumination/AVGVISIB_75S_120M_201608.TIF",
-        "citation": "Mazarico, E., Neumann, G.A., Smith, D.E., Zuber, M.T., Torrence, M.H. (2011), Illumination conditions of the lunar polar regions using LOLA topography, Icarus 211, 1066-1081, doi:10.1016/j.icarus.2010.10.030. 2016-08 release, PDS data set LRO-L-LOLA-4-GDR-V1.0; GeoTIFF from NASA GSFC PGDA product 69 (https://pgda.gsfc.nasa.gov/products/69).",
-        "native_pixel_m": 120,
-        "raw_dtype": "int16",
-        "raw_scale": 4e-05,
-        "raw_offset": 0.0,
-        "raw_nodata": -32768.0
-      },
-      "meaning": "Average fraction of time the Sun is visible from the surface (0 = never lit, 1 = always lit). Averaged over hourly time steps across 18.6 years (one lunar nodal precession cycle), modelled from LOLA polar topography (LOLA data 2009-07-13 to 2013-07-18), 2016-08 release. How partial visibility of the solar disc is counted was not checked here; the product page does not state a height above the surface, so treat it as at ground level (0 m)."
+      "meaning": "NASA long-term average visibility, not current mission visibility",
+      "resampling": "area average; majority threshold at 0.5 for PSR"
     },
     {
       "id": "earth_avg",
       "file": "earth_avg.png",
       "size": 2048,
-      "extent": {
-        "x_min_m": -304000.0,
-        "x_max_m": 304000.0,
-        "y_min_m": -304000.0,
-        "y_max_m": 304000.0
-      },
       "pixel_m": 296.875,
-      "grid": "row 0 = max y, col 0 = min x; identical to terrain sp_dem_L0",
+      "extent": {
+        "x_min_m": -304000,
+        "x_max_m": 304000,
+        "y_min_m": -304000,
+        "y_max_m": 304000
+      },
+      "source": {
+        "url": "https://pgda.gsfc.nasa.gov/data/MoonIllumination/AVGVISIB_75S_120M_201608_EARTH.TIF",
+        "sha256": "5355a015b3cd71602ac6a130bfd1d596465f14ebbaedb6e5919c5dc34984d4f8",
+        "raw_scale": 4e-05,
+        "raw_offset": 0
+      },
       "encoding": {
-        "type": "uint8 greyscale",
         "formula": "fraction = value / 250",
-        "valid_range": [
-          0,
-          250
-        ],
         "nodata": 255
       },
-      "resampling": "area average (rasterio.warp Resampling.average) from 120 m",
-      "source": {
-        "file": "AVGVISIB_75S_120M_201608_EARTH.TIF",
-        "url": "https://pgda.gsfc.nasa.gov/data/MoonIllumination/AVGVISIB_75S_120M_201608_EARTH.TIF",
-        "citation": "Mazarico, E., Neumann, G.A., Smith, D.E., Zuber, M.T., Torrence, M.H. (2011), Illumination conditions of the lunar polar regions using LOLA topography, Icarus 211, 1066-1081, doi:10.1016/j.icarus.2010.10.030. 2016-08 release, PDS data set LRO-L-LOLA-4-GDR-V1.0; GeoTIFF from NASA GSFC PGDA product 69 (https://pgda.gsfc.nasa.gov/products/69).",
-        "native_pixel_m": 120,
-        "raw_dtype": "int16",
-        "raw_scale": 4e-05,
-        "raw_offset": 0.0,
-        "raw_nodata": -32768.0
-      },
-      "meaning": "Average fraction of time the Earth is visible from the surface (0 = never, 1 = always). Averaged over hourly time steps across 18.6 years (one lunar nodal precession cycle), modelled from LOLA polar topography (LOLA data 2009-07-13 to 2013-07-18), 2016-08 release. Per the product notes Earth counts as visible when any part of its disc is unobscured, so this is slightly optimistic for radio-link planning; no height above the surface is stated, so treat it as at ground level (0 m)."
+      "meaning": "NASA long-term average visibility, not current mission visibility",
+      "resampling": "area average; majority threshold at 0.5 for PSR"
     },
     {
       "id": "psr",
       "file": "psr.png",
       "size": 2048,
-      "extent": {
-        "x_min_m": -304000.0,
-        "x_max_m": 304000.0,
-        "y_min_m": -304000.0,
-        "y_max_m": 304000.0
-      },
       "pixel_m": 296.875,
-      "grid": "row 0 = max y, col 0 = min x; identical to terrain sp_dem_L0",
-      "encoding": {
-        "type": "uint8 greyscale",
-        "values": {
-          "255": "permanently shadowed",
-          "0": "not permanently shadowed"
-        },
-        "nodata": null,
-        "note": "128 is not used"
+      "extent": {
+        "x_min_m": -304000,
+        "x_max_m": 304000,
+        "y_min_m": -304000,
+        "y_max_m": 304000
       },
-      "resampling": "area average of the 0/1 source mask, then threshold: 255 where at least half of the output pixel's area is PSR in the 120 m source (majority rule), else 0. PSRs smaller than about half a 297 m pixel are dropped.",
       "source": {
-        "file": "LPSR_75S_120M_201608.TIF",
         "url": "https://pgda.gsfc.nasa.gov/data/MoonIllumination/LPSR_75S_120M_201608.TIF",
-        "citation": "Mazarico, E., Neumann, G.A., Smith, D.E., Zuber, M.T., Torrence, M.H. (2011), Illumination conditions of the lunar polar regions using LOLA topography, Icarus 211, 1066-1081, doi:10.1016/j.icarus.2010.10.030. 2016-08 release, PDS data set LRO-L-LOLA-4-GDR-V1.0; GeoTIFF from NASA GSFC PGDA product 69 (https://pgda.gsfc.nasa.gov/products/69).",
-        "native_pixel_m": 120,
-        "raw_dtype": "int16",
+        "sha256": "8af40cd8c1ca0c4b469803586581e5fc9baa0b001bd2cf8d28ccad29640e2b8e",
         "raw_scale": 2.5e-05,
-        "raw_offset": 0.5,
-        "raw_nodata": -32768.0
+        "raw_offset": 0.5
       },
-      "meaning": "Permanently shadowed region: ground that never receives direct sunlight in the model. Averaged over hourly time steps across 18.6 years (one lunar nodal precession cycle), modelled from LOLA polar topography (LOLA data 2009-07-13 to 2013-07-18), 2016-08 release. Mask is at ground level and resampled from 120 m to 297 m by majority rule."
+      "encoding": {
+        "values": {
+          "0": "not PSR",
+          "255": "PSR"
+        }
+      },
+      "meaning": "Majority-area permanent-shadow mask",
+      "resampling": "area average; majority threshold at 0.5 for PSR"
     }
-  ]
+  ],
+  "generator": "tools/prepare_polar_products.py",
+  "source_documentation": "https://pgda.gsfc.nasa.gov/products/69"
 }
